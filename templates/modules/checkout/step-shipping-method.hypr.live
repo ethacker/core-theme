@@ -21,6 +21,11 @@
         {% else %}
             {{ labels.noFulfillmentInfoRequired }}
         {% endif %}
+        
+        <div class="mz-orderattributes">
+            {% include "modules/checkout/checkout-attributes" with model=model.getOrderAttributes %}
+        </div>
+
         <div class="mz-formstep-next">
             <button type="button" class="mz-button" data-mz-action="next">{{ labels.next }}</button>
         </div>

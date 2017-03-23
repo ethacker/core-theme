@@ -1,5 +1,4 @@
 ﻿<div class="mz-checkoutattributes-section mz-checkoutattributes-attributes">
-
   {% for attribute in model %}
     <div class="mz-l-formfieldgroup mz-l-formfieldgroup-norows mz-checkoutform">
       {% if attribute.inputType === "YesNo" %}

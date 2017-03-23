@@ -228,7 +228,7 @@
             initialize: function () {
                 var me = this;
                 this.on('change:availableShippingMethods', function (me, value) {
-                    me.updateShippingMethod(me.get('shippingMethodCode'), true);
+                    //me.updateShippingMethod(me.get('shippingMethodCode'), true);
                 });
                 _.defer(function () {
                     // This adds the price and other metadata off the chosen
@@ -237,7 +237,11 @@
                     // because the order data will impact the shipping costs.
                     me.updateShippingMethod(me.get('shippingMethodCode'), true);
                 });
+                this.on('change:shippingMethodCode', function (model) {
+                    me.updateShippingMethod(me.get('shippingMethodCode'), true);
+                })
             },
+            helpers: ['getOrderAttributes'],
             relations: {
                 fulfillmentContact: FulfillmentContact
             },
@@ -246,6 +250,9 @@
                     required: true,
                     msg: Hypr.getLabel('chooseShippingMethod')
                 }
+            },
+            getOrderAttributes: function(){
+                return this.getOrder().get('orderAttributes');
             },
             refreshShippingMethods: function (methods) {
                 this.set({
@@ -294,8 +301,8 @@
                 this.isLoading(true);
                 var order = this.getOrder();
                 if (order) {
-                    order.apiModel.update({ fulfillmentInfo: me.toJSON() })
-                        .then(function (o) {
+                    this.updateOrderAttrs();
+                    order.update({ fulfillmentInfo: me.toJSON() }).then(function (o) {
                             var billingInfo = me.parent.get('billingInfo');
                             if (billingInfo) {
                                 billingInfo.loadCustomerDigitalCredits();
@@ -311,6 +318,27 @@
                                 me.parent.messages.reset(me.parent.get('messages'));
                             }
                         });
+                }
+            },
+            updateOrderAttrs: function () {
+                var order = this.getOrder();
+                var self = this;
+                var storefrontOrderAttributes = require.mozuData('pagecontext').storefrontOrderAttributes;
+                if(storefrontOrderAttributes && storefrontOrderAttributes.length > 0) {
+                    var updateAttrs = [];
+                    storefrontOrderAttributes.forEach(function(attr){
+                        var attrVal = self.get('orderAttribute-' + attr.attributeFQN);
+                        if(attrVal) {
+                            updateAttrs.push({
+                                'fullyQualifiedName': attr.attributeFQN,
+                                'values': [ attrVal ]
+                            });
+                        }
+                    });
+
+                    if(updateAttrs.length > 0){
+                        order.apiUpdateAttributes(updateAttrs);
+                    }
                 }
             },
             next: function () {
