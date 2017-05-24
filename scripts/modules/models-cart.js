@@ -1,4 +1,4 @@
-﻿define(['underscore', 'modules/backbone-mozu', 'hyprlive', "modules/api", "modules/models-product",
+define(['underscore', 'modules/backbone-mozu', 'hyprlive', "modules/api", "modules/models-product",
     "hyprlivecontext", 'modules/models-location'
   ], function (_, Backbone, Hypr, api, ProductModels,
         HyprLiveContext, LocationModels) {
@@ -88,6 +88,7 @@
             }),
             storeLocationsCache : StoreLocationsCache
         },
+        
         initialize: function() {
             var self = this;
             this.get("items").on('sync remove', this.fetch, this)
