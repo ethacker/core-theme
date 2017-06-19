@@ -102,9 +102,7 @@ require(["modules/jquery-mozu", "underscore", "hyprlive", "modules/backbone-mozu
         if(storefrontOrderAttributes && storefrontOrderAttributes.length > 0) {
 
             storefrontOrderAttributes.forEach(function(attributeDef){
-                if(attributeDef.attributeFQN === "tenant~Bin") {
                     fields.push('orderAttribute-' + attributeDef.attributeFQN);
-                }
             }, this);
 
         }
