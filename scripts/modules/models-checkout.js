@@ -239,7 +239,7 @@
                 });
                 this.on('change:shippingMethodCode', function (model) {
                     me.updateShippingMethod(me.get('shippingMethodCode'), true);
-                })
+                });
             },
             helpers: ['getOrderAttributes'],
             relations: {
@@ -342,6 +342,7 @@
                 }
             },
             next: function () {
+                this.updateOrderAttrs();
                 this.stepStatus('complete');
                 this.parent.get('billingInfo').calculateStepStatus();
             }

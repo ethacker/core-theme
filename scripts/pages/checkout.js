@@ -112,19 +112,19 @@ require(["modules/jquery-mozu", "underscore", "hyprlive", "modules/backbone-mozu
 
     var ShippingInfoView = CheckoutStepView.extend({
         templateName: 'modules/checkout/step-shipping-method',
-        autoUpdate: [
-        'shippingMethodCode'
-        ].concat(attributeFields()),
+        autoUpdate: attributeFields(),
         renderOnChange: [
             'availableShippingMethods'
         ],
+        additionalEvents: {
+            "change [data-mz-shipping-method]": "updateShippingMethod"
+        },
         updateShippingMethod: function (e) {
             this.model.updateShippingMethod(this.$('[data-mz-shipping-method]:checked').val());
         },
         addAvalaraTaxAttr: function(e){
             this.model.applyAvalaraTaxCode(this.$('#avalara-tax-attr').val());
-        },
-        
+        }
     });
 
     var poCustomFields = function() {
@@ -429,23 +429,6 @@ require(["modules/jquery-mozu", "underscore", "hyprlive", "modules/backbone-mozu
         templateName: 'modules/checkout/comments-field',
         autoUpdate: ['shopperNotes.comments']
     });
-
-    var attributeFields = function(){
-        var me = this;
-
-        var fields = [];
-
-        var storefrontOrderAttributes = require.mozuData('pagecontext').storefrontOrderAttributes;
-        if(storefrontOrderAttributes && storefrontOrderAttributes.length > 0) {
-
-            storefrontOrderAttributes.forEach(function(attributeDef){
-                fields.push('orderAttribute-' + attributeDef.attributeFQN);
-            }, this);
-
-        }
-
-        return fields;
-    };
 
     var ReviewOrderView = Backbone.MozuView.extend({
         templateName: 'modules/checkout/step-review',
