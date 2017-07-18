@@ -299,9 +299,23 @@
         },
         {
             "entityType": "order",
+            "id": "checkout",
+            "template": "checkout",
+            "title": "Checkout",
+            "userCreatable": false
+        },
+        {
+            "entityType": "order",
             "id": "confirmation",
             "template": "confirmation",
             "title": "Confirmation",
+            "userCreatable": false
+        },
+        {
+            "entityType": "checkout",
+            "id": "checkoutv2",
+            "template": "checkoutv2",
+            "title": "Checkout V2",
             "userCreatable": false
         },
         {
