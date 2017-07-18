@@ -63,6 +63,12 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext) {
         },
         next: function () {
             if (this.submit()) this.isLoading(true);
+        },
+        isMultiShipMode: function(){
+            this.get('isMultiShipMode');
+        },
+        setMultiShipMode: function(bool){
+            this.set('isMultiShipMode', bool);
         }
     });
     return CheckoutStep;

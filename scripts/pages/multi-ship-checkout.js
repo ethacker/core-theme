@@ -14,7 +14,7 @@ require(["modules/jquery-mozu",
     'modules/checkout/views/views-payments',
     'modules/checkout/views/contact-dialog'], 
     function ($, _, Hypr, Backbone, messageViewFactory, CartMonitor, HyprLiveContext, EditableView, preserveElements, 
-        CheckoutModels, CheckoutStepView, ShippingDestinationsView, ShippingMethodsView, PaymentView, ContactDialog) {
+        CheckoutModels, CheckoutStepView, ShippingDestinationsView, ShippingMethodsView, PaymentView, ContactDialogView) {
 
     var OrderSummaryView = Backbone.MozuView.extend({
         templateName: 'modules/checkout/checkout-order-summary',
@@ -195,7 +195,6 @@ require(["modules/jquery-mozu",
       return conf;
     };
 
-
     $(document).ready(function () {
 
         var $checkoutView = $('#checkout-form'),
@@ -210,11 +209,11 @@ require(["modules/jquery-mozu",
                 steps: {
                     shippingAddress: new ShippingDestinationsView({
                         el: $('#step-shipping-address'),
-                        model: checkoutModel.get("shippingDestinations")
+                        model: checkoutModel.get("shippingStep")
                     }),
                     shippingInfo: new ShippingMethodsView({
                         el: $('#step-shipping-method'),
-                        model: checkoutModel.get('fulfillmentInfo')
+                        model: checkoutModel.get('shippingInfo')
                     }),
                     paymentInfo: new PaymentView({
                         el: $('#step-payment-info'),
@@ -240,6 +239,10 @@ require(["modules/jquery-mozu",
                 messageView: messageViewFactory({
                     el: $checkoutView.find('[data-mz-message-bar]'),
                     model: checkoutModel.messages
+                }),
+                contactDialog: new ContactDialogView({
+                    el: $("[mz-modal-contact-dialog]"),
+                    model: checkoutModel.get('dialogContact')
                 })
             };
 
@@ -251,6 +254,8 @@ require(["modules/jquery-mozu",
             window.location = (HyprLiveContext.locals.siteContext.siteSubdirectory||'') + "/checkout/" + checkoutModel.get('id') + "/confirmation";
         });
 
+        
+
         var $reviewPanel = $('#step-review');
         checkoutModel.on('change:isReady',function (model, isReady) {
             if (isReady) {
@@ -259,8 +264,8 @@ require(["modules/jquery-mozu",
         });
  
         _.invoke(checkoutViews.steps, 'initStepView');
-
+        checkoutViews.contactDialog.render();
         $checkoutView.noFlickerFadeIn();
-
+        
     });
 });

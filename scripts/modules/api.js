@@ -6,6 +6,12 @@
 
 define(['sdk', 'jquery', 'hyprlive'], function (Mozu, $, Hypr) {
     var apiConfig = require.mozuData('apicontext');
+
+    //TEMP
+    //TO-DO : Move to Hypr
+    apiConfig.urls.checkoutService = "/api/commerce/checkouts/";
+
+
     Mozu.setServiceUrls(apiConfig.urls);
     var api = Mozu.Store(apiConfig.headers).api();
 

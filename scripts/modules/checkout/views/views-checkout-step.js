@@ -48,6 +48,9 @@ var CheckoutStepView = EditableView.extend({
             EditableView.prototype.render.apply(this, arguments);
             this.resize();
         },
+        isMultiShipMode : function(){
+            return this.model.isMultiShipMode();
+        },
         resize: _.debounce(function () {
             this.$('.mz-panel-wrap').animate({'height': this.$('.mz-inner-panel').outerHeight() });
         },200)

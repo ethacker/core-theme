@@ -13,11 +13,12 @@ define(['modules/jquery-mozu','underscore',"modules/backbone-mozu",'hyprlive', '
                 self.listenTo(this.model, 'closeDialog', function () {
                     self.handleDialogClose();
                 });
+
+                this.initDialog(); 
             },
             initDialog: function(){
-                if(!this.modalDialog){
-                    this.modalDialog = new Dialog();
-                    this.modalDialog.init({
+                if(!this.bootstrapInstance){
+                    this.bootstrapInstance = Dialog.init({
                         elementId: "mzModalDialog"
                     });
                 }
@@ -28,16 +29,16 @@ define(['modules/jquery-mozu','underscore',"modules/backbone-mozu",'hyprlive', '
             },
             handleDialogClose: function(){
                 this.model.trigger('dialogClose');
-                modalDialog.close();
+                this.bootstrapInstance.hide();
             },
             handleDialogOpen: function(){
-                modalDialog.open();
+                this.model.trigger('dialogOpen');
+                this.bootstrapInstance.show();
+                
             },
             render: function() {
                 var self = this;
                 Backbone.MozuView.prototype.render.apply(this, arguments);
-
-                this.initDialog(); 
             }
         });
     return ModalDialog;

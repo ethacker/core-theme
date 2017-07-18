@@ -4,7 +4,7 @@ define(["modules/api", 'underscore', "modules/backbone-mozu", "hyprlive", "modul
             relations: {
                 product: ProductModels.Product
             },
-            helpers: ['uniqueProductCode'],
+            helpers: ['uniqueProductCode', ],
             uniqueProductCode: function() {
                 //Takes into account product variation code
                 var self = this,

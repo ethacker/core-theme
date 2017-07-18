@@ -8,14 +8,17 @@ define([
     'modules/models-address',
     'modules/models-paymentmethods',
     'hyprlivecontext',
+    'modules/models-orders',
     'modules/checkout/models-checkout-step',
     'modules/checkout/model-fulfillment-info',
+    'modules/checkout/models-shipping-step',
     'modules/checkout/models-shipping-destinations',
+    'modules/checkout/models-shipping-methods',
     'modules/checkout/models-payment',
-    'modules/models-dialog'
+    'modules/checkout/models-contact-dialog'
 ],
     function ($, _, Hypr, Backbone, api, CustomerModels, AddressModels, PaymentMethods, 
-        HyprLiveContext, CheckoutStep, FulfillmentInfo, ShippingDestinations, BillingInfo, ModalDialog) {
+        HyprLiveContext, OrderModels, CheckoutStep, FulfillmentInfo, ShippingStep, ShippingDestinationModels, ShippingInfo, BillingInfo, ContactDialogModels) {
 
     var checkoutPageValidation = {
             'emailAddress': {
@@ -58,19 +61,56 @@ define([
                 }
             }, this);
         }
-var ContactContent = ModalDialog.extend({
 
-});
+var CheckoutOrder = OrderModels.Order.extend({
+    helpers : ['selectableDestinations'],
+    getCheckout : function(){
+        return this.collection.parent;
+    },
+
+    getDestinations : function(){
+        return this.getCheckout().get('destinations');
+    },
+    selectableDestinations : function(){
+        return this.getCheckout().get('destinations').toJSON();
+    },
+    addNewContact: function(){
+        
+        this.getCheckout().get('dialogContact').get("contact").clear();
+        this.getCheckout().get('dialogContact').unset('id');
+
+        this.getCheckout().get('dialogContact').trigger('openDialog');
+    },
+    updateCheckoutDestination: function(fulfillmentId){
+        var self = this;
+        self.set('destinationId', fulfillmentId);
+        self.getCheckout().apiModel.updateCheckoutItemFulfillment({id: self.getCheckout().get('id'), itemId: self.get('id'), item: self.toJSON()}).then(function(data){
+            self.trigger('sync');
+        });
+    },
+    splitCheckoutItem : function(){
+        var self = this;
+        this.getCheckout().apiModel.splitCheckoutItem({itemId : self.get('id'), quantity : 1 }).then(function(data){
+            var asdf = self;
+            
+        })
+    }
+})
 
 var CheckoutPage = Backbone.MozuModel.extend({
-            mozuType: 'order',
+            mozuType: 'checkout',
             handlesMessages: true,
             relations: {
-                fulfillmentInfo: FulfillmentInfo,
+                items : Backbone.Collection.extend({
+                    model : CheckoutOrder 
+                }),
                 billingInfo: BillingInfo,
                 shopperNotes: Backbone.MozuModel.extend(),
                 customer: CustomerModels.Customer,
-                shippingDestinations: ShippingDestinations
+                shippingStep: ShippingStep,
+                shippingInfo: ShippingInfo,
+                dialogContact: ContactDialogModels,
+                destinations : ShippingDestinationModels.ShippingDestinations
             },
             validation: checkoutPageValidation,
             dataTypes: {
@@ -82,16 +122,16 @@ var CheckoutPage = Backbone.MozuModel.extend({
 
                 var self = this,
                     user = require.mozuData('user');
-                    self.get('shippingDestinations').initSet();
+                    self.get('shippingStep').initSet();
                     
                 _.defer(function() {
 
                     var latestPayment = self.apiModel.getCurrentPayment(),
                         activePayments = self.apiModel.getActivePayments(),
-                        fulfillmentInfo = self.get('fulfillmentInfo'),
-                        shippingDestinations = self.get('shippingDestinations'),
+                        //fulfillmentInfo = self.get('fulfillmentInfo'),
+                        shippingStep = self.get('shippingStep'),
                         billingInfo = self.get('billingInfo'),
-                        steps = [shippingDestinations, fulfillmentInfo, billingInfo],
+                        steps = [shippingStep, billingInfo],
                         paymentWorkflow = latestPayment && latestPayment.paymentWorkflow,
                         visaCheckoutPayment = activePayments && _.findWhere(activePayments, { paymentWorkflow: 'VisaCheckout' }),
                         allStepsComplete = function () {
@@ -153,11 +193,26 @@ var CheckoutPage = Backbone.MozuModel.extend({
                     self.set('acceptsMarketing', true);
                 }
 
+                this.addCustomerAddressDestinations();
+
                 _.bindAll(this, 'update', 'onCheckoutSuccess', 'onCheckoutError', 'addNewCustomer', 'saveCustomerCard', 'apiCheckout', 
                     'addDigitalCreditToCustomerAccount', 'addCustomerContact', 'addBillingContact', 'addShippingContact', 'addShippingAndBillingContact');
 
             },
+            getCustomerInfo : function(){
+                return this.get('customer');
+            },
+            addCustomerAddressDestinations : function(){
+                var destinations = this.get('destinations');
+                var customerContacts = this.getCustomerInfo().get('contacts').toJSON();
 
+                if(customerContacts.length){
+                    _.each(customerContacts, function(customer, idx){
+                        destinations.addContactDestination(customer, true); 
+                    })
+                   
+                }
+            },
             applyAttributes: function() {
                 var storefrontOrderAttributes = require.mozuData('pagecontext').storefrontOrderAttributes;
                 if(storefrontOrderAttributes && storefrontOrderAttributes.length > 0) {
@@ -192,7 +247,7 @@ var CheckoutPage = Backbone.MozuModel.extend({
             updateShippingInfo: function() {
                 var me = this;
                 this.apiModel.getShippingMethods().then(function (methods) { 
-                    me.get('fulfillmentInfo').refreshShippingMethods(methods);
+                    //me.get('fulfillmentInfo').refreshShippingMethods(methods);
                 });
             },
             updateVisaCheckoutBillingInfo: function() {

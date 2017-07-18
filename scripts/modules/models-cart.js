@@ -116,6 +116,12 @@ define(['underscore', 'modules/backbone-mozu', 'hyprlive', "modules/api", "modul
                 me.trigger('ordercreated', order);
             });
         },
+        toCheckout: function() {
+            var me = this;
+            me.apiCheckout2().then(function(checkout) {
+                me.trigger('checkoutcreated', checkout);
+            });
+        },
         removeItem: function (id) {
             return this.get('items').get(id).apiModel.del();
         },

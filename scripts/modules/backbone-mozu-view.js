@@ -4,8 +4,7 @@
     "hyprlive",
     "backbone",
     "modules/views-messages",
-    "modules/child-view-factory"
-], function ($, _, Hypr, Backbone, messageViewFactory, ChildViewFactory) {
+], function ($, _, Hypr, Backbone, messageViewFactory) {
 
     var MozuView = Backbone.MozuView = Backbone.View.extend(
 
@@ -61,14 +60,7 @@
                     this.listenTo(model, 'change:' + prop, this.enqueueRender, this);
                 }, this);
             }
-            if(this.childViews){
-                 var self=this;
-                 var viewFactory = new ChildViewFactory();
-                 _.each(this.childViews, function(view, selector){
-                     viewFactory.add(selector, view, self);
-                 });
-                 this.childViews = viewFactory;
-            }
+           
             Backbone.Validation.bind(this);
             Backbone.MozuView.trigger('create', this);
 

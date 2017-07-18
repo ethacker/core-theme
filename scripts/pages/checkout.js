@@ -133,7 +133,6 @@ require(["modules/jquery-mozu",
             }
 
         return fieldDefs;
-
     };
 
     var visaCheckoutSettings = HyprLiveContext.locals.siteContext.checkoutSettings.visaCheckout;
@@ -521,7 +520,7 @@ require(["modules/jquery-mozu",
                         model: checkoutModel.get('fulfillmentInfo').get('fulfillmentContact')
                     }),
                     shippingInfo: new ShippingInfoView({
-                        el: $('#step-shipping-method'),
+                        el: $('[mz-modal-dialog]'),
                         model: checkoutModel.get('fulfillmentInfo')
                     }),
                     paymentInfo: new BillingInfoView({
