@@ -119,7 +119,7 @@ define(["modules/jquery-mozu",
                 this.listenTo(this.model.parent, 'sync', function() {
                     self.render();
                 });
-                this.listenTo(this.model, 'destinationsUpdate', function() {
+                this.listenTo(this.model.getDestinations(), 'destinationsUpdate', function() {
                     self.render();
                 });
             },

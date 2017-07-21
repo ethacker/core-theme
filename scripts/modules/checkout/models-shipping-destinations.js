@@ -174,7 +174,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
         addShippingDestination: function(destination){
             var self = this;
             self.getCheckout().apiModel.addShippingDestination({DestinationContact : destination.get('contact').toJSON()}).then(function(data){
-                self.add(new ShippingDestination(data));
+                self.add(new ShippingDestination(data.data));
                 self.trigger('sync');
                 self.trigger('destinationsUpdate');
             });
@@ -182,10 +182,11 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
         updateShippingDestination: function(destination){
             var self = this;
             self.getCheckout().apiUpdateShippingDestination(destination.toJSON()).then(function(data){
-                var entry = self.findWhere({id: data.id});
+                var entry = self.findWhere({id: data.data.id});
                 if(entry) {
-                    self.set(entry.get('id'), data);
-                    self.trigger('sync'); 
+                    self.set(entry.get('id'), data.data);
+                    self.trigger('sync');
+                    self.trigger('destinationsUpdate');
                 }
             });
         }

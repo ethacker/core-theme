@@ -20,24 +20,15 @@ define(['modules/jquery-mozu','underscore', 'hyprlivecontext', 'modules/views-mo
     })
 
 	var ContactModalView = ModalDialogView.extend({
-		templateName : "modules/multi-ship-checkout/modal-contact",
-        // autoUpdate: [
-        //         'firstName',
-        //         'lastNameOrSurname',
-        //         'address.address1',
-        //         'address.address2',
-        //         'address.address3',
-        //         'address.cityOrTown',
-        //         'address.countryCode',
-        //         'address.stateOrProvince',
-        //         'address.postalOrZipCode',
-        //         'address.addressType',
-        //         'phoneNumbers.home',
-        //         'contactId',
-        //         'email'
-        //     ],
-       
+	   templateName : "modules/multi-ship-checkout/modal-contact",
+       handleDialogOpen : function(){
+            this.setInit();
+            this.model.trigger('dialogOpen');
+            this.bootstrapInstance.show();
+        },
 		handleDialogSave : function(){
+
+            if(this.model.get('contact').validate()) return false
 
 			var isAddressValidationEnabled = HyprLiveContext.locals.siteContext.generalSettings.isAddressValidationEnabled,
                     allowInvalidAddresses = HyprLiveContext.locals.siteContext.generalSettings.allowInvalidAddresses;

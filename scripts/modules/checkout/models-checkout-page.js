@@ -84,7 +84,7 @@ var CheckoutOrder = OrderModels.Order.extend({
     updateCheckoutDestination: function(fulfillmentId){
         var self = this;
         self.set('destinationId', fulfillmentId);
-        self.getCheckout().apiModel.updateCheckoutItemFulfillment({id: self.getCheckout().get('id'), itemId: self.get('id'), item: self.toJSON()}).then(function(data){
+        self.getCheckout().apiModel.updateCheckoutItemDestination({id: self.getCheckout().get('id'), itemId: self.get('id'), destination: fulfillmentId}).then(function(data){
             self.trigger('sync');
         });
     },
