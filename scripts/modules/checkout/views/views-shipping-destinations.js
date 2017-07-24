@@ -65,7 +65,10 @@ define(["modules/jquery-mozu",
                 var self = this;
             },
             handleEditContact: function(e){
-                var self = this;
+                var destinationId = this.model.destinationId;
+                if(destinationId) {
+                    this.model.addNewContact(destinationId);    
+                }
             },
             handleSplitOrderItem: function(e){
                 this.model.splitCheckoutItem();

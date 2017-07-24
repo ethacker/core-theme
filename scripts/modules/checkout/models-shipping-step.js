@@ -11,6 +11,20 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep) {
 
     var ShippingStep = CheckoutStep.extend({
         helpers : ['orderItems'],
+        validation: {
+            ShippingDestinations :{
+            fn: function(value, attr){
+                var destinationErrors = []
+                this.parent.get('items').forEach(function(item, idx){
+                    var itemValid = item.validate();
+                    if (itemValid) {
+                        destinationErrors.push(itemValid);
+                    }
+                })
+                return (destinationErrors.length) ? destinationErrors : false;
+            }
+            }
+        },
         initSet : function(){
            var self = this;
             // var orderItems = self.parent.get('items');
@@ -53,17 +67,17 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep) {
 
                 if (!this.requiresFulfillmentInfo() && !this.requiresDigitalFulfillmentContact()) return this.stepStatus('complete');
 
-                if( !this.getDestinations().length) return this.stepStatus('incomplete');
+                if(this.validate()) return this.stepStatus('incomplete');
                 return CheckoutStep.prototype.calculateStepStatus.apply(this);
             },
         validateModel: function() {
                 var validationObj = this.validate();
 
                 if (validationObj) {
-                    Object.keys(validationObj.ShippingDestination).forEach(function(key) {
-                        Object.keys(validationObj.ShippingDestination[key]).forEach(function(keyLevel2) {
+                    Object.keys(validationObj.ShippingDestinations).forEach(function(key) {
+                        Object.keys(validationObj.ShippingDestinations[key]).forEach(function(keyLevel2) {
                             this.trigger('error', {
-                                message: validationObj.ShippingDestination[key][keyLevel2]
+                                message: validationObj.ShippingDestinations[key][keyLevel2]
                             });
                         }, this);
                     }, this);

@@ -64,6 +64,12 @@ define([
 
 var CheckoutOrder = OrderModels.Order.extend({
     helpers : ['selectableDestinations'],
+    validation : {
+        destinationId : {
+            required: true,
+            msg: Hypr.getLabel("shippingDestinationRequiredError")
+        }
+    },
     getCheckout : function(){
         return this.collection.parent;
     },
@@ -81,17 +87,24 @@ var CheckoutOrder = OrderModels.Order.extend({
 
         this.getCheckout().get('dialogContact').trigger('openDialog');
     },
+    editContact: function(destinationId){
+        
+        this.getCheckout().get('dialogContact').get("contact").clear();
+        this.getCheckout().get('dialogContact').set('id', destinationId);
+
+        this.getCheckout().get('dialogContact').trigger('openDialog');
+    },
     updateCheckoutDestination: function(fulfillmentId){
         var self = this;
         self.set('destinationId', fulfillmentId);
-        self.getCheckout().apiModel.updateCheckoutItemDestination({id: self.getCheckout().get('id'), itemId: self.get('id'), destination: fulfillmentId}).then(function(data){
+        self.getCheckout().apiModel.updateCheckoutItemDestination({id: self.getCheckout().get('id'), itemId: self.get('id'), destinationId: fulfillmentId}).then(function(data){
             self.trigger('sync');
         });
     },
     splitCheckoutItem : function(){
         var self = this;
         this.getCheckout().apiModel.splitCheckoutItem({itemId : self.get('id'), quantity : 1 }).then(function(data){
-            var asdf = self;
+            
             
         })
     }

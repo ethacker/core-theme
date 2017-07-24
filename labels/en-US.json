@@ -406,6 +406,7 @@
     "shippingDestinationNewAddress" : "Add New Address",
     "shippingDestinationEditAddress" : "Edit Address",
     "shippingDestinationAddAddress" : "Ship to Another Address",
+    "shippingDestinationRequiredError" : "Please select shipping addresses for all items.",
     "signUp": "Sign Up",
     "signUpLink": "Create an Account",
     "sortBy": "Sort by",

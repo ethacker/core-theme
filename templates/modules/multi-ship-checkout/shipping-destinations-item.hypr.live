@@ -1,5 +1,10 @@
-
 <div data-mz-shipping-destinations-item data-mz-item-id="{{model.id}}" data-mz-destination-id="{{model.destinationId}}" data-mz-model-id="{{model.cid}}" class="mz-l-formfieldgroup-row">
+
+<div class="mz-shipping-destination-title">
+	<h3>{{ model.product.name }}</h3>
+</div>
+
+<div class="mz-l-formfieldgroup-row">
 	<div class="mz-l-formfieldgroup-cell">
 		<label for="mz-shipping-destination-quantity">{{ labels.shippingDestinationQuantityLabel }}</label>
 		<span id="mz-shipping-destination-quantity" data-mz-destination-quantity>{{ model.quantity }}</span>
@@ -15,10 +20,13 @@
 				<select id="mz-shipping-destination-address" name="shippingDestinationAddress" class="mz-shipping-destination-address-dd" data-mz-fulfillment-contact data-mz-value="fulfillmentContactId">
 			        <option selected="selected" value="new">{{ labels.shippingDestinationSelect }}</option>
 		            {% for destination in model.selectableDestinations %}
-		            	<option class="mz-shipping-destination-address-select" value="{{ contact.id }}" {% if model.destinationId == destination.id %} selected="selected" {% endif %}>{{ destination.destinationContact.address.address1 }}, {{ destination.destinationContact.address.cityOrTown }} {{ destination.destinationContact.address.stateOrProvince }}</option>
+		            	<option class="mz-shipping-destination-address-select" value="{{ destination.id }}" {% if model.destinationId == destination.id %} selected="selected" {% endif %}>{{ destination.destinationContact.address.address1 }}, {{ destination.destinationContact.address.cityOrTown }} {{ destination.destinationContact.address.stateOrProvince }}</option>
 		            {% endfor %}
 		            <option value="new" class="mz-shipping-destination-address-select-new-address" data-mz-action="handleNewContact">{{ labels.shippingDestinationNewAddress }}</option>
         		</select>
+        		{% if model.destinationId %}
+					<a class="mz-shipping-destination-edit-address-link" data-mz-action="handleEditContact" data-mz-destination-id="{{ model.destinationId }}">{{ labels.shippingDestinationEditAddress}}</a>
+				{% endif %}
     		</div>
 		</div>
 
@@ -36,4 +44,5 @@
 		<a class="mz-shipping-destination-add-address-link" data-mz-action="handleSplitOrderItem"> {{ labels.shippingDestinationAddAddress }} </a>
 	{% endif %}
 	</div>
+</div>
 </div>
