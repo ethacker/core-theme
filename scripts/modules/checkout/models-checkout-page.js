@@ -88,11 +88,15 @@ var CheckoutOrder = OrderModels.Order.extend({
         this.getCheckout().get('dialogContact').trigger('openDialog');
     },
     editContact: function(destinationId){
+        var destination = this.getDestinations().findWhere({'id': destinationId});
         
-        this.getCheckout().get('dialogContact').get("contact").clear();
-        this.getCheckout().get('dialogContact').set('id', destinationId);
+        if(destination){
+            this.getCheckout().get('dialogContact').get("contact").clear();
+            this.getCheckout().set('dialogContact', destination);
 
-        this.getCheckout().get('dialogContact').trigger('openDialog');
+            this.getCheckout().get('dialogContact').trigger('openDialog');
+        }
+
     },
     updateCheckoutDestination: function(fulfillmentId){
         var self = this;

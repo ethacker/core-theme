@@ -65,7 +65,11 @@ define(['modules/jquery-mozu','underscore', 'hyprlivecontext', 'modules/views-mo
                         completeStep();
                     }
                 }
-                this.model.parent.get('destinations').addShippingDestination(this.model);
+                if(this.model.parent.get('destinations').get('id')) {
+                    this.model.parent.get('destinations').updateShippingDestination(this.model);
+                } else {
+                    this.model.parent.get('destinations').addShippingDestination(this.model);
+                }
 			}
 		},
         setInit : function(){
