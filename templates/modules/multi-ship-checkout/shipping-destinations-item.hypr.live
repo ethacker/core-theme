@@ -6,7 +6,7 @@
 
 <div class="mz-l-formfieldgroup-row">
 	<div class="mz-l-formfieldgroup-cell">
-		<label for="mz-shipping-destination-quantity">{{ labels.shippingDestinationQuantityLabel }}</label>
+		<label for="mz-shipping-destination-quantity" class="mz-shipping-destination-label-quantity">{{ labels.shippingDestinationQuantityLabel }}</label>
 		<span id="mz-shipping-destination-quantity" data-mz-destination-quantity>{{ model.quantity }}</span>
 	</div>
 	<div class="mz-l-formfieldgroup-cell">

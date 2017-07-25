@@ -82,7 +82,7 @@ var CheckoutOrder = OrderModels.Order.extend({
     },
     addNewContact: function(){
         
-        this.getCheckout().get('dialogContact').get("contact").clear();
+        this.getCheckout().get('dialogContact').get("destinationContact").clear();
         this.getCheckout().get('dialogContact').unset('id');
 
         this.getCheckout().get('dialogContact').trigger('openDialog');
@@ -91,7 +91,7 @@ var CheckoutOrder = OrderModels.Order.extend({
         var destination = this.getDestinations().findWhere({'id': destinationId});
         
         if(destination){
-            this.getCheckout().get('dialogContact').get("contact").clear();
+            this.getCheckout().get('dialogContact').get("destinationContact").clear();
             this.getCheckout().set('dialogContact', destination);
 
             this.getCheckout().get('dialogContact').trigger('openDialog');

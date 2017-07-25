@@ -2,10 +2,10 @@ define(["backbone", 'hyprlive', 'modules/models-customer', 'modules/models-dialo
 
     var modalDialog = Dialog.extend({
         relations : {
-            contact : CustomerModels.Contact
+            destinationContact : CustomerModels.Contact
         },
         initialize: function () {
-        	this.set('contact', new CustomerModels.Contact({}));
+        	this.set('destinationContact', new CustomerModels.Contact({}));
         }
     });
 

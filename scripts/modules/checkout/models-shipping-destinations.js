@@ -173,7 +173,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
         },
         addShippingDestination: function(destination){
             var self = this;
-            self.getCheckout().apiModel.addShippingDestination({DestinationContact : destination.get('contact').toJSON()}).then(function(data){
+            self.getCheckout().apiModel.addShippingDestination({DestinationContact : destination.get('destinationContact').toJSON()}).then(function(data){
                 self.add(new ShippingDestination(data.data));
                 self.trigger('sync');
                 self.trigger('destinationsUpdate');

@@ -1,4 +1,4 @@
-define(['modules/jquery-mozu','underscore', 'hyprlivecontext', 'modules/views-modal-dialog'], function($, _, HyprLiveContext, ModalDialogView) {
+define(['modules/jquery-mozu','underscore', 'hyprlivecontext', 'modules/views-modal-dialog', 'modules/models-customer'], function($, _, HyprLiveContext, ModalDialogView, CustomerModels) {
 
     var ContactModalContactView = Backbone.MozuView.extend({
         templateName : "modules/common/address-form",
@@ -28,7 +28,7 @@ define(['modules/jquery-mozu','underscore', 'hyprlivecontext', 'modules/views-mo
         },
 		handleDialogSave : function(){
 
-            if(this.model.get('contact').validate()) return false
+            if(this.model.get('destinationContact').validate()) return false
 
 			var isAddressValidationEnabled = HyprLiveContext.locals.siteContext.generalSettings.isAddressValidationEnabled,
                     allowInvalidAddresses = HyprLiveContext.locals.siteContext.generalSettings.allowInvalidAddresses;
@@ -78,7 +78,7 @@ define(['modules/jquery-mozu','underscore', 'hyprlivecontext', 'modules/views-mo
 
                 var contactModalContactView = new ContactModalContactView({
                     el: $(this),
-                    model: self.model.get('contact')
+                    model: self.model.get('destinationContact')
                 });
                 contactModalContactView.render();
             });  

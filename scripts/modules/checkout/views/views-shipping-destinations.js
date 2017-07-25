@@ -65,7 +65,7 @@ define(["modules/jquery-mozu",
                 var self = this;
             },
             handleEditContact: function(e){
-                var destinationId = this.model.destinationId;
+                var destinationId = this.model.get('destinationId');
                 if(destinationId) {
                     this.model.editContact(destinationId);    
                 }
