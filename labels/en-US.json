@@ -211,6 +211,8 @@
   "orderPlaced"                           : "Order Placed",
   "storePickupFor"                        : "Store Pickup for <strong>{0}</strong>",
   "storeName"                             : "Store Name",
+  "pickupAt"                              : "Pick up at:",
+  "digitalDownload"                       : "Digital Download",
   "orderConfirmationBlob1"                : "Thank you for shopping with us at {0}. Your order was received and we are preparing it for shipment.  If you would like to view or manage your orders, please visit <a href=\"http://{1}/myaccount\">My Account</a>.",
   "checkOrderStatus"                      : "Check Order Status",
   "emailOpening"                          : "<p>Hello {0}!</p>",
