@@ -14,13 +14,13 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep) {
         validation: {
             ShippingDestinations :{
             fn: function(value, attr){
-                var destinationErrors = []
+                var destinationErrors = [];
                 this.parent.get('items').forEach(function(item, idx){
                     var itemValid = item.validate();
                     if (itemValid && item.get('FulfillmentMethod') === "Ship") {
                         destinationErrors.push(itemValid);
                     }
-                })
+                });
                 return (destinationErrors.length) ? destinationErrors : false;
             }
             }

@@ -9,10 +9,9 @@ define([
     'modules/models-paymentmethods',
     'hyprlivecontext',
     'modules/checkout/models-checkout-step',
-    'modules/checkout/model-fulfillment-info',
     'modules/checkout/models-shipping-destinations'
 ],
-    function ($, _, Hypr, Backbone, api, CustomerModels, AddressModels, PaymentMethods, HyprLiveContext, CheckoutStep, FulfillmentInfo, ShippingDestinations) {
+    function ($, _, Hypr, Backbone, api, CustomerModels, AddressModels, PaymentMethods, HyprLiveContext, CheckoutStep, ShippingDestinations) {
 
         var BillingInfo = CheckoutStep.extend({
             mozuType: 'payment',

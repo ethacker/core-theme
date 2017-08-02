@@ -211,6 +211,6 @@ define(["modules/jquery-mozu",
                     return new ComboShippingAddressView(options);
                 }
             }
-        }
+        };
         return determineView;
 });

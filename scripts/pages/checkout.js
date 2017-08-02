@@ -6,9 +6,8 @@ require(["modules/jquery-mozu",
     "modules/cart-monitor", 
     'hyprlivecontext', 
     'modules/editable-view', 
-    'modules/preserve-element-through-render',
-    'modules/modals-dialog'], 
-    function ($, _, Hypr, Backbone, CheckoutModels, messageViewFactory, CartMonitor, HyprLiveContext, EditableView, preserveElements, ModelDialog) {
+    'modules/preserve-element-through-render'], 
+    function ($, _, Hypr, Backbone, CheckoutModels, messageViewFactory, CartMonitor, HyprLiveContext, EditableView, preserveElements) {
 
 
     var CheckoutStepView = EditableView.extend({

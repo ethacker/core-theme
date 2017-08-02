@@ -102,43 +102,39 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, FulfillmentC
                         });
                 }
             }
-    })
+    });
     
     
     
     var FulfillmentInfo = CheckoutStep.extend({ 
-            helpers : ['groupings', ],
+            helpers : ['groupings'],
             validation: {
                 ShippingMethods :{
                     fn: function(value, attr){
-                        var shippingErrors = []
+                        var shippingErrors = [];
                         this.parent.get('groupings').forEach(function(item, idx){
                             var itemValid = item.validate();
                             if (itemValid) {
                                 shippingErrors.push(itemValid);
                             }
-                        })
+                        });
                         return (shippingErrors.length) ? shippingErrors : false;
                     }
                 }
             },
             render: function(){
                 var self = this;
-                this.getCheckout().apiModel.getAvaiableShippingMethods().then(function (methods) {
-                    fulfillmentInfo.refreshShippingMethods(methods);
-                    fulfillmentInfo.shippingInfoUpdated();
-                    self.calculateStepStatus();
-                });
+                
             },
             getCheckout: function() {
                 return this.parent;
             },
 
             groupings : function(){
-                var groups = []
+                var groups = [];
                 this.getCheckout().get('groupings').each(function(group){ 
                     groups.push(group.toJSON({ helpers: true }));
-                })
+                });
                 return groups;
             },
             // updateGroupingShippingMethod: function(e) {

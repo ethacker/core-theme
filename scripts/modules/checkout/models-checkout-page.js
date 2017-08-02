@@ -10,17 +10,15 @@ define([
     'hyprlivecontext',
     'modules/models-orders',
     'modules/checkout/models-checkout-step',
-    'modules/checkout/model-fulfillment-info',
     'modules/checkout/models-shipping-step',
     'modules/checkout/models-shipping-destinations',
     'modules/checkout/models-shipping-methods',
     'modules/checkout/models-payment',
-    'modules/checkout/models-contact-dialog',
-    'modules/models-customer'
+    'modules/checkout/models-contact-dialog'
 ],
     function ($, _, Hypr, Backbone, api, CustomerModels, AddressModels, PaymentMethods, 
-        HyprLiveContext, OrderModels, CheckoutStep, FulfillmentInfo, ShippingStep, 
-        ShippingDestinationModels, ShippingInfo, BillingInfo, ContactDialogModels, CustomerModels) {
+        HyprLiveContext, OrderModels, CheckoutStep, ShippingStep, 
+        ShippingDestinationModels, ShippingInfo, BillingInfo, ContactDialogModels) {
 
     var checkoutPageValidation = {
             'emailAddress': {
@@ -93,7 +91,7 @@ var CheckoutOrder = OrderModels.Order.extend({
         var destination = this.getDestinations().findWhere({'id': destinationId});
         
         if(destination){
-            destination.set('destinationContact', new CustomerModels.Contact(destination.get('destinationContact')))
+            destination.set('destinationContact', new CustomerModels.Contact(destination.get('destinationContact')));
             this.getCheckout().get('dialogContact').get("destinationContact").clear();
             this.getCheckout().set('dialogContact', destination);
 
@@ -115,9 +113,9 @@ var CheckoutOrder = OrderModels.Order.extend({
         this.getCheckout().apiModel.splitCheckoutItem({itemId : self.get('id'), quantity : 1 }).then(function(data){
             
             
-        })
+        });
     }
-})
+});
 
 
 var CheckoutGrouping = Backbone.MozuModel.extend({
@@ -138,7 +136,7 @@ var CheckoutGrouping = Backbone.MozuModel.extend({
         _.forEach(this.get('orderItemIds'), function(itemId, idx){
             var item = self.getCheckout().get('items').findWhere({id: itemId});
             if(item) orderItems.push(item.toJSON());
-        })
+        });
 
         return orderItems;
     },
@@ -152,7 +150,7 @@ var CheckoutGrouping = Backbone.MozuModel.extend({
         shippingMethod = self.getCheckout().get('shippingMethods').findWhere({groupingId:this.get('id')});
         return (shippingMethod) ? shippingMethod.toJSON().shippingRates : [];
     }
-})
+});
 
 var CheckoutPage = Backbone.MozuModel.extend({
             mozuType: 'checkout',
@@ -282,7 +280,7 @@ var CheckoutPage = Backbone.MozuModel.extend({
                 if(customerContacts.length){
                     _.each(customerContacts, function(customer, idx){
                         destinations.addContactDestination(customer, true); 
-                    })
+                    });
                    
                 }
             },

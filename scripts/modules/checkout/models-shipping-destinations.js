@@ -155,10 +155,10 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
             return this.parent;
         },
         addContactDestination : function(contact, isCustomerAddress){
-            var destination = {destinationContact : contact}
+            var destination = {destinationContact : contact};
 
             if(isCustomerAddress){
-               destination.isCustomerAddress = isCustomerAddress
+               destination.isCustomerAddress = isCustomerAddress;
             }
 
             this.add(new ShippingDestination(destination));
@@ -168,7 +168,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
             this.collection.each(function(item,idx){
                 var validation = item.validate();
                 if(validation.ShippingDestinationItem.length) itemValidations = itemValidations.concat(validation.ShippingDestinationItem);
-            })
+            });
             return (itemValidations.length) ? itemValidations : null; 
         },
         addShippingDestination: function(destination){
@@ -183,14 +183,14 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
                     self.trigger('sync');
                     self.trigger('destinationsUpdate');
                     item.model.isLoading(false);
-                })
+                });
             });
         },
         updateShippingDestination: function(destination){
             var self = this;
             var dest = destination.toJSON();
-            dest['destinationId'] = dest.id;
-            dest['checkoutId'] = this.getCheckout().get('id');
+            dest.destinationId = dest.id;
+            dest.checkoutId = this.getCheckout().get('id');
 
             self.getCheckout().apiModel.updateShippingDestination(dest).then(function(data){
                 var entry = self.findWhere({id: data.data.id});
@@ -201,12 +201,12 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
                 }
             });
         }
-    })
+    });
 
    
         return {
             ShippingDestinations: ShippingDestinations,
             ShippingDestination : ShippingDestination,
-            ShippingDestinationItem : ShippingDestinationItem,
+            ShippingDestinationItem : ShippingDestinationItem
         };
 });

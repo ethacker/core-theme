@@ -3,7 +3,7 @@
     "underscore",
     "hyprlive",
     "backbone",
-    "modules/views-messages",
+    "modules/views-messages"
 ], function ($, _, Hypr, Backbone, messageViewFactory) {
 
     var MozuView = Backbone.MozuView = Backbone.View.extend(

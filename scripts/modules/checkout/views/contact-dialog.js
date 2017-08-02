@@ -1,4 +1,4 @@
-define(['modules/jquery-mozu','underscore', 'hyprlivecontext', 'modules/views-modal-dialog'], function($, _, HyprLiveContext, ModalDialogView, CustomerModels) {
+define(['modules/backbone-mozu','modules/jquery-mozu','underscore', 'hyprlivecontext', 'modules/views-modal-dialog'], function(Backbone, $, _, HyprLiveContext, ModalDialogView, CustomerModels) {
 
     var ContactModalContactView = Backbone.MozuView.extend({
         templateName : "modules/common/address-form",
@@ -17,7 +17,7 @@ define(['modules/jquery-mozu','underscore', 'hyprlivecontext', 'modules/views-mo
                 'contactId',
                 'email'
             ]
-    })
+    });
 
 	var ContactModalView = ModalDialogView.extend({
 	   templateName : "modules/multi-ship-checkout/modal-contact",
@@ -28,42 +28,44 @@ define(['modules/jquery-mozu','underscore', 'hyprlivecontext', 'modules/views-mo
         },
 		handleDialogSave : function(){
 
-            if(this.model.get('destinationContact').validate()) return false
+            if(this.model.get('destinationContact').validate()) return false;
 
 			var isAddressValidationEnabled = HyprLiveContext.locals.siteContext.generalSettings.isAddressValidationEnabled,
                     allowInvalidAddresses = HyprLiveContext.locals.siteContext.generalSettings.allowInvalidAddresses;
 
+            var addr = this.get('address'); 
+                   
 			if(!this.model.validate()) {
             	if (!isAddressValidationEnabled) {
                     this.model.trigger('closeDialog');
                 } else {
-                    if (!addr.get('candidateValidatedAddresses')) {
-                        var methodToUse = allowInvalidAddresses ? 'validateAddressLenient' : 'validateAddress';
-                        addr.syncApiModel();
-                        addr.apiModel[methodToUse]().then(function (resp) {
-                            if (resp.data && resp.data.addressCandidates && resp.data.addressCandidates.length) {
-                                if (_.find(resp.data.addressCandidates, addr.is, addr)) {
-                                    addr.set('isValidated', true);
-                                        completeStep();
-                                        return;
-                                    }
-                                addr.set('candidateValidatedAddresses', resp.data.addressCandidates);
-                                promptValidatedAddress();
-                            } else {
-                                completeStep();
-                            }
-                        }, function (e) {
-                            if (allowInvalidAddresses) {
-                                // TODO: sink the exception.in a better way.
-                                order.messages.reset();
-                                completeStep();
-                            } else {
-                                order.messages.reset({ message: Hypr.getLabel('addressValidationError') });
-                            }
-                        });
-                    } else {
-                        completeStep();
-                    }
+                    // if (!addr.get('candidateValidatedAddresses')) {
+                    //     var methodToUse = allowInvalidAddresses ? 'validateAddressLenient' : 'validateAddress';
+                    //     addr.syncApiModel();
+                    //     addr.apiModel[methodToUse]().then(function (resp) {
+                    //         if (resp.data && resp.data.addressCandidates && resp.data.addressCandidates.length) {
+                    //             if (_.find(resp.data.addressCandidates, addr.is, addr)) {
+                    //                 addr.set('isValidated', true);
+                    //                     completeStep();
+                    //                     return;
+                    //                 }
+                    //             addr.set('candidateValidatedAddresses', resp.data.addressCandidates);
+                    //             promptValidatedAddress();
+                    //         } else {
+                    //             //completeStep();
+                    //         }
+                    //     }, function (e) {
+                    //         if (allowInvalidAddresses) {
+                    //             // TODO: sink the exception.in a better way.
+                    //             order.messages.reset();
+                    //             completeStep();
+                    //         } else {
+                    //             order.messages.reset({ message: Hypr.getLabel('addressValidationError') });
+                    //         }
+                    //     });
+                    // } else {
+                    //     completeStep();
+                    // }
                 }
                 if(this.model.get('id')) {
                     this.model.parent.get('destinations').updateShippingDestination(this.model);

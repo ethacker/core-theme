@@ -47,7 +47,7 @@ define(["modules/jquery-mozu",
                 if(!$(e.currentTarget).selected) {
                     self.model.getCheckout().apiModel.updateCheckoutItemFulfillment().then(function(){
 
-                    })
+                    });
                 }
             },
             render: function(){

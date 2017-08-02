@@ -13,6 +13,6 @@ define(["backbone", 'hyprlive'], function(Backbone, Hypr) {
         saveDialog: function(){
             this.trigger('saveDialog');
         }
-    })
+    });
     return modalDialog;
 });
