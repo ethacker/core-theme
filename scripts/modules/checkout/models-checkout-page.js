@@ -15,10 +15,12 @@ define([
     'modules/checkout/models-shipping-destinations',
     'modules/checkout/models-shipping-methods',
     'modules/checkout/models-payment',
-    'modules/checkout/models-contact-dialog'
+    'modules/checkout/models-contact-dialog',
+    'modules/models-customer'
 ],
     function ($, _, Hypr, Backbone, api, CustomerModels, AddressModels, PaymentMethods, 
-        HyprLiveContext, OrderModels, CheckoutStep, FulfillmentInfo, ShippingStep, ShippingDestinationModels, ShippingInfo, BillingInfo, ContactDialogModels) {
+        HyprLiveContext, OrderModels, CheckoutStep, FulfillmentInfo, ShippingStep, 
+        ShippingDestinationModels, ShippingInfo, BillingInfo, ContactDialogModels, CustomerModels) {
 
     var checkoutPageValidation = {
             'emailAddress': {
@@ -91,6 +93,7 @@ var CheckoutOrder = OrderModels.Order.extend({
         var destination = this.getDestinations().findWhere({'id': destinationId});
         
         if(destination){
+            destination.set('destinationContact', new CustomerModels.Contact(destination.get('destinationContact')))
             this.getCheckout().get('dialogContact').get("destinationContact").clear();
             this.getCheckout().set('dialogContact', destination);
 
@@ -100,9 +103,11 @@ var CheckoutOrder = OrderModels.Order.extend({
     },
     updateCheckoutDestination: function(fulfillmentId){
         var self = this;
+        self.isLoading(true);
         self.set('destinationId', fulfillmentId);
         self.getCheckout().apiModel.updateCheckoutItemDestination({id: self.getCheckout().get('id'), itemId: self.get('id'), destinationId: fulfillmentId}).then(function(data){
             self.trigger('sync');
+            self.isLoading(false);
         });
     },
     splitCheckoutItem : function(){
@@ -114,6 +119,41 @@ var CheckoutOrder = OrderModels.Order.extend({
     }
 })
 
+
+var CheckoutGrouping = Backbone.MozuModel.extend({
+    helpers: ['groupingItemInfo', 'groupingDestinationInfo', 'groupingShippingMethods'],
+    validation : {
+        shippingMethodCode : {
+            required: true,
+            msg: Hypr.getLabel("shippingMethodRequiredError")
+        }
+    },
+    getCheckout : function(){
+        return this.collection.parent;
+    },
+    groupingItemInfo : function(){
+        var self = this,
+            orderItems = [];
+
+        _.forEach(this.get('orderItemIds'), function(itemId, idx){
+            var item = self.getCheckout().get('items').findWhere({id: itemId});
+            if(item) orderItems.push(item.toJSON());
+        })
+
+        return orderItems;
+    },
+    groupingDestinationInfo : function(){
+       var self = this,
+       destinationInfo = self.getCheckout().get('destinations').findWhere({id:this.get('destinationId')});
+       return (destinationInfo) ? destinationInfo.toJSON() : {};
+    },
+    groupingShippingMethods : function(){
+        var self = this,
+        shippingMethod = self.getCheckout().get('shippingMethods').findWhere({groupingId:this.get('id')});
+        return (shippingMethod) ? shippingMethod.toJSON().shippingRates : [];
+    }
+})
+
 var CheckoutPage = Backbone.MozuModel.extend({
             mozuType: 'checkout',
             handlesMessages: true,
@@ -121,20 +161,36 @@ var CheckoutPage = Backbone.MozuModel.extend({
                 items : Backbone.Collection.extend({
                     model : CheckoutOrder 
                 }),
+                groupings : Backbone.Collection.extend({
+                    model : CheckoutGrouping 
+                }),
                 billingInfo: BillingInfo,
                 shopperNotes: Backbone.MozuModel.extend(),
                 customer: CustomerModels.Customer,
                 shippingStep: ShippingStep,
                 shippingInfo: ShippingInfo,
                 dialogContact: ContactDialogModels,
-                destinations : ShippingDestinationModels.ShippingDestinations
+                destinations : ShippingDestinationModels.ShippingDestinations,
+                shippingMethods : Backbone.Collection.extend()
             },
             validation: checkoutPageValidation,
             dataTypes: {
                 createAccount: Backbone.MozuModel.DataTypes.Boolean,
                 acceptsMarketing: Backbone.MozuModel.DataTypes.Boolean,
-                amountRemainingForPayment: Backbone.MozuModel.DataTypes.Float
+                amountRemainingForPayment: Backbone.MozuModel.DataTypes.Float,
+                isMultiShipMode : Backbone.MozuModel.DataTypes.Boolean
             },
+            defaults: {
+                isMultiShipMode : function(){
+                    if(this.get('destinations').length > 1) {
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            renderOnChange: [
+                'isMultiShipMode'
+            ],
             initialize: function (data) {
 
                 var self = this,

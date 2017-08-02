@@ -17,7 +17,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep) {
                 var destinationErrors = []
                 this.parent.get('items').forEach(function(item, idx){
                     var itemValid = item.validate();
-                    if (itemValid) {
+                    if (itemValid && item.get('FulfillmentMethod') === "Ship") {
                         destinationErrors.push(itemValid);
                     }
                 })
@@ -145,18 +145,28 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep) {
                     return self.nextDigitalOnly();
                 }
 
+
                 if (!self.validateModel()) return false;
 
-                var order = self.getOrder();
-                    //fulfillmentInfo = order.get('fulfillmentInfo');
+                var order = self.getOrder(),
+                    fulfillmentInfo = order.get('shippingInfo');
+                    
 
-                self.isLoading(false);
+                self.isLoading(true);
 
                 var completeStep = function() {
                     order.messages.reset();
                     order.syncApiModel();
-                    //fulfillmentInfo.shippingInfoUpdated();
-                    self.calculateStepStatus();
+
+                    order.apiModel.updateCheckout(order.toJSON()).then(function () {
+                        order.apiModel.getAvaiableShippingMethods().then(function (methods) {
+                            fulfillmentInfo.refreshShippingMethods(methods);
+                            fulfillmentInfo.shippingInfoUpdated();
+                            self.calculateStepStatus();
+                            self.isLoading(false);
+                        });    
+                    });
+
                     //
                     // Remove getShippingMethodsFromContact, move to shipping Fulfillment as call to refresh
                     // Saves Fulfillment Info and Returns Shipping Methods 

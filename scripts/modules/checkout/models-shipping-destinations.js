@@ -119,7 +119,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
         },
         dataTypes: {
             destinationId: function(val) {
-                    return (val === 'new') ? val : Backbone.MozuModel.DataTypes.Int(val);
+                return (val === 'new') ? val : Backbone.MozuModel.DataTypes.Int(val);
             }
         },
         validation: {
@@ -169,22 +169,33 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
                 var validation = item.validate();
                 if(validation.ShippingDestinationItem.length) itemValidations = itemValidations.concat(validation.ShippingDestinationItem);
             })
-            return (itemValidations.length) ? itemValidations : null;
+            return (itemValidations.length) ? itemValidations : null; 
         },
         addShippingDestination: function(destination){
             var self = this;
+
             self.getCheckout().apiModel.addShippingDestination({DestinationContact : destination.get('destinationContact').toJSON()}).then(function(data){
                 self.add(new ShippingDestination(data.data));
-                self.trigger('sync');
-                self.trigger('destinationsUpdate');
+                var item = self.getCheckout().get('items').findWhere({editingDestination: true});
+                item.model.isLoading(true);
+                item.updateCheckoutDestination(data.data.id).then(function(){
+                    item.model.set('editingDestination', false);
+                    self.trigger('sync');
+                    self.trigger('destinationsUpdate');
+                    item.model.isLoading(false);
+                })
             });
         },
         updateShippingDestination: function(destination){
             var self = this;
-            self.getCheckout().apiUpdateShippingDestination(destination.toJSON()).then(function(data){
+            var dest = destination.toJSON();
+            dest['destinationId'] = dest.id;
+            dest['checkoutId'] = this.getCheckout().get('id');
+
+            self.getCheckout().apiModel.updateShippingDestination(dest).then(function(data){
                 var entry = self.findWhere({id: data.data.id});
                 if(entry) {
-                    self.set(entry.get('id'), data.data);
+                    entry.set('destinationContact', data.data.destinationContact); 
                     self.trigger('sync');
                     self.trigger('destinationsUpdate');
                 }

@@ -1,4 +1,4 @@
-define(['modules/jquery-mozu','underscore', 'hyprlivecontext', 'modules/views-modal-dialog', 'modules/models-customer'], function($, _, HyprLiveContext, ModalDialogView, CustomerModels) {
+define(['modules/jquery-mozu','underscore', 'hyprlivecontext', 'modules/views-modal-dialog'], function($, _, HyprLiveContext, ModalDialogView, CustomerModels) {
 
     var ContactModalContactView = Backbone.MozuView.extend({
         templateName : "modules/common/address-form",
@@ -65,7 +65,7 @@ define(['modules/jquery-mozu','underscore', 'hyprlivecontext', 'modules/views-mo
                         completeStep();
                     }
                 }
-                if(this.model.parent.get('destinations').get('id')) {
+                if(this.model.get('id')) {
                     this.model.parent.get('destinations').updateShippingDestination(this.model);
                 } else {
                     this.model.parent.get('destinations').addShippingDestination(this.model);

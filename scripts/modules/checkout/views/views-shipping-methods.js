@@ -36,10 +36,24 @@ define(["modules/jquery-mozu",
             updateShippingMethod: function (e) {
                 this.model.updateShippingMethod(this.$('[data-mz-shipping-method]:checked').val());
             },
+            updateGroupingShippingMethod: function(e) {
+                var self = this;
+                var groupingId = $(e.currentTarget).attr('data-mz-grouping-id');
+                var grouping = self.model.getCheckout().get('groupings').findWhere({id: groupingId});
+
+                grouping.set('shippingMethodCode', $(e.currentTarget).val());
+                self.model.getCheckout().syncApiModel();
+
+                if(!$(e.currentTarget).selected) {
+                    self.model.getCheckout().apiModel.updateCheckoutItemFulfillment().then(function(){
+
+                    })
+                }
+            },
             render: function(){
                 var self = this;
                 this.$el.removeClass('is-new is-incomplete is-complete is-invalid').addClass('is-' + this.model.stepStatus());
-                this.model.initSet();
+                //this.model.initSet();
 
                 EditableView.prototype.render.apply(this, arguments);    
                 this.resize();

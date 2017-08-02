@@ -111,16 +111,12 @@ define(["modules/jquery-mozu",
 
         var MultiShippingAddressView = CheckoutStepView.extend({
             templateName: 'modules/multi-ship-checkout/step-shipping-destinations',
-            setMultiShipMode : function(){
-                this.model.setMultiShipMode(false);
-            },
             initialize: function(){
                 var self = this;
                 this.listenTo(this.model.parent, 'sync', function() {
                     self.render();
                 });
                 this.listenTo(this.model.getDestinations(), 'destinationsUpdate', function() {
-                    
                     self.render();
                 });
             },

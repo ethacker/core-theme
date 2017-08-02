@@ -48,8 +48,11 @@ var CheckoutStepView = EditableView.extend({
             EditableView.prototype.render.apply(this, arguments);
             this.resize();
         },
-        isMultiShipMode : function(){
-            return this.model.isMultiShipMode();
+        isMultiShipMode: function(){
+            this.model.isMultiShipMode();
+        },
+        toggleMultiShipMode : function() {
+            this.model.toggleMultiShipMode();
         },
         resize: _.debounce(function () {
             this.$('.mz-panel-wrap').animate({'height': this.$('.mz-inner-panel').outerHeight() });
