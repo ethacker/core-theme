@@ -122,9 +122,12 @@ var CheckoutGrouping = Backbone.MozuModel.extend({
     helpers: ['groupingItemInfo', 'groupingDestinationInfo', 'groupingShippingMethods'],
     validation : {
         shippingMethodCode : {
-            required: true,
+            fn: "validateShippingCode",
             msg: Hypr.getLabel("shippingMethodRequiredError")
         }
+    },
+    validateShippingCode: function(value, attr) {
+        if (!this.get('shippingMethodCode') && this.get('fulfillmentMethod') == "Ship") return this.validation[attr.split('.').pop()].msg;
     },
     getCheckout : function(){
         return this.collection.parent;

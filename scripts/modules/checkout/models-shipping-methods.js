@@ -122,10 +122,6 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, FulfillmentC
                     }
                 }
             },
-            render: function(){
-                var self = this;
-                
-            },
             getCheckout: function() {
                 return this.parent;
             },

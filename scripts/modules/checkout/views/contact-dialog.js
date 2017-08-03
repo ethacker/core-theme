@@ -33,7 +33,7 @@ define(['modules/backbone-mozu','modules/jquery-mozu','underscore', 'hyprlivecon
 			var isAddressValidationEnabled = HyprLiveContext.locals.siteContext.generalSettings.isAddressValidationEnabled,
                     allowInvalidAddresses = HyprLiveContext.locals.siteContext.generalSettings.allowInvalidAddresses;
 
-            var addr = this.get('address'); 
+            //var addr = this.get('address'); 
                    
 			if(!this.model.validate()) {
             	if (!isAddressValidationEnabled) {

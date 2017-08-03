@@ -69,8 +69,11 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext) {
             return this.parent.get('isMultiShipMode');
         },
         toggleMultiShipMode : function() {
+            var self = this;
             if(this.parent.get('isMultiShipMode')){
-                this.parent.apiModel.unsetAllShippingDestinations();
+                this.parent.apiModel.unsetAllShippingDestinations().then(function(){
+                    self.trigger('sync');
+                });
                 this.parent.set('isMultiShipMode', false);
                 return;
             }

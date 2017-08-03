@@ -13,4 +13,4 @@
     <div class="mz-formstep-next">
         <button type="button" class="mz-button" data-mz-action="next">{{ labels.next }}</button>
     </div>
-</div>  
+</div>

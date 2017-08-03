@@ -45,7 +45,7 @@ define(["modules/jquery-mozu",
                 self.model.getCheckout().syncApiModel();
 
                 if(!$(e.currentTarget).selected) {
-                    self.model.getCheckout().apiModel.updateCheckoutItemFulfillment().then(function(){
+                    self.model.getCheckout().apiModel.setShippingMethods().then(function(){
 
                     });
                 }
@@ -55,7 +55,16 @@ define(["modules/jquery-mozu",
                 this.$el.removeClass('is-new is-incomplete is-complete is-invalid').addClass('is-' + this.model.stepStatus());
                 //this.model.initSet();
 
-                EditableView.prototype.render.apply(this, arguments);    
+                if(self.model.getCheckout().get('groupings').length && !self.model.getCheckout().get('shippingMethods').length) {
+                    self.model.getCheckout().apiModel.getAvaiableShippingMethods().then(function (methods) {
+                        self.model.refreshShippingMethods(methods);
+                        self.model.shippingInfoUpdated();
+                        //self.calculateStepStatus();
+                        //self.isLoading(false);
+                    });   
+                }
+
+                EditableView.prototype.render.apply(this, arguments);
                 this.resize();
             }
         });

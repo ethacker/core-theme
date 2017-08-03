@@ -17,7 +17,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep) {
                 var destinationErrors = [];
                 this.parent.get('items').forEach(function(item, idx){
                     var itemValid = item.validate();
-                    if (itemValid && item.get('FulfillmentMethod') === "Ship") {
+                    if (itemValid && item.get('fulfillmentMethod') === "Ship") {
                         destinationErrors.push(itemValid);
                     }
                 });

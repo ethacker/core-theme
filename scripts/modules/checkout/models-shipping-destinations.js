@@ -177,12 +177,12 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
             self.getCheckout().apiModel.addShippingDestination({DestinationContact : destination.get('destinationContact').toJSON()}).then(function(data){
                 self.add(new ShippingDestination(data.data));
                 var item = self.getCheckout().get('items').findWhere({editingDestination: true});
-                item.model.isLoading(true);
+                //item.model.isLoading(true);
                 item.updateCheckoutDestination(data.data.id).then(function(){
                     item.model.set('editingDestination', false);
                     self.trigger('sync');
                     self.trigger('destinationsUpdate');
-                    item.model.isLoading(false);
+                    //item.model.isLoading(false);
                 });
             });
         },
