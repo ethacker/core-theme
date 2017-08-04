@@ -40,8 +40,11 @@ define(["modules/jquery-mozu",
                 var self = this;
                 var groupingId = $(e.currentTarget).attr('data-mz-grouping-id');
                 var grouping = self.model.getCheckout().get('groupings').findWhere({id: groupingId});
+                var shippingRates = self.model.getCheckout().get('shippingMethods').findWhere({groupingId: groupingId}).get('shippingRates');
 
-                grouping.set('shippingMethodCode', $(e.currentTarget).val());
+                var shippingRate = _.findWhere(shippingRates, {shippingMethodCode: $(e.currentTarget).val()});
+                grouping.set('shippingRate', shippingRate);
+                grouping.set('shippingMethodCode', shippingRate.shippingMethodCode);
                 self.model.getCheckout().syncApiModel();
 
                 if(!$(e.currentTarget).selected) {
@@ -54,8 +57,10 @@ define(["modules/jquery-mozu",
                 var self = this;
                 this.$el.removeClass('is-new is-incomplete is-complete is-invalid').addClass('is-' + this.model.stepStatus());
                 //this.model.initSet();
-
-                if(self.model.getCheckout().get('groupings').length && !self.model.getCheckout().get('shippingMethods').length) {
+                var hasDestinations = self.model.getCheckout().get('items').filter(function(item){
+                    return item.get('destinationId');
+                });
+                if(self.model.getCheckout().get('groupings').length && !self.model.getCheckout().get('shippingMethods').length && hasDestinations.length == self.model.getCheckout().get('items').length) {
                     self.model.getCheckout().apiModel.getAvaiableShippingMethods().then(function (methods) {
                         self.model.refreshShippingMethods(methods);
                         self.model.shippingInfoUpdated();

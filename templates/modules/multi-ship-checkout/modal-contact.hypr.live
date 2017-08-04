@@ -1,7 +1,10 @@
 {% extends "modules/common/modal-dialog" %}
 
 {% block modal-body %}
+
 <div id="mzContactDialog" data-mz-contact-modal-content class="mz-contact-dialog">
-	{% include "modules/common/address-form" %}
+
+	{% include "modules/multi-ship-checkout/address-form" %}      
+
 </div>
 {% endblock modal-body %}

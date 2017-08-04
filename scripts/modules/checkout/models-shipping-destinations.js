@@ -174,7 +174,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
         addShippingDestination: function(destination){
             var self = this;
 
-            self.getCheckout().apiModel.addShippingDestination({DestinationContact : destination.get('destinationContact').toJSON()}).then(function(data){
+            return self.getCheckout().apiModel.addShippingDestination({DestinationContact : destination.get('destinationContact').toJSON()}).then(function(data){
                 self.add(new ShippingDestination(data.data));
                 var item = self.getCheckout().get('items').findWhere({editingDestination: true});
                 //item.model.isLoading(true);
@@ -192,7 +192,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
             dest.destinationId = dest.id;
             dest.checkoutId = this.getCheckout().get('id');
 
-            self.getCheckout().apiModel.updateShippingDestination(dest).then(function(data){
+            return self.getCheckout().apiModel.updateShippingDestination(dest).then(function(data){
                 var entry = self.findWhere({id: data.data.id});
                 if(entry) {
                     entry.set('destinationContact', data.data.destinationContact); 

@@ -19,17 +19,17 @@
     </div>
     <div class="mz-l-formfieldgroup-row mz-addressform-address1">
         <div class="mz-l-formfieldgroup-cell">
-            <label for="address-line-1">{{ labels.address }}<span class="is-required"> *</span>:</label>
+            <label for="address-line1">{{ labels.address }}<span class="is-required"> *</span>:</label>
         </div>
         <div class="mz-l-formfieldgroup-cell">
-            <input type="text" name="address-line-1" data-mz-value="{{ addresscontext }}address.address1" value="{{ model.address.address1 }}" maxlength="200">
+            <input type="text" name="address-line1" data-mz-value="{{ addresscontext }}address.address1" value="{{ model.address.address1 }}" maxlength="200" autocomplete="address-line1">
             <span class="mz-validationmessage" data-mz-validationmessage-for="{{ addresscontext }}address.address1"></span>
         </div>
     </div>
     <div class="mz-l-formfieldgroup-row mz-addressform-address2">
         <div class="mz-l-formfieldgroup-cell"></div>
         <div class="mz-l-formfieldgroup-cell">
-            <input type="text" name="address-line-2" data-mz-value="{{ addresscontext }}address.address2" value="{{ model.address.address2 }}" maxlength="200">
+            <input type="text" name="address-line2" data-mz-value="{{ addresscontext }}address.address2" value="{{ model.address.address2 }}" maxlength="200" autocomplete="address-line2">
             <span class="mz-validationmessage">&nbsp;</span>
         </div>
     </div>

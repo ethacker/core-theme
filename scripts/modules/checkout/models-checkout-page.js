@@ -73,7 +73,6 @@ var CheckoutOrder = OrderModels.Order.extend({
     getCheckout : function(){
         return this.collection.parent;
     },
-
     getDestinations : function(){
         return this.getCheckout().get('destinations');
     },
