@@ -55,7 +55,7 @@ define(['modules/backbone-mozu','modules/jquery-mozu','underscore', 'hyprlivecon
                          self.model.trigger('closeDialog');    
                     });
                 }
-            }
+            };
 
 			if(!this.model.validate()) {
             	if (false) {
@@ -85,7 +85,7 @@ define(['modules/backbone-mozu','modules/jquery-mozu','underscore', 'hyprlivecon
                                 checkout.messages.reset();
                                 saveAddress();
                             } else { 
-                                checkout.messages.reset({ message: Hypr.getLabel('addressValidationError') });
+                                //checkout.messages.reset({ message: Hypr.getLabel('addressValidationError') });
                             }
                         });
                     } else {
