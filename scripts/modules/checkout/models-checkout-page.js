@@ -105,12 +105,8 @@ var CheckoutOrder = OrderModels.Order.extend({
     },
     updateCheckoutDestination: function(fulfillmentId){
         var self = this;
-        self.isLoading(true);
         self.set('destinationId', fulfillmentId);
-        self.getCheckout().apiModel.updateCheckoutItemDestination({id: self.getCheckout().get('id'), itemId: self.get('id'), destinationId: fulfillmentId}).then(function(data){
-            self.trigger('sync');
-            self.isLoading(false);
-        });
+        self.getCheckout().apiUpdateCheckoutItemDestination({id: self.getCheckout().get('id'), itemId: self.get('id'), destinationId: fulfillmentId});
     },
     splitCheckoutItem : function(){
         var self = this;
@@ -122,7 +118,7 @@ var CheckoutOrder = OrderModels.Order.extend({
 
 
 var CheckoutGrouping = Backbone.MozuModel.extend({
-    helpers: ['groupingItemInfo', 'groupingDestinationInfo', 'groupingShippingMethods'],
+    helpers: ['groupingItemInfo', 'groupingDestinationInfo', 'groupingShippingMethods', 'loadingShippingMethods'],
     validation : {
         shippingMethodCode : {
             fn: "validateShippingCode",
@@ -155,6 +151,9 @@ var CheckoutGrouping = Backbone.MozuModel.extend({
         var self = this,
         shippingMethod = self.getCheckout().get('shippingMethods').findWhere({groupingId:this.get('id')});
         return (shippingMethod) ? shippingMethod.toJSON().shippingRates : [];
+    },
+    loadingShippingMethods : function(){
+        this.getCheckout().get('shippingMethods').get('isLoading');
     }
 });
 
@@ -199,7 +198,8 @@ var CheckoutPage = Backbone.MozuModel.extend({
 
                 var self = this,
                     user = require.mozuData('user');
-                    self.get('shippingStep').initSet();
+                    //self.get('shippingStep').initSet();
+                    
                     
                 _.defer(function() {
 

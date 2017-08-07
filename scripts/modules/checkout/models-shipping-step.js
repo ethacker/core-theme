@@ -158,10 +158,14 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep) {
                     order.messages.reset();
                     order.syncApiModel();
 
-                    order.apiModel.updateCheckout(order.toJSON()).then(function () {
-                        fulfillmentInfo.updateShippingMethods(); 
-                        self.stepStatus('complete');   
+                    fulfillmentInfo.updateShippingMethods().ensure(function() {
+                        self.stepStatus('complete');
+                        fulfillmentInfo.calculateStepStatus();
                     });
+
+                    // order.apiModel.updateCheckout(order.toJSON()).then(function () {
+                         
+                    // });
 
                     //
                     // Remove getShippingMethodsFromContact, move to shipping Fulfillment as call to refresh

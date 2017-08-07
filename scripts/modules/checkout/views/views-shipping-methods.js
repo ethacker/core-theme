@@ -33,6 +33,10 @@ define(["modules/jquery-mozu",
                     self.render();
                 });
             },
+            initStepView: function(){
+                CheckoutStepView.prototype.initStepView.apply(this, arguments);
+                this.model.updateShippingMethods();
+            },
             updateShippingMethod: function (e) {
                 this.model.updateShippingMethod(this.$('[data-mz-shipping-method]:checked').val());
             },

@@ -192,7 +192,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
             dest.destinationId = dest.id;
             dest.checkoutId = this.getCheckout().get('id');
 
-            return self.getCheckout().apiModel.updateShippingDestination(dest).then(function(data){
+            return self.getCheckout().apiUpdateShippingDestination(dest).then(function(data){
                 var entry = self.findWhere({id: data.data.id});
                 if(entry) {
                     entry.set('destinationContact', data.data.destinationContact); 

@@ -36,15 +36,20 @@
     
       <div class="mz-formstep-fields mz-l-formfieldgroup mz-checkoutform mz-checkoutform-active">
          <div class="mz-l-formfieldgroup-cell">
+         {%if model.loadingShippingMethods %}
+            <span class="loading"> Loading...</span>
+         {% else %}
             {% if model.groupingShippingMethods.length %}
                 <select id="mz-shipping-method-selector" name="shippingMethodSelector" class="mz-shipping-method-selector-dd" data-mz-shipping-method data-mz-grouping-id="{{ model.id }}">
+                <option class="mz-shipping-method-selector-option" value=""></option>
                     {% for method in model.groupingShippingMethods %}
-                        <option class="mz-shipping-method-selector-option" value="{{ method.shippingMethodCode }}" {% if method.shippingMethodCode == model.shippingMethodCode %} selected="selected" {% endif %}>{{ method.shippingMethodCode }} - {{ method.price|currency }}</option>
+                        <option class="mz-shipping-method-selector-option" value="{{ method.shippingMethodCode }}" {% if method.shippingMethodCode == model.shippingMethodCode %} selected="selected" {% endif %}>{{ method.shippingMethodName }} - {{ method.price|currency }}</option>
                     {% endfor %}
                 </select>
                 <span class="mz-validationmessage" data-mz-validationmessage-for="shippingMethodSelector"></span>
             {% else %}
                 <p>{{ labels.noShippingMethods }}</p>
+            {% endif %}
             {% endif %}
         </div>
       </div>
