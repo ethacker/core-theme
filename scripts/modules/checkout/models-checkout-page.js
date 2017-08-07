@@ -63,7 +63,7 @@ define([
         }
 
 var CheckoutOrder = OrderModels.Order.extend({
-    helpers : ['selectableDestinations'],
+    helpers : ['selectableDestinations', 'isOriginalCartItem'],
     validation : {
         destinationId : {
             required: true,
@@ -78,6 +78,11 @@ var CheckoutOrder = OrderModels.Order.extend({
     },
     selectableDestinations : function(){
         return this.getCheckout().get('destinations').toJSON();
+    },
+    isOriginalCartItem : function(){
+        var self = this;
+        var originalCartItem = self.collection.findWhere({originalCartItemId: self.get('originalCartItemId')});
+        return originalCartItem.id == self.get('id');
     },
     addNewContact: function(){
         
@@ -109,8 +114,7 @@ var CheckoutOrder = OrderModels.Order.extend({
     },
     splitCheckoutItem : function(){
         var self = this;
-        this.getCheckout().apiModel.splitCheckoutItem({itemId : self.get('id'), quantity : 1 }).then(function(data){
-            
+        this.getCheckout().apiSplitCheckoutItem({itemId : self.get('id'), quantity : 1 }).then(function(data){
             
         });
     }

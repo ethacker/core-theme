@@ -125,7 +125,6 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, FulfillmentC
             getCheckout: function() {
                 return this.parent;
             },
-
             groupings : function(){
                 var groups = [];
                 this.getCheckout().get('groupings').each(function(group){ 

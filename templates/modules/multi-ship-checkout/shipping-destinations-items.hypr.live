@@ -1,2 +1,0 @@
-
-{% include "modules/multi-ship-checkout/shipping-destinations-item" with isLastItem=forloop %}

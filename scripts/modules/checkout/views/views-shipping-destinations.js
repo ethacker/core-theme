@@ -46,6 +46,18 @@ define(["modules/jquery-mozu",
                 'fulfillmentContactId',
                 'isLoading'
             ],
+            initialize: function(){
+                var self = this;
+                this.listenTo(this.model, 'addedNewDestination', function() {
+                    self.render();
+                });
+                this.listenTo(this.model, 'changeDestination', function() {
+                    self.render();
+                });
+                this.listenTo(this.model, 'destinationsUpdate', function() {
+                    self.render();
+                });
+            },
             handleChangeDestinationAddress: function(e){
                 var self = this;
                 var $target = $(e.currentTarget);
@@ -152,10 +164,10 @@ define(["modules/jquery-mozu",
                 EditableView.prototype.render.apply(this, arguments);
                 this.resize();
 
-                $.each(this.$el.find('[data-mz-shipping-destinations-items]'), function(index, val) {
-                    var id = $(this).data('mzId');
+                $.each(this.$el.find('[data-mz-shipping-destinations-item]'), function(index, val) {
+                    var id = $(this).data('mzItemId');
                     var shippingDestination = self.model.parent.get("items").findWhere({'id': id});
-                    var shippingDestinationView = new ShippingDestinationView({
+                    var shippingDestinationView = new ShippingDestinationItemView({
                         el: $(this),
                         model: shippingDestination
                     });
@@ -187,8 +199,8 @@ define(["modules/jquery-mozu",
                 EditableView.prototype.render.apply(this, arguments);
                 this.resize();
 
-                $.each(this.$el.find('[data-mz-shipping-destinations-items]'), function(index, val) {
-                    var id = $(this).data('mzId');
+                $.each(this.$el.find('[data-mz-shipping-destinations-item]'), function(index, val) {
+                    var id = $(this).data('mzItemId');
                     var shippingDestination = self.model.parent.get("items").findWhere({'id': id});
                     var shippingDestinationView = new ShippingDestinationView({
                         el: $(this),

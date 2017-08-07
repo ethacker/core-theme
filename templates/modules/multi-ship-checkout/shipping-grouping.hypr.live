@@ -33,17 +33,13 @@
         <div class="mz-l-formfieldgroup-cell">
             {{labels.shippingMethodSelector}}
         </div>
-
-
-
-
     
       <div class="mz-formstep-fields mz-l-formfieldgroup mz-checkoutform mz-checkoutform-active">
          <div class="mz-l-formfieldgroup-cell">
             {% if model.groupingShippingMethods.length %}
-                <select id="mz-shipping-method-selector" name="shippingMethodSelector" class="mz-shipping-method-selector-dd" data-mz-fulfillment-method data-mz-grouping-id="{{ model.id }}" data-mz-value="groupingShippingMethod">
+                <select id="mz-shipping-method-selector" name="shippingMethodSelector" class="mz-shipping-method-selector-dd" data-mz-shipping-method data-mz-grouping-id="{{ model.id }}">
                     {% for method in model.groupingShippingMethods %}
-                        <option class="mz-shipping-method-selector-option" value="{{ method.shippingMethodCode }}" {% if model.shippingMethodCode == method.code %} selected="selected" {% endif %}>{{ method.shippingMethodCode }} - {{ method.price|currency }}</option>
+                        <option class="mz-shipping-method-selector-option" value="{{ method.shippingMethodCode }}" {% if method.shippingMethodCode == model.shippingMethodCode %} selected="selected" {% endif %}>{{ method.shippingMethodCode }} - {{ method.price|currency }}</option>
                     {% endfor %}
                 </select>
                 <span class="mz-validationmessage" data-mz-validationmessage-for="shippingMethodSelector"></span>

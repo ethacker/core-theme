@@ -1,7 +1,6 @@
-<div data-mz-shipping-destinations-item data-mz-item-id="{{model.id}}" data-mz-destination-id="{{model.destinationId}}" data-mz-model-id="{{model.cid}}" class="mz-l-formfieldgroup-row">
 {% if model.fulfillmentMethod == "Ship" %}
 <div class="mz-shipping-destination-title">
-	<h3>{{ model.product.name }}</h3>
+  <h3>{{ model.product.name }}</h3>
 </div>
 
 <div class="mz-l-formfieldgroup-row">
@@ -48,4 +47,3 @@
 	</div>
 </div>
 {% endif %}
-</div>

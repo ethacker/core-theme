@@ -25,7 +25,7 @@ define(["modules/jquery-mozu",
                 'availableShippingMethods'
             ],
             additionalEvents: {
-                "change [data-mz-shipping-method]": "updateShippingMethod"
+                "change [data-mz-shipping-method]": "updateGroupingShippingMethod"
             },
              initialize: function(){
                 var self = this;
@@ -48,26 +48,29 @@ define(["modules/jquery-mozu",
                 self.model.getCheckout().syncApiModel();
 
                 if(!$(e.currentTarget).selected) {
-                    self.model.getCheckout().apiModel.setShippingMethods().then(function(){
+                    self.model.getCheckout().apiSetShippingMethod({groupId: groupingId, shippingRate: shippingRate}).then(function(){
 
                     });
+                    // self.model.getCheckout().apiSetShippingMethods().then(function(){
+
+                    // });
                 }
             },
             render: function(){
                 var self = this;
                 this.$el.removeClass('is-new is-incomplete is-complete is-invalid').addClass('is-' + this.model.stepStatus());
                 //this.model.initSet();
-                var hasDestinations = self.model.getCheckout().get('items').filter(function(item){
-                    return item.get('destinationId');
-                });
-                if(self.model.getCheckout().get('groupings').length && !self.model.getCheckout().get('shippingMethods').length && hasDestinations.length == self.model.getCheckout().get('items').length) {
-                    self.model.getCheckout().apiModel.getAvaiableShippingMethods().then(function (methods) {
-                        self.model.refreshShippingMethods(methods);
-                        self.model.shippingInfoUpdated();
-                        //self.calculateStepStatus();
-                        //self.isLoading(false);
-                    });   
-                }
+                // var hasDestinations = self.model.getCheckout().get('items').filter(function(item){
+                //     return item.get('destinationId');
+                // });
+                // if(self.model.getCheckout().get('groupings').length && !self.model.getCheckout().get('shippingMethods').length && hasDestinations.length == self.model.getCheckout().get('items').length) {
+                //     self.model.getCheckout().apiModel.getAvaiableShippingMethods().then(function (methods) {
+                //         self.model.refreshShippingMethods(methods);
+                //         self.model.shippingInfoUpdated();
+                //         //self.calculateStepStatus();
+                //         //self.isLoading(false);
+                //     });   
+                // }
 
                 EditableView.prototype.render.apply(this, arguments);
                 this.resize();
