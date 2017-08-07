@@ -92,10 +92,6 @@ define(["modules/jquery-mozu",
                     itemId = $target.parents('[data-mz-shipping-destinations-item]').data('mzItemId');
 
                 this.model.removeDestination();
-            },
-            initialize: function(){
-                var self = this;
-
             }
         });
 

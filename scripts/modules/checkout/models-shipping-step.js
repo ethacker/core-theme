@@ -159,11 +159,8 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep) {
                     order.syncApiModel();
 
                     order.apiModel.updateCheckout(order.toJSON()).then(function () {
-                        order.apiModel.getAvaiableShippingMethods().then(function (methods) {
-                            fulfillmentInfo.refreshShippingMethods(methods);      
-                            self.stepStatus('complete');
-                            fulfillmentInfo.calculateStepStatus();
-                        });    
+                        fulfillmentInfo.updateShippingMethods(); 
+                        self.stepStatus('complete');   
                     });
 
                     //

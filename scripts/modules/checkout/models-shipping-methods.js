@@ -146,6 +146,13 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, FulfillmentC
             refreshShippingMethods: function (methods) {
                 this.parent.get('shippingMethods').add(methods);
             },
+            updateShippingMethods : function(){
+                var self = this;
+                this.getCheckout().apiGetAvaiableShippingMethods().then(function (methods) {
+                    self.refreshShippingMethods(methods);      
+                    self.calculateStepStatus();
+                });
+            },
             validateModel: function() {
                 var validationObj = this.validate();
 
