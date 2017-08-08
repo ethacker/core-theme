@@ -1,2 +1,20 @@
 ﻿{% extends "modules/common/contact-selector" %}
-{% block module-classes %} mz-l-tiles {% endblock module-classes %}
+{% block contact-selector %}
+    
+  <div class="mz-l-formfieldgroup-cell">
+   <select id="mz--contactselector-savedcontact" data-mz-single-fulfillment-contact class="mz-contactselector" data-mz-value="{{ contactcontext }}contactId" name="contactId" >
+      <option>{{labels.selectSavedAddress}}</option>
+      {% for destination in model %}
+    
+          <option value="{{ destination.id }}"  {% if destination.id == destinationId %} selected {% endif %}> {% include "modules/common/address-list" with model=destination.destinationContact %}</option>
+   
+      {% endfor %}
+    </select> 
+    
+    <div>
+        <a href="javascript:;" data-mz-action="handleNewContact">{{labels.addAddress}}</a>
+    </div>
+
+
+   </div>
+{% endblock contact-selector %}
