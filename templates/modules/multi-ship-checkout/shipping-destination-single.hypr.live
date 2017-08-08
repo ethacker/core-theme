@@ -12,7 +12,7 @@
     <div class="mz-formstep-fields mz-l-formfieldgroup mz-checkoutform  mz-checkoutform-shipping mz-checkoutform-active">
       {% if model.selectableDestinations.length %}
        
-          {% include "modules/checkout/checkout-shipping-contact-selector" with model=model.selectableDestinations destinationId=model.groupdestinationId %}
+          {% include "modules/checkout/checkout-shipping-contact-selector" with model=model.selectableDestinations destinationId=model.selectedDestination.id isLoading=model.isLoading%}
 
         {% else %}
         {% include "modules/common/address-form" with countries=pageContext.shippingCountries states=pageContext.shippingStates %}
@@ -21,7 +21,7 @@
 
     <div class="mz-formstep-summary mz-addresssummary mz-checkoutform">
       {% if model.requiresFulfillmentInfo %}
-        {% include "modules/common/address-summary" %}      
+        {% include "modules/common/address-summary" with model=model.selectedDestination.destinationContact %}      
       {% else %}
         {{ labels.noFulfillmentInfoRequired }}
       {% endif %}

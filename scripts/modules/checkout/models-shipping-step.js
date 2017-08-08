@@ -10,7 +10,7 @@ define([
 function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep) {
 
     var ShippingStep = CheckoutStep.extend({
-        helpers : ['orderItems', 'selectableDestinations', 'groupdestinationId'],
+        helpers : ['orderItems', 'selectableDestinations', 'selectedDestination'],
         validation: {
             ShippingDestinations :{
             fn: function(value, attr){
@@ -50,17 +50,18 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep) {
         selectableDestinations : function(){
             return this.parent.get('destinations').toJSON();
         },
-        groupdestinationId : function(){
-            return this.getCheckout().get('items').at(0).get('destinationId');
+        selectedDestination : function(){
+            var selectedId = this.getCheckout().get('items').at(0).get('destinationId');
+            if(selectedId){
+                return this.getCheckout().get('destinations').get(selectedId).toJSON();
+            }
         },
         getCheckout: function(){
             return this.parent;
         },
         updateSingleCheckoutDestination: function(destinationId){
             var self = this;
-            return this.getCheckout().apiModel.setAllShippingDestinations({destinationId: destinationId}).then(function(){
-                self.trigger('sync');
-            });
+            return this.getCheckout().apiSetAllShippingDestinations({destinationId: destinationId});
         },
         addNewContact: function(){
             this.getCheckout().get('dialogContact').get("destinationContact").clear();
