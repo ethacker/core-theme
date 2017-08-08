@@ -150,7 +150,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, FulfillmentC
                 var self = this;
                 return this.getCheckout().apiGetAvaiableShippingMethods().then(function (methods) {
                     self.refreshShippingMethods(methods);      
-                    self.calculateStepStatus();
+                    //self.calculateStepStatus();
                 });
             },
             validateModel: function() {

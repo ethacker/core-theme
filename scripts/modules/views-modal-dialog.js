@@ -13,6 +13,9 @@ define(['modules/jquery-mozu','underscore',"modules/backbone-mozu",'hyprlive', '
                 self.listenTo(this.model, 'closeDialog', function () {
                     self.handleDialogClose();
                 });
+                self.listenTo(this.model, 'cancelDialog', function () {
+                    self.handleDialogCancel();
+                });
 
                 this.initDialog(); 
             },
@@ -35,6 +38,10 @@ define(['modules/jquery-mozu','underscore',"modules/backbone-mozu",'hyprlive', '
                 this.model.trigger('dialogOpen');
                 this.bootstrapInstance.show();
                 
+            },
+            handleDialogCancel: function(){
+                this.model.trigger('dialogCancel');
+                this.handleDialogClose();  
             },
             render: function() {
                 var self = this;

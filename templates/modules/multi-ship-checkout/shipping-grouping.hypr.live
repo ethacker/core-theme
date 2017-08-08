@@ -36,7 +36,7 @@
     
       <div class="mz-formstep-fields mz-l-formfieldgroup mz-checkoutform mz-checkoutform-active">
          <div class="mz-l-formfieldgroup-cell">
-         {%if model.loadingShippingMethods %}
+         {% if isLoading %}
             <span class="loading"> Loading...</span>
          {% else %}
             {% if model.groupingShippingMethods.length %}
@@ -55,7 +55,7 @@
       </div>
       <div class="mz-formstep-summary mz-checkoutform-active">
         <div class="mz-l-formfieldgroup-cell">
-            {{ model.shippingMethodCode }}
+            {{ model.shippingMethodName }}
         </div>
       </div>
 

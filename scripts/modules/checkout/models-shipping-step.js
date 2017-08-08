@@ -160,6 +160,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep) {
 
                     fulfillmentInfo.updateShippingMethods().ensure(function() {
                         self.stepStatus('complete');
+                        self.isLoading(false);
                         fulfillmentInfo.calculateStepStatus();
                     });
 

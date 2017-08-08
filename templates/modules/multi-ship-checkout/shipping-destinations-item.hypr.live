@@ -19,11 +19,11 @@
 			<div class="mz-l-formfieldgroup-cell"> 
 				<span class="mz-validationmessage" data-mz-validationmessage-for="shippingDestinationAddress"></span>
 				<select id="mz-shipping-destination-address" name="shippingDestinationAddress" class="mz-shipping-destination-address-dd" data-mz-fulfillment-contact data-mz-value="fulfillmentContactId" {% if model.isLoading %} disabled {% endif %}>
-			        <option selected="selected" value="new">{{ labels.shippingDestinationSelect }}</option>
+				   <option value="" class="mz-shipping-destination-address"> </option>
+			       <option value="new" class="mz-shipping-destination-address-select-new-address">{{ labels.shippingDestinationNewAddress }}</option>
 		            {% for destination in model.selectableDestinations %}
 		            	<option class="mz-shipping-destination-address-select" value="{{ destination.id }}" {% if model.destinationId == destination.id %} selected="selected" {% endif %}>{{ destination.destinationContact.address.address1 }}, {{ destination.destinationContact.address.cityOrTown }} {{ destination.destinationContact.address.stateOrProvince }}</option>
 		            {% endfor %}
-		            <option value="new" class="mz-shipping-destination-address-select-new-address" data-mz-action="handleNewContact">{{ labels.shippingDestinationNewAddress }}</option>
         		</select>
         		{% if model.destinationId %}
 					<a class="mz-shipping-destination-edit-address-link" data-mz-action="handleEditContact" data-mz-destination-id="{{ model.destinationId }}">{{ labels.shippingDestinationEditAddress}}</a>

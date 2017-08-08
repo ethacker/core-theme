@@ -58,8 +58,7 @@ define(['modules/backbone-mozu','modules/jquery-mozu','underscore', 'hyprlivecon
             };
 
 			if(!this.model.validate()) {
-            	if (false) {
-                    //!isAddressValidationEnabled
+            	if (!isAddressValidationEnabled) {
                     saveAddress();
                 } else {
                     if (!addr.get('candidateValidatedAddresses')) {

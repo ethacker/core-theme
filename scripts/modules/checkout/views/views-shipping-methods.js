@@ -34,8 +34,14 @@ define(["modules/jquery-mozu",
                 });
             },
             initStepView: function(){
+                var self = this;
+                 self.model.isLoading(true);
                 CheckoutStepView.prototype.initStepView.apply(this, arguments);
-                this.model.updateShippingMethods();
+
+                this.model.updateShippingMethods().ensure(function(){
+                    self.model.isLoading(false);
+                    self.render();
+                });
             },
             updateShippingMethod: function (e) {
                 this.model.updateShippingMethod(this.$('[data-mz-shipping-method]:checked').val());

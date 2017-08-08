@@ -95,9 +95,10 @@ var CheckoutOrder = OrderModels.Order.extend({
         var destination = this.getDestinations().findWhere({'id': destinationId});
         
         if(destination){
-            destination.set('destinationContact', new CustomerModels.Contact(destination.get('destinationContact')));
+            var destCopy = destination.clone();
+            destCopy.set('destinationContact', new CustomerModels.Contact(destCopy.get('destinationContact')));
             this.getCheckout().get('dialogContact').get("destinationContact").clear();
-            this.getCheckout().set('dialogContact', destination);
+            this.getCheckout().set('dialogContact', destCopy);
 
             this.getCheckout().get('dialogContact').trigger('openDialog');
         }
