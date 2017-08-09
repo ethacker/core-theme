@@ -177,6 +177,9 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
             return self.getCheckout().apiModel.addShippingDestination({DestinationContact : destination.get('destinationContact').toJSON()}).then(function(data){
                 self.add(new ShippingDestination(data.data));
                 var item = self.getCheckout().get('items').findWhere({editingDestination: true});
+                if(!item){
+                    item = self.getCheckout().get('items').at(0);
+                }
                 //item.model.isLoading(true);
                 item.updateCheckoutDestination(data.data.id).then(function(){
                     item.model.set('editingDestination', false);

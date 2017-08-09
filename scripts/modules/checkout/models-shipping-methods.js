@@ -144,6 +144,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, FulfillmentC
             //     })
             // },
             refreshShippingMethods: function (methods) {
+                this.parent.get('shippingMethods').reset();
                 this.parent.get('shippingMethods').add(methods);
             },
             updateShippingMethods : function(){

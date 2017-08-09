@@ -51,7 +51,7 @@ define(["modules/jquery-mozu",
             handleEditContact: function(e){
                 var destinationId = this.model.get('destinationId');
                 if(destinationId) {
-                    this.model.set('editingDestination', true);
+                    //this.model.set('editingDestination', true);
                     this.model.editContact(destinationId);    
                 }
             },
@@ -141,7 +141,7 @@ define(["modules/jquery-mozu",
             handleEditContact: function(e){
                 var destinationId = this.model.get('destinationId');
                 if(destinationId) {
-                    this.model.set('editingDestination', true);
+                    //this.model.set('editingDestination', true);
                     this.model.editContact(destinationId);    
                 }
             },

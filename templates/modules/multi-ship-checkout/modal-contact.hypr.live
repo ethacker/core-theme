@@ -4,7 +4,7 @@
 
 <div id="mzContactDialog" data-mz-contact-modal-content class="mz-contact-dialog">
 
-	{% include "modules/multi-ship-checkout/address-form" %}      
+	{% include "modules/multi-ship-checkout/address-dialog" %}      
 
 </div>
 {% endblock modal-body %}

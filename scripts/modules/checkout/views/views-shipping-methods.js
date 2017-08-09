@@ -30,7 +30,7 @@ define(["modules/jquery-mozu",
              initialize: function(){
                 var self = this;
                 this.listenTo(this.model, 'shippingInfoUpdated', function() {
-                    self.render();
+                    self.render(); 
                 });
             },
             initStepView: function(){
@@ -38,10 +38,12 @@ define(["modules/jquery-mozu",
                  self.model.isLoading(true);
                 CheckoutStepView.prototype.initStepView.apply(this, arguments);
 
-                this.model.updateShippingMethods().ensure(function(){
-                    self.model.isLoading(false);
-                    self.render();
-                });
+                if(this.model.getCheckout().get('shippingStep').stepStatus() == "complete") {
+                    this.model.updateShippingMethods().ensure(function(){
+                        self.model.isLoading(false);
+                        self.render();
+                    });
+                }
             },
             updateShippingMethod: function (e) {
                 this.model.updateShippingMethod(this.$('[data-mz-shipping-method]:checked').val());
