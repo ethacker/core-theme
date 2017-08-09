@@ -3,9 +3,9 @@
 
 	<p>{{ labels.confirmationText }}</p>
 
-    <p>{{ labels.yourOrderNumber|string_format(model.fakedata.number)|safe }}</p>
+    <p>{{ labels.yourOrderNumber|string_format(model.number)|safe }}</p>
 
-    {% with model.fakedata.groupings as groupings %}
+    {% with model.groupings as groupings %}
     <div class="mz-l-stack">
 
       {% if groupings|findwhere('fulfillmentMethod', 'Ship') %}
@@ -14,12 +14,12 @@
           {% for grouping in groupings %}
             {% if grouping.fulfillmentMethod == "Ship" %}
               <div class="mz-confirmation-container">
-                    {% with model.fakedata.items as items %}
+                    {% with model.items as items %}
                       {% include "modules/confirmationv2/confirmation-order-summary" with items=items grouping=grouping %}
                     {% endwith %}
 
                 <div style="display:-webkit-flex;margin:10px;width:100%">
-                  {% with model.fakedata.destinations|findwhere("id", grouping.destinationId) as destination %}
+                  {% with model.destinations|findwhere("id", grouping.destinationId) as destination %}
                   <div class="mz-addresssummary" style="width:50%"><b>{{ labels.shipTo }}</b>{% include "modules/common/address-summary" with model=destination.destinationContact %}</div>
                   <div style="width:50%"><b>{{ labels.shippingMethod }}</b>: {{ grouping.shippingMethodName }}</div>
                   {% endwith %}
@@ -53,7 +53,7 @@
           {% for grouping in groupings %}
             {% if grouping.fulfillmentMethod == "Digital" %}
               <div class="mz-confirmation-container">
-                  {% with model.fakedata.items as items %}
+                  {% with model.items as items %}
                     {% include "modules/confirmationv2/confirmation-order-summary" with items=items grouping=grouping %}
                   {% endwith %}
                   <div class="mz-confirmation-shoppernotes">
@@ -82,7 +82,7 @@
       {% if grouping %}
         <div class="mz-l-stack-section" id="mz-pickup-section">
           <h4 class="mz-l-stack-sectiontitle">{{ labels.orderItemsPickup }}</h4>
-        {% for location in model.fakedata.fulfillmentLocations %}
+        {% for location in model.fulfillmentLocations %}
           <div class="mz-confirmation-container">
             <table class="mz-ordersummary-confirmation">
               <thead>
@@ -94,7 +94,7 @@
                 </tr>
               </thead>
               <tbody>
-                {% for item in model.fakedata.items %}
+                {% for item in model.items %}
                   {% if item.fulfillmentLocationCode == location.id %}
                   <tr class="mz-ordersummary-line mz-ordersummary-line-item {% if item.discountTotal > 0 %}is-discounted{% endif %}">
                     <td class="mz-ordersummary-item-product">
@@ -152,8 +152,7 @@
           {% endif %}
       </div>
 
-
-        {% include "modules/confirmationv2/confirmation-price-summary" with model=model.fakedata %}
+        {% include "modules/confirmationv2/confirmation-price-summary" %}
 
         {% if model.shopperNotes.comments %}
         <div class="mz-l-stack-section">
@@ -167,6 +166,7 @@
             <p class="mz-ordercomments-body">{{ model.shopperNotes.giftMessage }}</p>
         </div>
         {% endif %}
+
         {% if model.attributes.length > 0 %}
         <div class="mz-l-stack-section">
             <h4 class="mz-l-stack-sectiontitle">{{ labels.additionalInformation }}</h4>
