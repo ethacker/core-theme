@@ -4,7 +4,7 @@
 	<p>{{ labels.confirmationText }}</p>
 
     <p>{{ labels.yourOrderNumber|string_format(model.orderNumber)|safe }}</p>
-    
+
   <div class="mz-l-stack">
         {% if model.hasDirectShip %}
         <div class="mz-l-stack-section">

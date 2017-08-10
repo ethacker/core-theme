@@ -8,6 +8,7 @@
     </tr>
   </thead>
   <tbody>
+
     {% for id in grouping.orderItemIds %}
       {% with items|findwhere("id", id) as item %}
     <tbody>

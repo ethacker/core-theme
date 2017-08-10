@@ -7,7 +7,9 @@
 
     {% with model.groupings as groupings %}
     <div class="mz-l-stack">
-      {% if groupings|findwhere('fulfillmentMethod', 'Ship') %}
+
+      {% if model.items|findwhere("fulfillmentMethod", "Ship") %}
+
       <div class="mz-l-stack-section" id="mz-ship-section">
           <h4 class="mz-l-stack-sectiontitle">{{ labels.shippingInformation }}</h4>
           {% for grouping in groupings %}

@@ -6,7 +6,9 @@
 
 {% block body-content %}
 
-{% preload_json model "order" %}
+{% preload_json model "checkout" %}
+{% require_script "pages/confirmationv2" %}
+
 
 <div id="confirmation-container">
   {% include "modules/confirmationv2/confirmation-detail" %}
