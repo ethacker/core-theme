@@ -312,6 +312,13 @@
             "userCreatable": false
         },
         {
+          "entityType": "checkout",
+          "id": "confirmationv2",
+          "template":"confirmationv2",
+          "title": "ConfirmationV2",
+          "userCreatable": false
+        },
+        {
             "entityType": "checkout",
             "id": "checkoutv2",
             "template": "checkoutv2",

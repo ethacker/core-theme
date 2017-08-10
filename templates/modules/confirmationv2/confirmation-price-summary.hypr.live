@@ -1,110 +1,91 @@
-<div class="mz-l-container">
-    <h1 class="mz-pagetitle">{{ labels.orderConfirmation }} </h1>
+<div class="mz-confirmation-price-summary">
+<table class="mz-ordersummary-confirmation">
+    <tr class="mz-ordersummary-subtotal">
+      <td colspan="4">
+        <span class="mz-ordersummary-totalname">{{ labels.subtotal }}:</span>
+        <span class="mz-ordersummary-totalvalue">{{ model.subtotal|currency }}</span>
+      </td>
+    </tr>
+  {% for discount in model.orderDiscounts %}
+  {% if not discount.excluded %}
+  <tr class="mz-ordersummary-discount">
+    <td colspan="4">
+      <span class="mz-ordersummary-discountname">{{ discount.discount.name }}:</span>
+      <span class="mz-ordersummary-discountamt">-{{ discount.impact|currency }}</span>
+    </td>
+  </tr>
+  {% endif %}
+  {% endfor %}
 
-	<p>{{ labels.confirmationText }}</p>
+  {% if model.dutyTotal > 0 %}
+  <tr class="mz-ordersummary-tax">
+    <td colspan="4">
+      <span class="mz-ordersummary-totalname">{{ labels.taxDuty }}:</span>
+      <span class="mz-ordersummary-totalvalue">{% filter currency %} {{ model.dutyTotal|add(model.taxTotal)}} {% endfilter %}</span>
+    </td>
+  </tr>
+  {% else %}
+  {% if model.taxTotal %}
+  <tr class="mz-ordersummary-tax">
+      <td colspan="4">
+          <span class="mz-ordersummary-totalname">{{ labels.tax }}:</span>
+          <span class="mz-ordersummary-totalvalue">{{ model.taxTotal|currency }}</span>
+      </td>
+  </tr>
+  {% endif %}
+  {% endif %}
 
-    <p>{{ labels.yourOrderNumber|string_format(model.orderNumber)|safe }}</p>
+  <tr class="mz-ordersummary-shippingtotal">
+      <td colspan="4">
+        <span class="mz-ordersummary-totalname">{{ labels.shippingHandling }}:</span>
+        <span class="mz-ordersummary-totalvalue">{{ model.shippingTotal|currency }}</span>
+      </td>
+    </tr>
+    {% for shippingDiscount in model.grouping.shippingDiscounts %}
+    <tr class="mz-ordersummary-shippingdiscount">
+      <td colspan="4">
+        <span class="mz-ordersummary-totalname">{{ shippingDiscount.discount.discount.name }}:</span>
+        <span class="mz-ordersummary-totalvalue">-{{ shippingDiscount.discount.impact|currency }}</span>
+      </td>
+    </tr>
+    {% endfor %}
+    {% if model.handlingTotal %}
+    <tr class="mz-ordersummary-additionalhandling">
+        <td colspan="4">
+          <span class="mz-ordersummary-totalname">{{ labels.additionalHandling }}{% if model.handlingAmount > model.handlingTotal  %}<span class="is-crossedout" {% block crossedout-inline-style %}{% endblock crossedout-inline-style %}> ( {{ model.handlingAmount|currency }} )</span>{% endif %}</span>
+          <span class="mz-ordersummary-totalvalue">{{ model.handlingTotal|currency }}</span>
+        </td>
+    </tr>
+    {% endif %}
 
-    <div class="mz-l-stack">
-        {% if model.hasDirectShip %}
-        <div class="mz-l-stack-section">
-            <h4 class="mz-l-stack-sectiontitle">{{ labels.shippingInformation }}</h4>
-            <div class="mz-l-stack-item">
-                <small>{{ labels.shipTo }}</small>
-                <div class="mz-addresssummary">{% include "modules/common/address-summary" with model=model.fulfillmentInfo.fulfillmentContact %}</div>
-            </div>
-            <div class="mz-l-stack-item">
-                <small>{{ labels.shippingMethod }}</small>
-                <div>{{ model.fulfillmentInfo.shippingMethodName }}</div>
-            </div>
-        </div>
-        {% endif %}
-        {% for item in model.items %}
-        {% if item.fulfillmentMethod == "Pickup" %}
-        <div class="mz-l-stack-section">
-            <h4 class="mz-l-stack-sectiontitle">{{ labels.storePickupFor|string_format(item.product.name)|safe }}</h4>
-            {% with model.locationDetails|findwhere("code", item.fulfillmentLocationCode) as location %}
-            <div class="mz-l-stack-item">
-                <small>{{ labels.storeName }}</small>
-                <div>{{ location.name }}</div>
 
-            </div>
-            <div class="mz-l-stack-item">
-              <small>{{ labels.address }}</small>
-              <div>{{ location.address.address1 }}</div>
-              {% if location.address.address2 %}<div> {{ location.address.address2 }}</div>{% endif %}
-              {% if location.address.address3 %}<div> {{ location.address.address3 }}</div>{% endif %}
-              {% if location.address.address4 %}<div> {{ location.address.address4 }}</div>{% endif %}
-              <div> {{ location.address.cityOrTown }}, {{ location.address.stateOrProvince }}</div>
-              <div> {{location.address.postalOrZipCode}} </div>
-            </div>
-            {% endwith %}
-        </div>
-        {% endif %}
-        {% endfor %}
+{% if model.billingInfo and model.billingInfo.digitalCreditPaymentTotal %}
+  <tr class="mz-ordersummary-digitalcreditpayment">
+    <td colspan="4">
+      <span class="mz-ordersummary-totalname">{{ labels.digitalCreditTotal }}</span>
+      <span class="mz-ordersummary-totalvalue">{{ labels.digitalCreditSubtractFromOrderPrefix }}{{ model.billingInfo.digitalCreditPaymentTotal|currency }}{{ labels.digitalCreditSubtractFromOrderSuffix }}</span>
+    </td>
+  </tr>
 
-        <div class="mz-l-stack-section">
-            <h4 class="mz-l-stack-sectiontitle">{{ labels.payments }}</h4>
-            {% if model.total == 0 %}
-                {% with model.total|currency as total %}
-                    <h4 class="mz-confirmation-nopaymentrequired">{{ labels.noPaymentWasRequired|string_format(total) }}</h4>
-                {% endwith %}
-            {% else %}
-                {% for payment in model.payments %}
-                {% if payment.status != "Voided" and payment.status != "Declined" %}
-                {% include "modules/checkout/checkout-payment" with model=payment %}
-                {% endif %}
-                {% endfor %}
-            {% endif %}
-        </div>
+  <tr class="mz-ordersummary-grandtotal">
+        <td colspan="4">
+            <span class="mz-ordersummary-totalname">{{ labels.remainingBalance }}:</span>
+            <span class="mz-ordersummary-totalvalue">{{ model.billingInfo.nonStoreCreditTotal|currency }}</span>
+        </td>
+    </tr>
 
-        {% if model.attributes.length > 0 %}
-        <div class="mz-l-stack-section">
-            <h4 class="mz-l-stack-sectiontitle">{{ labels.additionalInformation }}</h4>
-            {% for attribute in model.attributes %}
-            {% with attribute.values|first as attributeVal %}
-            {% with model.orderAttributeDefinitions|findwhere('attributeFQN', attribute.fullyQualifiedName) as attributeDef %}
-            {% if attributeDef %}
-                <div class="mz-l-stack-item">
-                    <small>{{ attributeDef.content.value }}</small>
-                    <div>
-                        {% if attributeDef.dataType == "DateTime" %}
-                            {{ attributeVal|date("F j, Y") }}
-                        {% else %}
-                            {% if attributeDef.dataType == "Bool" %}
-                                {% if attributeVal == "True" %}
-                                Yes
-                                {% else %}
-                                No
-                                {% endif %}
-                            {% else %}
-                                {{ attributeVal }}
-                            {% endif %}
-                        {% endif %}
-                    </div>
-                </div>
-            {% endif %}
-            {% endwith %}
-            {% endwith %}
-            {% endfor %}
-        </div>
-        {% endif %}
+{% endif %}
+</table>
+</div>
+<div class="mz-confirmation-price-summary">
+  <table class="mz-ordersummary-confirmation">
+    <tr class="mz-ordersummary-grandtotal">
+          <td colspan="4">
+              <span class="mz-ordersummary-totalname">{{ labels.total }}:</span>
+              <span class="mz-ordersummary-totalvalue">{{ model.total|currency }}</span>
+          </td>
 
-        <div class="mz-l-stack-section">
-            <h4 class="mz-l-stack-sectiontitle">{{ labels.orderSummary }} </h4>
-            {% include "modules/common/order-summary" %}
-            {% if model.shopperNotes.comments %}
-            <div class="mz-ordercomments">
-                <h5 class="mz-ordercomments-header">{{ labels.comments }}</h5>
-                <p class="mz-ordercomments-body">{{ model.shopperNotes.comments }}</p>
-            </div>
-            {% endif %}
-            {% if model.shopperNotes.giftMessage %}
-            <div class="mz-ordercomments">
-                <h5 class="mz-ordercomments-header">{{ labels.giftMessage }}</h5>
-                <p class="mz-ordercomments-body">{{ model.shopperNotes.giftMessage }}</p>
-            </div>
-            {% endif %}
-        </div>
-    </div>
-</div><!-- #order-confirmation -->
+      </tr>
+
+  </table>
+</div>

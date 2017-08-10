@@ -8,8 +8,6 @@
 
 {% preload_json model "order" %}
 
-{% require_script "pages/confirmation" %}
-
 <div id="confirmation-container">
   {% include "modules/confirmationv2/confirmation-detail" %}
 </div>
