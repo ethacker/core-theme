@@ -430,7 +430,7 @@ define(['modules/api',
     });
 
   function renderVisaCheckout(model) {
-    
+
     var visaCheckoutSettings = HyprLiveContext.locals.siteContext.checkoutSettings.visaCheckout;
     var apiKey = visaCheckoutSettings.apiKey;
     var clientId = visaCheckoutSettings.clientId;
@@ -456,7 +456,7 @@ define(['modules/api',
     }
 
     initVisa();
-    
+
   }
     /* begin visa checkout */
     function initVisaCheckout () {
