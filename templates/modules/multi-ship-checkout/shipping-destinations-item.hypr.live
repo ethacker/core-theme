@@ -1,14 +1,16 @@
 {% if model.fulfillmentMethod == "Ship" %}
-<div class="mz-shipping-destination-title">
+<div class="mz-shipping-destination-title mz-l-formfieldgroup-row">
+{% if model.isOriginalCartItem%}
   <h3>{{ model.product.name }}</h3>
+{%endif%}
 </div>
 
 <div class="mz-l-formfieldgroup-row">
 	<div class="mz-l-formfieldgroup-cell">
 		<label for="mz-shipping-destination-quantity" class="mz-shipping-destination-label-quantity">
 			{{ labels.shippingDestinationQuantityLabel }}
+			<span id="mz-shipping-destination-quantity" data-mz-destination-quantity>{{ model.quantity }}</span>
 		</label>
-		<span id="mz-shipping-destination-quantity" data-mz-destination-quantity>{{ model.quantity }}</span>
 	</div>
 	<div class="mz-l-formfieldgroup-cell">
 		<div class="mz-l-formfieldgroup-row mz-shipping-destination">

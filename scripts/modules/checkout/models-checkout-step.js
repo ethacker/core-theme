@@ -46,6 +46,9 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext) {
         getOrder: function () {
             return this.parent;
         },
+        getCheckout: function () {
+            return this.parent;
+        },
         stepStatus: function (newStatus) {
             if (arguments.length > 0) {
                 this._stepStatus = newStatus;

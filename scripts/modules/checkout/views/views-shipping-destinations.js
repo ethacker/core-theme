@@ -4,8 +4,36 @@ define(["modules/jquery-mozu",
     "modules/backbone-mozu", 
     'hyprlivecontext',
     "modules/checkout/views-checkout-step",
-    'modules/editable-view'], 
-    function ($, _, Hypr, Backbone, HyprLiveContext, CheckoutStepView, EditableView) {
+    'modules/editable-view',
+    'modules/checkout/models-shipping-destinations'], 
+    function ($, _, Hypr, Backbone, HyprLiveContext, CheckoutStepView, EditableView, ShippingDestinationModels) {
+
+        var ShippingDestinationSingleView = Backbone.MozuView.extend({
+            templateName: 'modules/common/address-form',
+            autoUpdate: [
+                'firstName',
+                'lastNameOrSurname',
+                'address.address1',
+                'address.address2',
+                'address.address3',
+                'address.cityOrTown',
+                'address.countryCode',
+                'address.stateOrProvince',
+                'address.postalOrZipCode',
+                'address.addressType',
+                'phoneNumbers.home',
+                'email'
+            ],
+            initialize: function(){
+                var self = this;
+                this.listenTo(this.model, 'saveSingleDestination', function() {
+                    self.saveSingleDestination();
+                });
+            },
+            saveSingleDestination: function(){
+
+            }
+        });
 
         var ShippingDestinationItemView = Backbone.MozuView.extend({
             templateName: 'modules/multi-ship-checkout/shipping-destinations-item',
@@ -95,21 +123,6 @@ define(["modules/jquery-mozu",
 
          var ComboShippingAddressView = CheckoutStepView.extend({
             templateName: 'modules/multi-ship-checkout/step-shipping-destinations',
-            autoUpdate: [
-                'firstName',
-                'lastNameOrSurname',
-                'address.address1',
-                'address.address2',
-                'address.address3',
-                'address.cityOrTown',
-                'address.countryCode',
-                'address.stateOrProvince',
-                'address.postalOrZipCode',
-                'address.addressType',
-                'phoneNumbers.home',
-                'contactId',
-                'email'
-            ],
             renderOnChange: [
                 'isMultiShipMode'
             ],
@@ -129,7 +142,7 @@ define(["modules/jquery-mozu",
                 }
 
                 self.model.updateSingleCheckoutDestination($target.val()).ensure(function(){
-                   self.render(); 
+                   //self.render(); 
                 });
             },
             handleNewContact: function(e){
@@ -168,6 +181,18 @@ define(["modules/jquery-mozu",
                         model: shippingDestination
                     });
                     shippingDestinationView.render();
+                });
+
+                $.each(this.$el.find('[data-mz-shipping-destination-single]'), function(index, val) {
+                    var shippingDestination = self.model.getCheckout().get('destinations').at(0);
+                    if(!shippingDestination) {
+                        shippingDestination = self.model.getCheckout().get('destinations').newDestination();
+                    }
+                    var shippingDestinationSingleView = new ShippingDestinationSingleView({
+                        el: $(this),
+                        model: shippingDestination.get('destinationContact')
+                    });
+                    shippingDestinationSingleView.render();
                 });
             }
         });

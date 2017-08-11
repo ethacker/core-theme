@@ -171,10 +171,10 @@ var CheckoutPage = Backbone.MozuModel.extend({
                 billingInfo: BillingInfo,
                 shopperNotes: Backbone.MozuModel.extend(),
                 customer: CustomerModels.Customer,
+                destinations : ShippingDestinationModels.ShippingDestinations,
                 shippingStep: ShippingStep,
                 shippingInfo: ShippingInfo,
                 dialogContact: ContactDialogModels,
-                destinations : ShippingDestinationModels.ShippingDestinations,
                 shippingMethods : Backbone.Collection.extend()
             },
             validation: checkoutPageValidation,
@@ -185,16 +185,26 @@ var CheckoutPage = Backbone.MozuModel.extend({
                 isMultiShipMode : Backbone.MozuModel.DataTypes.Boolean
             },
             defaults: {
-                isMultiShipMode : function(){
-                    if(this.get('destinations').length > 1) {
-                        return true;
-                    }
-                    return false;
-                }
+                "isMultiShipMode" : false
             },
             renderOnChange: [
                 'isMultiShipMode'
             ],
+            setMultiShipMode : function(){
+               if(this.get('destinations').length > 1) {
+                    return this.set('isMultiShipMode', true);
+                }
+                return this.set('isMultiShipMode', false);
+            },
+            addCustomerContacts : function(){
+                var self =this;
+                var contacts = self.get('customer').get('contacts');
+                if(contacts.length){
+                    _.each(contacts, function(contact, key){
+                        self.get('destinations').newDestination(contact, true);
+                    }) 
+                }
+            },
             initialize: function (data) {
 
                 var self = this,
@@ -203,7 +213,8 @@ var CheckoutPage = Backbone.MozuModel.extend({
                     
                     
                 _.defer(function() {
-
+                    self.setMultiShipMode();
+                    self.addCustomerContacts();
                     var latestPayment = self.apiModel.getCurrentPayment(),
                         activePayments = self.apiModel.getActivePayments(),
                         //fulfillmentInfo = self.get('fulfillmentInfo'),

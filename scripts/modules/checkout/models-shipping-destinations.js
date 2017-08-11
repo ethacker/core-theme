@@ -115,7 +115,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
 
     var ShippingDestination = Backbone.MozuModel.extend({
         relations: {
-            DestinationContact: CustomerModels.Contact
+            destinationContact: CustomerModels.Contact
         },
         dataTypes: {
             destinationId: function(val) {
@@ -126,7 +126,6 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
             'destinationId': function (value) {
                 if (!value || typeof value !== "number") return Hypr.getLabel('passwordMissing');
             }
-
         },
         getCheckout : function(){
             return this.collection.parent.parent;
@@ -154,14 +153,17 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
         getCheckout : function(){
             return this.parent;
         },
-        addContactDestination : function(contact, isCustomerAddress){
-            var destination = {destinationContact : contact};
+        newDestination : function(contact, isCustomerAddress){
+            var destination = {destinationContact : contact || new CustomerModels.Contact({})};
 
             if(isCustomerAddress){
                destination.isCustomerAddress = isCustomerAddress;
             }
 
-            this.add(new ShippingDestination(destination));
+            destination.isSaved = false;
+            var shippingDestination = new ShippingDestination(destination);
+            this.add(shippingDestination);
+            return shippingDestination;
         },
         validateShippingDestination : function(value, attr, computedState){
             var itemValidations =[];
@@ -171,23 +173,16 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
             });
             return (itemValidations.length) ? itemValidations : null; 
         },
-        addShippingDestination: function(destination){
+        addApiShippingDestination : function(destination){
             var self = this;
-
             return self.getCheckout().apiModel.addShippingDestination({DestinationContact : destination.get('destinationContact').toJSON()}).then(function(data){
                 self.add(new ShippingDestination(data.data));
-                var item = self.getCheckout().get('items').findWhere({editingDestination: true});
-                if(!item){
-                    item = self.getCheckout().get('items').at(0);
-                }
-                //item.model.isLoading(true);
-                item.updateCheckoutDestination(data.data.id).then(function(){
-                    item.model.set('editingDestination', false);
-                    self.trigger('sync');
-                    self.trigger('destinationsUpdate');
-                    //item.model.isLoading(false);
-                });
+                return data;
             });
+        },
+        addShippingDestination: function(destination){
+            var self = this;
+            return self.addApiShippingDestination(destination)
         },
         updateShippingDestination: function(destination){
             var self = this;
@@ -207,9 +202,9 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
     });
 
    
-        return {
-            ShippingDestinations: ShippingDestinations,
-            ShippingDestination : ShippingDestination,
-            ShippingDestinationItem : ShippingDestinationItem
-        };
+    return {
+        ShippingDestinations: ShippingDestinations,
+        ShippingDestination : ShippingDestination,
+        ShippingDestinationItem : ShippingDestinationItem
+    };
 });

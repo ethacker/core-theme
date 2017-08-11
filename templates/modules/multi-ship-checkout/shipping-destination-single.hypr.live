@@ -10,12 +10,14 @@
 
   {% if model.requiresFulfillmentInfo  %}
     <div class="mz-formstep-fields mz-l-formfieldgroup mz-checkoutform  mz-checkoutform-shipping mz-checkoutform-active">
-      {% if model.selectableDestinations.length %}
+      {% if model.selectableDestinations.length > 1 %}
        
           {% include "modules/checkout/checkout-shipping-contact-selector" with model=model.selectableDestinations destinationId=model.selectedDestination.id isLoading=model.isLoading%}
 
         {% else %}
-        {% include "modules/common/address-form" with countries=pageContext.shippingCountries states=pageContext.shippingStates %}
+         <div data-mz-shipping-destination-single>
+          {% include "modules/common/address-form" with model=model.destinationContact countries=pageContext.shippingCountries states=pageContext.shippingStates %}
+         </div>
       {% endif %}
     </div>
 

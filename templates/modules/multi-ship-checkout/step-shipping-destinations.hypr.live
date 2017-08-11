@@ -5,26 +5,31 @@
       {% endif %}
   </h3>
   {% if model.requiresFulfillmentInfo %}
-    <a data-mz-action="toggleMultiShipMode">Toggle Multi Ship</a>
+   
   {% endif %}
   <div class="mz-formstep-body" mz-shipping-destination-view>
     {% if model.requiresDigitalFulfillmentContact %}
-      <div class="mz-formstep-fields mz-l-formfieldgroup mz-checkoutform mz-checkoutform-active">
-        {% include "modules/checkout/checkout-digital-fulfillment" with editingContact=model %}
+      <div class="mz-formstep-fields mz-l-formfieldgroup mz-checkoutform mz-checkoutform-section mz-checkoutform-active">
+        {% include "modules/checkout/checkout-digital-fulfillment" %}
       </div>
-      <div class="mz-formstep-summary mz-addresssummary mz-checkoutform-active">
+      <div class="mz-formstep-summary mz-addresssummary mz-checkoutform-section mz-checkoutform-active">
         <span>Gift Card Email: {{ model.email }}</span>
       </div>
     {% endif %}
 
-    {% if model.isMultiShipMode %}
-    	{% include "modules/multi-ship-checkout/shipping-destinations" %}
-    {% else %}
-    	{% include "modules/multi-ship-checkout/shipping-destination-single" %}
-    {% endif %}
-  <div class="mz-formstep-next">
-    {% if model.requiresFulfillmentInfo || model.requiresDigitalFulfillmentContact %} 
-        <button class="mz-button" data-mz-action="next">{{ labels.next }}</button>
-    {% endif %}
-  </div>
+    <div class="mz-checkoutform-section">
+      
+      {% if model.isMultiShipMode %}
+        <a data-mz-action="toggleMultiShipMode">{{ labels.toggleToSingleShip }}</a>
+      	{% include "modules/multi-ship-checkout/shipping-destinations" %}
+      {% else %}
+        <a data-mz-action="toggleMultiShipMode">{{ labels.toggleToMultiShip }}</a>
+      	{% include "modules/multi-ship-checkout/shipping-destination-single" %}
+      {% endif %}
+      <div class="mz-formstep-next">
+        {% if model.requiresFulfillmentInfo || model.requiresDigitalFulfillmentContact %} 
+            <button class="mz-button" data-mz-action="next">{{ labels.next }}</button>
+        {% endif %}
+      </div>
+    </div>
 </div>

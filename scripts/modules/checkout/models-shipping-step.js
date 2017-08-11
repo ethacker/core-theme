@@ -3,51 +3,75 @@ define([
     'underscore',
     'hyprlive',
     'modules/backbone-mozu',
-    'modules/api',
+    'modules/api',  
     'hyprlivecontext',
-    'modules/checkout/models-checkout-step'
+    'modules/checkout/models-checkout-step',
+    'modules/checkout/models-shipping-destinations',
+    'modules/models-customer'
 ],
-function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep) {
+function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDestinationModels, CustomerModels) {
 
     var ShippingStep = CheckoutStep.extend({
         helpers : ['orderItems', 'selectableDestinations', 'selectedDestination'],
         validation: {
             ShippingDestinations :{
-            fn: function(value, attr){
-                var destinationErrors = [];
-                this.parent.get('items').forEach(function(item, idx){
-                    var itemValid = item.validate();
-                    if (itemValid && item.get('fulfillmentMethod') === "Ship") {
-                        destinationErrors.push(itemValid);
+                fn: function(value, attr){
+                    var destinationErrors = [];
+                    this.parent.get('items').forEach(function(item, idx){
+                        var itemValid = item.validate();
+                        if (itemValid && item.get('fulfillmentMethod') === "Ship") {
+                            destinationErrors.push(itemValid);
+                        }
+                    });
+                    return (destinationErrors.length) ? destinationErrors : false;
+                }
+            }
+        },
+        digitalOnlyValidation: {
+            'email': {
+                pattern: 'email',
+                msg: Hypr.getLabel('emailMissing')
+            }
+        },
+        singleShippingAddressValidation : { 
+            singleShippingAddess : {
+                fn : function(value, attr){ 
+                    var destination = this.parent.get('destinations').at(0);
+
+                    if(destination){
+                        var instance = destination.get('destinationContact') instanceof CustomerModels.Contact;
+                        if(!instance) {
+                            destination.set('destinationContact',  new CustomerModels.Contact(destination.get('destinationContact')))
+                        }
+                        var destinationErrors = destination.get('destinationContact').validate();
+                        return (destinationErrors) ? destinationErrors : false;
                     }
-                });
-                return (destinationErrors.length) ? destinationErrors : false;
-            }
+                    return true
+                }
             }
         },
-        initSet : function(){
-           var self = this;
-            // var orderItems = self.parent.get('items');
-            // var groupedOrderItems = _.groupBy(orderItems, 'lineId');
-            // _.each(groupedOrderItems, function(value, key){
-            //     self.getDestinations().add(new ShippingDestination({ lineId: key, items: value }));
-            // }); 
-            
-            
-        },
+        autoUpdate: [
+            'digitalContactEmail'
+        ],
         initialize : function() {
             //TO-DO: This is a work around for the api sync rerendering collections.
             // Replace before using in Prod
             var self = this;
-            //api.on('sync', function(asdf,asdff, asdfff){
-                //self.parent.set('items', asdff.items);
-                //self.trigger('render');
-            //});
+        },
+        digitalGiftDestination :function() {
+            //TO-DO : Primary Addresss select First
+            var shippingDestinations = this.getCheckout().get('destinations');
+            var dGDestination = shippingDestinations.findWhere({digitalGiftDestination: true});
+            if(dGDestination){
+                return dGDestination.toJSON();
+            }
+            return new ShippingDestinationModels.ShippingDestination({});
         },
         orderItems : function(){
-             return this.parent.get("items").models;
+            return this.parent.get("items").sortBy('originalCartItemId');
         },
         selectableDestinations : function(){
+           // return this.parent.get('destinations').filter(function(destination){ return !destination.get('digitalGiftDestination') }).toJSON();
             return this.parent.get('destinations').toJSON();
         },
         selectedDestination : function(){
@@ -61,7 +85,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep) {
         },
         updateSingleCheckoutDestination: function(destinationId){
             var self = this;
-            return this.getCheckout().apiSetAllShippingDestinations({destinationId: destinationId});
+            return self.getCheckout().apiSetAllShippingDestinations({destinationId: destinationId}); 
         },
         addNewContact: function(){
             this.getCheckout().get('dialogContact').get("destinationContact").clear();
@@ -78,13 +102,85 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep) {
                 }
             },
             //Rename for clear
+        //Rename for clear
         isDigitalValid: function() {
-                var email = this.get('email');
-                return (!email) ? false : true;
-            },
+            var email = this.get('email');
+            return (!email) ? false : true;
+        },
+        //Rename for clear
+        // Breakup into seperate api update for fulfillment
+        nextDigitalOnly: function() {
+            var self = this,
+            checkout = this.getCheckout();
+
+            if (self.validate()) {
+                return false;
+            }
+
+            if(digitalGiftDestination) {}
+
+            // return self.getCheckout().apiModel.addShippingDestination({DestinationContact : {email: self.get('email')}}).then(function(data){
+            //     self.isLoading(false);
+            //     order.messages.reset();
+            //     order.syncApiModel();
+
+            //     self.calculateStepStatus();
+            //     return order.get('billingInfo').calculateStepStatus();
+            // });
+        },
+        nextSingleShippingAddress: function() {
+            var self = this,
+            checkout = this.getCheckout();
+            var validationObj = self.validate();
+
+            if (validationObj) {
+                if (validationObj) {
+                    Object.keys(validationObj.singleShippingAddess).forEach(function(key) {
+                        this.trigger('error', {
+                            message: validationObj.singleShippingAddess[key]
+                        });
+                    }, this);
+                }
+                return false;
+            }
+
+            var shippingDestination = self.getDestinations().at(0);
+
+            if(shippingDestination.get('isSaved') === false) {
+                self.getDestinations().addApiShippingDestination(shippingDestination).then(function(data){
+                    self.getCheckout().apiSetAllShippingDestinations({destinationId: data.data.id}).then(function(){
+                        self.calculateStepStatus();
+                        self.getCheckout().get('shippingInfo').calculateStepStatus();
+                    })
+                });
+            } else {
+                self.getDestinations().updateShippingDestination(shippingDestination).then(function(data){
+                    self.getCheckout().apiSetAllShippingDestinations({destinationId: data.data.id}).then(function(){
+                        self.calculateStepStatus();
+                        self.getCheckout().get('shippingInfo').calculateStepStatus();
+                    })
+                });
+            }
+            // return self.getCheckout().apiModel.addShippingDestination({DestinationContact : {email: self.get('email')}}).then(function(data){
+            //     self.isLoading(false);
+            //     order.messages.reset();
+            //     order.syncApiModel();
+
+            //     self.calculateStepStatus();
+            //     return order.get('billingInfo').calculateStepStatus();
+            // });
+
+        },
         calculateStepStatus: function() {
+
                 if (!this.requiresFulfillmentInfo() && this.requiresDigitalFulfillmentContact()) {
                     this.validation = this.digitalOnlyValidation;
+                }
+
+                if(this.validate()) return this.stepStatus('incomplete');
+
+                if (!this.isMultiShipMode() && this.getCheckout().get('destinations').length < 2) {
+                    this.validation = this.singleShippingAddressValidation;
                 }
 
                 if (!this.requiresFulfillmentInfo() && !this.requiresDigitalFulfillmentContact()) return this.stepStatus('complete');
@@ -96,6 +192,12 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep) {
                 var validationObj = this.validate();
 
                 if (validationObj) {
+                    if (!this.isMultiShipMode() && this.getCheckout().get('destinations').length < 2) {
+                        this.validation = this.singleShippingAddressValidation;
+                        this.nextSingleShippingAddress();
+                        return false;
+                    } 
+
                     Object.keys(validationObj.ShippingDestinations).forEach(function(key) {
                         Object.keys(validationObj.ShippingDestinations[key]).forEach(function(keyLevel2) {
                             this.trigger('error', {
@@ -103,7 +205,6 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep) {
                             });
                         }, this);
                     }, this);
-
                     return false;
                 }
                 return true;
@@ -167,9 +268,10 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep) {
                     return self.nextDigitalOnly();
                 }
 
-
-                if (!self.validateModel()) return false;
-
+                if (!self.validateModel()) {
+                    
+                  return false;  
+                } 
                 var order = self.getOrder(),
                     fulfillmentInfo = order.get('shippingInfo');
                     
@@ -185,26 +287,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep) {
                         self.isLoading(false);
                         fulfillmentInfo.calculateStepStatus();
                     });
-
-                    // order.apiModel.updateCheckout(order.toJSON()).then(function () {
-                         
-                    // });
-
-                    //
-                    // Remove getShippingMethodsFromContact, move to shipping Fulfillment as call to refresh
-                    // Saves Fulfillment Info and Returns Shipping Methods 
-                    //
-                    // order.apiModel.getShippingMethodsFromContact().then(function (methods) {
-                    //     return parent.refreshShippingMethods(methods);
-                    // }).ensure(function () {
-                    //     addr.set('candidateValidatedAddresses', null);
-                    //     self.isLoading(false);
-                    //     //Redundent
-                    //     //parent.isLoading(false);
-                    //     self.calculateStepStatus();
-                    //     //Redundent
-                    //     //parent.calculateStepStatus();
-                    // });                  
+                
                 };
                 completeStep();
 

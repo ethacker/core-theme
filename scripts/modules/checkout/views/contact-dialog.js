@@ -51,7 +51,19 @@ define(['modules/backbone-mozu','modules/jquery-mozu','underscore', 'hyprlivecon
                              self.model.trigger('closeDialog');
                         });
                 } else {
-                    self.model.parent.get('destinations').addShippingDestination(self.model).ensure(function () {
+                    self.model.parent.get('destinations').addShippingDestination(self.model).then(function(data){
+                        var item = checkout.get('items').findWhere({editingDestination: true});
+                        if(!item){
+                            item = checkout.get('items').at(0);
+                        }
+                        //item.model.isLoading(true);
+                        item.updateCheckoutDestination(data.data.id).then(function(){
+                            item.model.set('editingDestination', false);
+                            self.trigger('sync');
+                            self.trigger('destinationsUpdate');
+                            //item.model.isLoading(false);
+                        });
+                    }).ensure(function () {
                          self.model.trigger('closeDialog');    
                     });
                 }

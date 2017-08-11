@@ -1,7 +1,7 @@
 /* global module: true */
 module.exports = function (grunt) {
   'use strict';
-  //process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
   var pkg = grunt.file.readJSON('./package.json');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-jshint');
@@ -137,7 +137,7 @@ module.exports = function (grunt) {
       },
       javascript: {
         files: [
-          'scripts/**/*.js'
+          'scripts/**/**/**/*.js'
         ],
         tasks: [
           'newer:jshint:develop',
