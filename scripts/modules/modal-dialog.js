@@ -122,7 +122,7 @@ define(['modules/jquery-mozu', 'shim!vendor/bootstrap/js/modal[jquery=jQuery]'],
 
          if (footer){
            theElement.find('.modal-footer').html(footer);
-         } 
+         }
 
          if (hasCloseButton){
            var $closeButton = $("<button>", {"type": "button", "class": "mz-button", "aria-hidden": "true" });
