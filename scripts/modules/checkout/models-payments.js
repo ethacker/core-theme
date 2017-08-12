@@ -25,6 +25,6 @@ define([
             check: PaymentMethods.Check,
             purchaseOrder: PaymentMethods.PurchaseOrder
         }
-    })
+    });
     return BillingInfo;
 });

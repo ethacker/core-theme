@@ -66,7 +66,7 @@ define(["modules/jquery-mozu",
                     return;
                 }
 
-                self.model.updateCheckoutDestination($target.val());
+                self.model.updateCheckoutDestination($target.val(), $target.data("mzIsSaved"));
                 self.render();
 
             },

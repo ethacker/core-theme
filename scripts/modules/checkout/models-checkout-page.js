@@ -104,9 +104,17 @@ var CheckoutOrder = OrderModels.Order.extend({
         }
 
     },
-    updateCheckoutDestination: function(fulfillmentId){
+    updateCheckoutDestination: function(fulfillmentId, isSaved){
         var self = this;
         self.set('destinationId', fulfillmentId);
+        
+        if(!isSaved) {
+            var destination = self.getCheckout().get('destination').get(fulfillmentId);
+            self.getCheckout().get('destinations').addApiShippingDestination(destination).then(function(data){
+                self.getCheckout().apiUpdateCheckoutItemDestination({id: self.getCheckout().get('id'), itemId: self.get('id'), destinationId: data.data.id});
+            });
+            return false;
+        }
         self.getCheckout().apiUpdateCheckoutItemDestination({id: self.getCheckout().get('id'), itemId: self.get('id'), destinationId: fulfillmentId});
     },
     splitCheckoutItem : function(){
@@ -199,10 +207,13 @@ var CheckoutPage = Backbone.MozuModel.extend({
             addCustomerContacts : function(){
                 var self =this;
                 var contacts = self.get('customer').get('contacts');
+
                 if(contacts.length){
-                    _.each(contacts, function(contact, key){
-                        self.get('destinations').newDestination(contact, true);
-                    }) 
+                    contacts.each(function(contact, key){
+                        if(!self.get('destinations').hasDestination(contact)){
+                            self.get('destinations').newDestination(contact, true);
+                        }
+                    });
                 }
             },
             initialize: function (data) {
@@ -282,25 +293,12 @@ var CheckoutPage = Backbone.MozuModel.extend({
                     self.set('acceptsMarketing', true);
                 }
 
-                this.addCustomerAddressDestinations();
-
                 _.bindAll(this, 'update', 'onCheckoutSuccess', 'onCheckoutError', 'addNewCustomer', 'saveCustomerCard', 'apiCheckout', 
                     'addDigitalCreditToCustomerAccount', 'addCustomerContact', 'addBillingContact', 'addShippingContact', 'addShippingAndBillingContact');
 
             },
             getCustomerInfo : function(){
                 return this.get('customer');
-            },
-            addCustomerAddressDestinations : function(){
-                var destinations = this.get('destinations');
-                var customerContacts = this.getCustomerInfo().get('contacts').toJSON();
-
-                if(customerContacts.length){
-                    _.each(customerContacts, function(customer, idx){
-                        destinations.addContactDestination(customer, true); 
-                    });
-                   
-                }
             },
             applyAttributes: function() {
                 var storefrontOrderAttributes = require.mozuData('pagecontext').storefrontOrderAttributes;

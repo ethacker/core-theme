@@ -41,12 +41,12 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                     if(destination){
                         var instance = destination.get('destinationContact') instanceof CustomerModels.Contact;
                         if(!instance) {
-                            destination.set('destinationContact',  new CustomerModels.Contact(destination.get('destinationContact')))
+                            destination.set('destinationContact',  new CustomerModels.Contact(destination.get('destinationContact')));
                         }
                         var destinationErrors = destination.get('destinationContact').validate();
                         return (destinationErrors) ? destinationErrors : false;
                     }
-                    return true
+                    return true;
                 }
             }
         },
@@ -117,7 +117,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                 return false;
             }
 
-            if(digitalGiftDestination) {}
+            //if(digitalGiftDestination) {}
 
             // return self.getCheckout().apiModel.addShippingDestination({DestinationContact : {email: self.get('email')}}).then(function(data){
             //     self.isLoading(false);
@@ -151,14 +151,14 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                     self.getCheckout().apiSetAllShippingDestinations({destinationId: data.data.id}).then(function(){
                         self.calculateStepStatus();
                         self.getCheckout().get('shippingInfo').calculateStepStatus();
-                    })
+                    });
                 });
             } else {
                 self.getDestinations().updateShippingDestination(shippingDestination).then(function(data){
                     self.getCheckout().apiSetAllShippingDestinations({destinationId: data.data.id}).then(function(){
                         self.calculateStepStatus();
                         self.getCheckout().get('shippingInfo').calculateStepStatus();
-                    })
+                    });
                 });
             }
             // return self.getCheckout().apiModel.addShippingDestination({DestinationContact : {email: self.get('email')}}).then(function(data){

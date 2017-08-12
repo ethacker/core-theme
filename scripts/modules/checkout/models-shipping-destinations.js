@@ -156,14 +156,25 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
         newDestination : function(contact, isCustomerAddress){
             var destination = {destinationContact : contact || new CustomerModels.Contact({})};
 
-            if(isCustomerAddress){
-               destination.isCustomerAddress = isCustomerAddress;
+            if(isCustomerAddress && contact.get('id')){
+               destination.customerContactId = contact.get('id');
             }
 
             destination.isSaved = false;
             var shippingDestination = new ShippingDestination(destination);
             this.add(shippingDestination);
             return shippingDestination;
+        },
+        hasDestination: function(destinationContact){
+            var self = this;
+            var foundDestinations = self.filter(function(destination){
+                return self.compareObjects(destination.get('destinationContact').get('address'), destinationContact.get('address'));
+            });
+            return (foundDestinations) ? true : false;
+        },
+        compareObjects: function(obj1, obj2) {
+            var areEqual = _.isEqual(obj1, obj2);
+            return areEqual;
         },
         validateShippingDestination : function(value, attr, computedState){
             var itemValidations =[];
@@ -175,14 +186,14 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
         },
         addApiShippingDestination : function(destination){
             var self = this;
-            return self.getCheckout().apiModel.addShippingDestination({DestinationContact : destination.get('destinationContact').toJSON()}).then(function(data){
-                self.add(new ShippingDestination(data.data));
-                return data;
-            });
+            return self.getCheckout().apiModel.addShippingDestination({DestinationContact : destination.get('destinationContact').toJSON()});
         },
         addShippingDestination: function(destination){
             var self = this;
-            return self.addApiShippingDestination(destination)
+            return self.addApiShippingDestination(destination).then(function(data){
+                self.add(new ShippingDestination(data.data));
+                return data;
+            });
         },
         updateShippingDestination: function(destination){
             var self = this;
@@ -193,7 +204,8 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
             return self.getCheckout().apiUpdateShippingDestination(dest).then(function(data){
                 var entry = self.findWhere({id: data.data.id});
                 if(entry) {
-                    entry.set('destinationContact', data.data.destinationContact); 
+                    var mergedDestinationContact = _.extend(entry.get('destinationContact'),  data.data.destinationContact);
+                    entry.set('destinationContact', mergedDestinationContact); 
                     self.trigger('sync');
                     self.trigger('destinationsUpdate');
                 }
