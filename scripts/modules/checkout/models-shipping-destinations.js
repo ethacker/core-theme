@@ -203,8 +203,9 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
             return self.getCheckout().apiUpdateShippingDestination(dest).then(function(data){
                 var entry = self.findWhere({id: data.data.id});
                 if(entry) {
-                    var mergedDestinationContact = _.extend(entry.get('destinationContact'),  data.data.destinationContact);
-                    entry.set('destinationContact', mergedDestinationContact); 
+                    //var mergedDestinationContact = _.extend(entry.get('destinationContact'),  data.data.destinationContact);
+                    
+                    entry.set('destinationContact', data.data.destinationContact); 
                     self.trigger('sync');
                     self.trigger('destinationsUpdate');
                 }

@@ -95,10 +95,12 @@ var CheckoutOrder = OrderModels.Order.extend({
         var destination = this.getDestinations().findWhere({'id': destinationId});
         
         if(destination){
-            var destCopy = destination.clone();
-            destCopy.set('destinationContact', new CustomerModels.Contact(destCopy.get('destinationContact')));
-            this.getCheckout().get('dialogContact').get("destinationContact").clear();
+            var destCopy = destination.toJSON();
+            destCopy = new ShippingDestinationModels.ShippingDestination(destCopy);
+            //destCopy.set('destinationContact', new CustomerModels.Contact(destCopy.get('destinationContact')));
+            //this.getCheckout().get('dialogContact').get("destinationContact").clear();
             this.getCheckout().set('dialogContact', destCopy);
+            this.getCheckout().get('dialogContact').set("destinationContact", new CustomerModels.Contact(destCopy.get('destinationContact').toJSON()));
             this.getCheckout().get('dialogContact').trigger('openDialog');
         }
 
