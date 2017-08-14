@@ -708,10 +708,10 @@ var CheckoutPage = Backbone.MozuModel.extend({
                 this.setFulfillmentContactEmail();
 
                 // skip payment validation, if there are no payments, but run the attributes and accept terms validation.
-                if ((nonStoreCreditTotal > 0 && this.validate()) || this.validateReviewCheckoutFields()) {
-                    this.isSubmitting = false;
-                    return false;
-                } 
+                // if ((nonStoreCreditTotal > 0 && this.validate()) || this.validateReviewCheckoutFields()) {
+                //     this.isSubmitting = false;
+                //     return false;
+                // } 
 
                 this.isLoading(true);
 
