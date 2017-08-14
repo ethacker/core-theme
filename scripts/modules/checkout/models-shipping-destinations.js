@@ -144,9 +144,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
     });
 
     var ShippingDestinations = Backbone.Collection.extend({
-        relations: {
-            model : ShippingDestination
-        },
+         model : ShippingDestination,
          validation: {
             ShippingDestination : "validateShippingDestination"
         },
@@ -158,9 +156,10 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
 
             if(isCustomerAddress && contact.get('id')){
                destination.customerContactId = contact.get('id');
+               destination.id = contact.get('id');
             }
 
-            destination.isSaved = false;
+            destination.isCustomerContact = true;
             var shippingDestination = new ShippingDestination(destination);
             this.add(shippingDestination);
             return shippingDestination;
@@ -170,7 +169,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
             var foundDestinations = self.filter(function(destination){
                 return self.compareObjects(destination.get('destinationContact').get('address'), destinationContact.get('address'));
             });
-            return (foundDestinations) ? true : false;
+            return (foundDestinations.length) ? true : false;
         },
         compareObjects: function(obj1, obj2) {
             var areEqual = _.isEqual(obj1, obj2);

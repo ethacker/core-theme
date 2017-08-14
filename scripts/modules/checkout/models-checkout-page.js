@@ -99,17 +99,16 @@ var CheckoutOrder = OrderModels.Order.extend({
             destCopy.set('destinationContact', new CustomerModels.Contact(destCopy.get('destinationContact')));
             this.getCheckout().get('dialogContact').get("destinationContact").clear();
             this.getCheckout().set('dialogContact', destCopy);
-
             this.getCheckout().get('dialogContact').trigger('openDialog');
         }
 
     },
-    updateCheckoutDestination: function(fulfillmentId, isSaved){
+    updateCheckoutDestination: function(fulfillmentId, customerContact){
         var self = this;
         self.set('destinationId', fulfillmentId);
         
-        if(!isSaved) {
-            var destination = self.getCheckout().get('destination').get(fulfillmentId);
+        if(customerContact) {
+            var destination = self.getCheckout().get('destinations').get(fulfillmentId);
             self.getCheckout().get('destinations').addApiShippingDestination(destination).then(function(data){
                 self.getCheckout().apiUpdateCheckoutItemDestination({id: self.getCheckout().get('id'), itemId: self.get('id'), destinationId: data.data.id});
             });
@@ -204,14 +203,17 @@ var CheckoutPage = Backbone.MozuModel.extend({
                 }
                 return this.set('isMultiShipMode', false);
             },
+            
             addCustomerContacts : function(){
                 var self =this;
                 var contacts = self.get('customer').get('contacts');
 
                 if(contacts.length){
                     contacts.each(function(contact, key){
-                        if(!self.get('destinations').hasDestination(contact)){
-                            self.get('destinations').newDestination(contact, true);
+                        if(contact.contactTypeHelpers().isShipping()){
+                            if(!self.get('destinations').hasDestination(contact)){
+                                self.get('destinations').newDestination(contact, true);
+                            }
                         }
                     });
                 }
@@ -230,8 +232,9 @@ var CheckoutPage = Backbone.MozuModel.extend({
                         activePayments = self.apiModel.getActivePayments(),
                         //fulfillmentInfo = self.get('fulfillmentInfo'),
                         shippingStep = self.get('shippingStep'),
+                        shippingInfo = self.get('shippingInfo'),
                         billingInfo = self.get('billingInfo'),
-                        steps = [shippingStep, billingInfo],
+                        steps = [shippingStep, shippingInfo, billingInfo],
                         paymentWorkflow = latestPayment && latestPayment.paymentWorkflow,
                         visaCheckoutPayment = activePayments && _.findWhere(activePayments, { paymentWorkflow: 'VisaCheckout' }),
                         allStepsComplete = function () {
@@ -294,7 +297,7 @@ var CheckoutPage = Backbone.MozuModel.extend({
                 }
 
                 _.bindAll(this, 'update', 'onCheckoutSuccess', 'onCheckoutError', 'addNewCustomer', 'saveCustomerCard', 'apiCheckout', 
-                    'addDigitalCreditToCustomerAccount', 'addCustomerContact', 'addBillingContact', 'addShippingContact', 'addShippingAndBillingContact');
+                    'addDigitalCreditToCustomerAccount');
 
             },
             getCustomerInfo : function(){
@@ -471,94 +474,102 @@ var CheckoutPage = Backbone.MozuModel.extend({
                     throw error;
                 });
             },
-            addBillingContact: function () {
-                return this.addCustomerContact('billingInfo', 'billingContact', [{ name: 'Billing' }]);
-            },
-            addShippingContact: function () {
-                return this.addCustomerContact('fulfillmentInfo', 'fulfillmentContact', [{ name: 'Shipping' }]);
-            },
-            addShippingAndBillingContact: function () {
-                return this.addCustomerContact('fulfillmentInfo', 'fulfillmentContact', [{ name: 'Shipping' }, { name: 'Billing' }]);
-            },
-            addCustomerContact: function (infoName, contactName, contactTypes) {
-                var customer = this.get('customer'),
-                    contactInfo = this.get(infoName),
-                    process = [function () {
-                      
-                        // Update contact if a valid contact ID exists
-                        if (orderContact.id && orderContact.id > 0) {
-                            return customer.apiModel.updateContact(orderContact);
-                        }
-
-                        if (orderContact.id === -1 || orderContact.id === 1 || orderContact.id === 'new') {
-                            delete orderContact.id;
-                        }
-                        return customer.apiModel.addContact(orderContact).then(function(contactResult) {
-                                orderContact.id = contactResult.data.id;
-                                return contactResult;
-                            });
-                    }];
-                var contactInfoContactName = contactInfo.get(contactName);
-                var customerContacts = customer.get('contacts');
+            addApiCustomerContacts: function (){
+                var self = this;
+                var destinations = self.get('destinations');
+                if(self.get('destinations').length) {
+                    //Save some Contacts
                     
-                if (!contactInfoContactName.get('accountId')) {
-                    contactInfoContactName.set('accountId', customer.id);
-                }
-                var orderContact = contactInfoContactName.toJSON();
-                // if customer doesn't have a primary of any of the contact types we're setting, then set primary for those types
-                if (!this.isSavingNewCustomer()) {
-                    process.unshift(function() {
-                        return customer.apiModel.getContacts().then(function(contacts) {
-                            _.each(contactTypes, function(newType) {
-                                var primaryExistsAlready = _.find(contacts.data.items, function(existingContact) {
-                                    return _.find(existingContact.types || [], function(existingContactType) {
-                                        return existingContactType.name === newType.name && existingContactType.isPrimary;
-                                    });
-                                });
-                                newType.isPrimary = !primaryExistsAlready;
-                            });
-                        });
-                    });
-                } else {
-                    _.each(contactTypes, function(type) {
-                        type.isPrimary = true;
-                    });
-                }
-
-                // handle email
-                if (!orderContact.email) orderContact.email = this.get('emailAddress') || customer.get('emailAddress') || require.mozuData('user').email;
-
-                var contactId = orderContact.contactId;
-                if (contactId) orderContact.id = contactId;
-                if (!orderContact.id || orderContact.id === -1 || orderContact.id === 1 || orderContact.id === 'new') {
-                    orderContact.types = contactTypes;
-                    return api.steps(process);
-                } else {
-                    var customerContact = customerContacts.get(orderContact.id).toJSON();
-                    if (this.isContactModified(orderContact, customerContact)) {
-                        //keep the current types on edit
-                        orderContact.types = orderContact.types ? orderContact.types : customerContact.types;
-                        return api.steps(process);
-                    } else {
-                        var deferred = api.defer();
-                        deferred.resolve();
-                        return deferred.promise;
-                    }
                 }
             },
-            isContactModified: function(orderContact, customerContact) {
-                var validContact = orderContact && customerContact && orderContact.id === customerContact.id;
-                var addressChanged = validContact && !_.isEqual(orderContact.address, customerContact.address);
-                //Note: Only home phone is used on the checkout page     
-                var phoneChanged = validContact && orderContact.phoneNumbers.home &&
-                                    (!customerContact.phoneNumbers.home || orderContact.phoneNumbers.home !== customerContact.phoneNumbers.home);
+            // addBillingContact: function () {
+            //     return this.addCustomerContact('billingInfo', 'billingContact', [{ name: 'Billing' }]);
+            // },
+            // addShippingContact: function () {
+            //     return this.addCustomerContact('fulfillmentInfo', 'fulfillmentContact', [{ name: 'Shipping' }]);
+            // },
+            // addShippingAndBillingContact: function () {
+            //     return this.addCustomerContact('fulfillmentInfo', 'fulfillmentContact', [{ name: 'Shipping' }, { name: 'Billing' }]);
+            // },
+            // addCustomerContact: function (infoName, contactName, contactTypes) {
+            //     var customer = this.get('customer'),
+            //         contactInfo = this.get(infoName),
+            //         process = [function () {
+                      
+            //             // Update contact if a valid contact ID exists
+            //             if (orderContact.id && orderContact.id > 0) {
+            //                 return customer.apiModel.updateContact(orderContact);
+            //             }
 
-                //Check whether any of the fields available in the contact UI on checkout page is modified
-                return validContact &&
-                    (addressChanged || phoneChanged || 
-                    orderContact.email !== customerContact.email || orderContact.firstName !== customerContact.firstName ||
-                    orderContact.lastNameOrSurname !== customerContact.lastNameOrSurname);
-            },
+            //             if (orderContact.id === -1 || orderContact.id === 1 || orderContact.id === 'new') {
+            //                 delete orderContact.id;
+            //             }
+            //             return customer.apiModel.addContact(orderContact).then(function(contactResult) {
+            //                     orderContact.id = contactResult.data.id;
+            //                     return contactResult;
+            //                 });
+            //         }];
+            //     var contactInfoContactName = contactInfo.get(contactName);
+            //     var customerContacts = customer.get('contacts');
+                    
+            //     if (!contactInfoContactName.get('accountId')) {
+            //         contactInfoContactName.set('accountId', customer.id);
+            //     }
+            //     var orderContact = contactInfoContactName.toJSON();
+            //     // if customer doesn't have a primary of any of the contact types we're setting, then set primary for those types
+            //     if (!this.isSavingNewCustomer()) {
+            //         process.unshift(function() {
+            //             return customer.apiModel.getContacts().then(function(contacts) {
+            //                 _.each(contactTypes, function(newType) {
+            //                     var primaryExistsAlready = _.find(contacts.data.items, function(existingContact) {
+            //                         return _.find(existingContact.types || [], function(existingContactType) {
+            //                             return existingContactType.name === newType.name && existingContactType.isPrimary;
+            //                         });
+            //                     });
+            //                     newType.isPrimary = !primaryExistsAlready;
+            //                 });
+            //             });
+            //         });
+            //     } else {
+            //         _.each(contactTypes, function(type) {
+            //             type.isPrimary = true;
+            //         });
+            //     }
+
+            //     // handle email
+            //     if (!orderContact.email) orderContact.email = this.get('emailAddress') || customer.get('emailAddress') || require.mozuData('user').email;
+
+            //     var contactId = orderContact.contactId;
+            //     if (contactId) orderContact.id = contactId;
+            //     if (!orderContact.id || orderContact.id === -1 || orderContact.id === 1 || orderContact.id === 'new') {
+            //         orderContact.types = contactTypes;
+            //         return api.steps(process);
+            //     } else {
+            //         var customerContact = customerContacts.get(orderContact.id).toJSON();
+            //         if (this.isContactModified(orderContact, customerContact)) {
+            //             //keep the current types on edit
+            //             orderContact.types = orderContact.types ? orderContact.types : customerContact.types;
+            //             return api.steps(process);
+            //         } else {
+            //             var deferred = api.defer();
+            //             deferred.resolve();
+            //             return deferred.promise;
+            //         }
+            //     }
+            // },
+            // isContactModified: function(orderContact, customerContact) {
+            //     var validContact = orderContact && customerContact && orderContact.id === customerContact.id;
+            //     var addressChanged = validContact && !_.isEqual(orderContact.address, customerContact.address);
+            //     //Note: Only home phone is used on the checkout page     
+            //     var phoneChanged = validContact && orderContact.phoneNumbers.home &&
+            //                         (!customerContact.phoneNumbers.home || orderContact.phoneNumbers.home !== customerContact.phoneNumbers.home);
+
+            //     //Check whether any of the fields available in the contact UI on checkout page is modified
+            //     return validContact &&
+            //         (addressChanged || phoneChanged || 
+            //         orderContact.email !== customerContact.email || orderContact.firstName !== customerContact.firstName ||
+            //         orderContact.lastNameOrSurname !== customerContact.lastNameOrSurname);
+            // },
             saveCustomerCard: function () {
                 var order = this,
                     customer = this.get('customer'), //new CustomerModels.EditableCustomer(this.get('customer').toJSON()),
@@ -726,14 +737,14 @@ var CheckoutPage = Backbone.MozuModel.extend({
 
                 //save contacts
                 if (isAuthenticated || isSavingNewCustomer) {
-                    if (!isSameBillingShippingAddress && !isSavingCreditCard) {
-                        if (requiresFulfillmentInfo) process.push(this.addShippingContact);
-                        if (requiresBillingInfo) process.push(this.addBillingContact);
-                    } else if (isSameBillingShippingAddress && !isSavingCreditCard) {
-                        process.push(this.addShippingAndBillingContact);
-                    } else if (!isSameBillingShippingAddress && isSavingCreditCard && requiresFulfillmentInfo) {
-                        process.push(this.addShippingContact);
-                    }
+                    // if (!isSameBillingShippingAddress && !isSavingCreditCard) {
+                    //     if (requiresFulfillmentInfo) process.push(this.addShippingContact);
+                    //     if (requiresBillingInfo) process.push(this.addBillingContact);
+                    // } else if (isSameBillingShippingAddress && !isSavingCreditCard) {
+                    //     process.push(this.addShippingAndBillingContact);
+                    // } else if (!isSameBillingShippingAddress && isSavingCreditCard && requiresFulfillmentInfo) {
+                    //     process.push(this.addShippingContact);
+                    // }
                 }
                
                 process.push(/*this.finalPaymentReconcile, */this.apiCheckout);

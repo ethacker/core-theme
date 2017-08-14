@@ -286,6 +286,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                         self.stepStatus('complete');
                         self.isLoading(false);
                         fulfillmentInfo.calculateStepStatus();
+                        fulfillmentInfo.isLoading(false);
                     });
                 
                 };

@@ -144,8 +144,12 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, FulfillmentC
             //     })
             // },
             refreshShippingMethods: function (methods) {
-                this.parent.get('shippingMethods').reset();
-                this.parent.get('shippingMethods').add(methods);
+                if(this.parent.get('shippingMethods')) {
+                    this.parent.get('shippingMethods').reset();
+                    this.parent.get('shippingMethods').add(methods);
+                    return;
+                }
+                this.parent.set('shippingMethods', methods);
             },
             updateShippingMethods : function(){
                 var self = this;

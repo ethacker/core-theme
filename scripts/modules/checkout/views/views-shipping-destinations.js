@@ -65,8 +65,8 @@ define(["modules/jquery-mozu",
                     this.handleNewContact();
                     return;
                 }
-
-                self.model.updateCheckoutDestination($target.val(), $target.data("mzIsSaved"));
+                var isCustomerContact = $target.find(":selected").data("mzIscustomercontact");
+                self.model.updateCheckoutDestination($target.val(), isCustomerContact);
                 self.render();
 
             },
