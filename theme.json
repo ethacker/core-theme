@@ -90,6 +90,12 @@
             "title": "Order Confirmation"
         },
         {
+            "id": "order.changed2",
+            "properties": { },
+            "template": "email/order-confirmation-v2",
+            "title": "Multiship Order Confirmation"
+        },
+        {
             "id": "refund.created",
             "properties": { },
             "template": "email/order-refund-issued",
