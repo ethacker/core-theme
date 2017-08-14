@@ -12,21 +12,8 @@ define([
 function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDestinationModels, CustomerModels) {
 
     var ShippingStep = CheckoutStep.extend({
-        helpers : ['orderItems', 'selectableDestinations', 'selectedDestination'],
-        validation: {
-            ShippingDestinations :{
-                fn: function(value, attr){
-                    var destinationErrors = [];
-                    this.parent.get('items').forEach(function(item, idx){
-                        var itemValid = item.validate();
-                        if (itemValid && item.get('fulfillmentMethod') === "Ship") {
-                            destinationErrors.push(itemValid);
-                        }
-                    });
-                    return (destinationErrors.length) ? destinationErrors : false;
-                }
-            }
-        },
+        helpers : ['orderItems', 'selectableDestinations', 'selectedDestination', 'selectedDestinationsCount'],
+        validation: this.multiShipValidation,
         digitalOnlyValidation: {
             'email': {
                 pattern: 'email',
@@ -47,6 +34,20 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                         return (destinationErrors) ? destinationErrors : false;
                     }
                     return true;
+                }
+            }
+        },
+        multiShipValidation : {
+            ShippingDestinations :{
+                fn: function(value, attr){
+                    var destinationErrors = [];
+                    this.parent.get('items').forEach(function(item, idx){
+                        var itemValid = item.validate();
+                        if (itemValid && item.get('fulfillmentMethod') === "Ship") {
+                            destinationErrors.push(itemValid);
+                        }
+                    });
+                    return (destinationErrors.length) ? destinationErrors : false;
                 }
             }
         },
@@ -73,6 +74,13 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
         selectableDestinations : function(){
            // return this.parent.get('destinations').filter(function(destination){ return !destination.get('digitalGiftDestination') }).toJSON();
             return this.parent.get('destinations').toJSON();
+        },
+        selectedDestinationsCount : function(){
+            var destinationCount = this.parent.get("items").countBy(function(item){ 
+                return item.get('destinationId'); 
+            })
+            return _.size(destinationCount);
+            
         },
         selectedDestination : function(){
             var selectedId = this.getCheckout().get('items').at(0).get('destinationId');
@@ -145,31 +153,20 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
             }
 
             var shippingDestination = self.getDestinations().at(0);
-
-            if(shippingDestination.get('isSaved') === false) {
+            self.isLoading('true');
+            if(!shippingDestination.get('id')) {
                 self.getDestinations().addApiShippingDestination(shippingDestination).then(function(data){
                     self.getCheckout().apiSetAllShippingDestinations({destinationId: data.data.id}).then(function(){
-                        self.calculateStepStatus();
-                        self.getCheckout().get('shippingInfo').calculateStepStatus();
+                        self.completeStep();
                     });
                 });
             } else {
                 self.getDestinations().updateShippingDestination(shippingDestination).then(function(data){
                     self.getCheckout().apiSetAllShippingDestinations({destinationId: data.data.id}).then(function(){
-                        self.calculateStepStatus();
-                        self.getCheckout().get('shippingInfo').calculateStepStatus();
+                        self.completeStep();
                     });
                 });
             }
-            // return self.getCheckout().apiModel.addShippingDestination({DestinationContact : {email: self.get('email')}}).then(function(data){
-            //     self.isLoading(false);
-            //     order.messages.reset();
-            //     order.syncApiModel();
-
-            //     self.calculateStepStatus();
-            //     return order.get('billingInfo').calculateStepStatus();
-            // });
-
         },
         calculateStepStatus: function() {
 
@@ -189,6 +186,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                 return CheckoutStep.prototype.calculateStepStatus.apply(this);
             },
         validateModel: function() {
+                this.validation = this.multiShipValidation;
                 var validationObj = this.validate();
 
                 if (validationObj) {
@@ -260,6 +258,21 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                 }
                 return deferredValidate.promise;
             },
+            completeStep : function(){
+                var self = this;
+                var checkout = self.getCheckout();
+
+                checkout.messages.reset();
+                checkout.syncApiModel();
+                self.isLoading(true);
+
+                checkout.get('shippingInfo').updateShippingMethods().ensure(function() {
+                    self.stepStatus('complete');
+                    self.isLoading(false);
+                    checkout.get('shippingInfo').calculateStepStatus();
+                    checkout.get('shippingInfo').isLoading(false);
+                });
+            },
             // Breakup for validation
             // Break for compelete step
             next: function() {
@@ -268,30 +281,15 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                     return self.nextDigitalOnly();
                 }
 
-                if (!self.validateModel()) {
-                    
+                if (!this.isMultiShipMode() && this.getCheckout().get('destinations').length < 2) {
+                    return self.nextSingleShippingAddress();
+                }
+
+                if (!self.validateModel()) {  
                   return false;  
                 } 
-                var order = self.getOrder(),
-                    fulfillmentInfo = order.get('shippingInfo');
-                    
 
-                self.isLoading(true);
-
-                var completeStep = function() {
-                    order.messages.reset();
-                    order.syncApiModel();
-
-                    fulfillmentInfo.updateShippingMethods().ensure(function() {
-                        self.stepStatus('complete');
-                        self.isLoading(false);
-                        fulfillmentInfo.calculateStepStatus();
-                        fulfillmentInfo.isLoading(false);
-                    });
-                
-                };
-                completeStep();
-
+                self.completeStep();
             }
     });
 

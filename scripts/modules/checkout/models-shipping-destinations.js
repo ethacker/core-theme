@@ -209,6 +209,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
                     self.trigger('sync');
                     self.trigger('destinationsUpdate');
                 }
+                return data;
             });
         }
     });

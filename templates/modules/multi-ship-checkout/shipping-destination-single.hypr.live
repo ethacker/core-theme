@@ -9,7 +9,9 @@
   {% endif %}
 
   {% if model.requiresFulfillmentInfo  %}
+
     <div class="mz-formstep-fields mz-l-formfieldgroup mz-checkoutform  mz-checkoutform-shipping mz-checkoutform-active">
+      <a data-mz-action="toggleMultiShipMode">{{ labels.toggleToMultiShip }}</a>
       {% if model.selectableDestinations.length > 1 %}
        
           {% include "modules/checkout/checkout-shipping-contact-selector" with model=model.selectableDestinations destinationId=model.selectedDestination.id isLoading=model.isLoading%}

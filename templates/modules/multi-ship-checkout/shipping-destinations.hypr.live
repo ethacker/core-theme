@@ -1,17 +1,21 @@
 <div class="mz-checkoutform mz-checkoutform-active ">
+
 {% if model.requiresFulfillmentInfo %}
+<div class="mz-formstep-fields">
+  <a data-mz-action="toggleMultiShipMode">{{ labels.toggleToSingleShip }}</a>
   {% for item in model.orderItems %}  
-  	  	<div data-mz-shipping-destinations-item data-mz-item-id="{{item.id}}" data-mz-destination-id="{{item.destinationId}}" data-mz-model-id="{{item.cid}}" class="mz-formstep-fields mz-l-formfieldgroup-full mz-shipping-destinations">
+  	  	<div data-mz-shipping-destinations-item data-mz-item-id="{{item.id}}" data-mz-destination-id="{{item.destinationId}}" data-mz-model-id="{{item.cid}}" class="mz-l-formfieldgroup-full mz-shipping-destinations">
   	    	{% include "modules/multi-ship-checkout/shipping-destinations-item" with model=item %}
         </div>
   {% endfor %} 
+  </div>
 {% else %}
     {{ labels.noFulfillmentInfoRequired }}
 {% endif %} 
 </div>
 <div class="mz-formstep-summary mz-addresssummary ">
   {% if model.requiresFulfillmentInfo %}
-    <span class="mz-summary-text"> {{ labels.multiShipAddressSummary|string_format(model.fulfillmentinfo.length)}}</span>       
+    <span class="mz-summary-text"> {{ labels.multiShipAddressSummary|string_format(model.selectedDestinationsCount)}}</span>       
   {% else %}
       {{ labels.noFulfillmentInfoRequired }}
   {% endif %} 

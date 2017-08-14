@@ -20,10 +20,8 @@
     <div class="mz-checkoutform-section">
       
       {% if model.isMultiShipMode %}
-        <a data-mz-action="toggleMultiShipMode">{{ labels.toggleToSingleShip }}</a>
       	{% include "modules/multi-ship-checkout/shipping-destinations" %}
       {% else %}
-        <a data-mz-action="toggleMultiShipMode">{{ labels.toggleToMultiShip }}</a>
       	{% include "modules/multi-ship-checkout/shipping-destination-single" %}
       {% endif %}
       <div class="mz-formstep-next">
