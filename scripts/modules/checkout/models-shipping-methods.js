@@ -154,7 +154,8 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, FulfillmentC
             updateShippingMethods : function(){
                 var self = this;
                 return this.getCheckout().apiGetAvaiableShippingMethods().then(function (methods) {
-                    self.refreshShippingMethods(methods);      
+                    self.refreshShippingMethods(methods);
+                    //self.trigger('shippingInfoUpdated');     
                     //self.calculateStepStatus();
                 });
             },
@@ -194,9 +195,6 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, FulfillmentC
 
                 // Payment Info step has been initialized. Complete status hides the Shipping Method's Next button.
                 return this.stepStatus('complete');
-            },
-            shippingInfoUpdated: function(){
-                this.trigger('shippingInfoUpdated');
             },
             next: function () {
                 if(!this.validateModel()) {

@@ -106,17 +106,30 @@ var CheckoutOrder = OrderModels.Order.extend({
 
     },
     updateOrderItemDestination: function(destinationId, customerContactId){
-        var self = this;        
+        var self = this;
+        self.isLoading(true);        
         if(!destinationId) {
             var destination = self.getCheckout().get('destinations').findWhere({customerContactId: customerContactId});
             if(destination){
                 return destination.saveDestinationAsync().then(function(data){
-                    return self.getCheckout().apiUpdateCheckoutItemDestination({id: self.getCheckout().get('id'), itemId: self.get('id'), destinationId: data.data.id});
+                    return self.getCheckout().apiUpdateCheckoutItemDestination({
+                        id: self.getCheckout().get('id'), 
+                        itemId: self.get('id'), 
+                        destinationId: data.data.id
+                    }).ensure(function(){
+                        self.isLoading(false);
+                    });
                 });
             }
         }
         self.set('destinationId', destinationId);
-        return self.getCheckout().apiUpdateCheckoutItemDestination({id: self.getCheckout().get('id'), itemId: self.get('id'), destinationId: destinationId});
+        return self.getCheckout().apiUpdateCheckoutItemDestination({
+            id: self.getCheckout().get('id'), 
+            itemId: self.get('id'), 
+            destinationId: destinationId
+        }).ensure(function(){
+            self.isLoading(false);
+        });
     },
     splitCheckoutItem : function(){
         var self = this;
@@ -226,10 +239,10 @@ var CheckoutPage = Backbone.MozuModel.extend({
                     user = require.mozuData('user');
                     //self.get('shippingStep').initSet();
                     
-                     
+                 self.addCustomerContacts();
                 _.defer(function() {
                     self.setMultiShipMode();
-                    self.addCustomerContacts();
+                    
 
                     var latestPayment = self.apiModel.getCurrentPayment(),
                         activePayments = self.apiModel.getActivePayments(),

@@ -95,17 +95,25 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
         },
         updateSingleCheckoutDestination: function(destinationId, customerContactId){
             var self = this;
+            self.isLoading(true);
             if(destinationId){
-                return self.getCheckout().apiSetAllShippingDestinations({destinationId: destinationId}); 
+                return self.getCheckout().apiSetAllShippingDestinations({
+                    destinationId: destinationId
+                }).ensure(function(){
+                     self.isLoading(false);
+                }); 
             }
 
             var destination = self.getCheckout().get('destinations').findWhere({customerContactId: customerContactId});
             if(destination){
                 return destination.saveDestinationAsync().then(function(data){
-                    return self.getCheckout().apiSetAllShippingDestinations({destinationId: destinationId});
+                    return self.getCheckout().apiSetAllShippingDestinations({
+                        destinationId: destinationId
+                    }).ensure(function(){
+                        self.isLoading(false);
+                    }); 
                 });
             }
-            
         },
         addNewContact: function(){
             this.getCheckout().get('dialogContact').get("destinationContact").clear();
@@ -281,8 +289,8 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                 checkout.get('shippingInfo').updateShippingMethods().ensure(function() {
                     self.stepStatus('complete');
                     self.isLoading(false);
-                    checkout.get('shippingInfo').calculateStepStatus();
                     checkout.get('shippingInfo').isLoading(false);
+                    checkout.get('shippingInfo').calculateStepStatus();
                 });
             },
             // Breakup for validation
