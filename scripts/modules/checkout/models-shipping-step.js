@@ -78,7 +78,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
         selectedDestinationsCount : function(){
             var destinationCount = this.parent.get("items").countBy(function(item){ 
                 return item.get('destinationId'); 
-            })
+            });
             return _.size(destinationCount);
             
         },
