@@ -62,7 +62,7 @@ define([
             }, this);
         }
 
-var CheckoutOrder = OrderModels.Order.extend({
+var CheckoutOrder = OrderModels.OrderItem.extend({
     helpers : ['selectableDestinations', 'isOriginalCartItem'],
     validation : {
         destinationId : {
@@ -105,17 +105,19 @@ var CheckoutOrder = OrderModels.Order.extend({
         }
 
     },
-    updateCheckoutDestination: function(fulfillmentId, customerContact){
-        var self = this;
-        self.set('destinationId', fulfillmentId);
-        
-        if(customerContact) {
-            var destination = self.getCheckout().get('destinations').get(fulfillmentId);
-            return self.getCheckout().get('destinations').addApiShippingDestination(destination).then(function(data){
-                return self.getCheckout().apiUpdateCheckoutItemDestination({id: self.getCheckout().get('id'), itemId: self.get('id'), destinationId: data.data.id});
-            });
+    updateOrderItemDestination: function(destinationId, customerContactId){
+        var self = this;        
+        if(!destinationId) {
+            var destination = self.getCheckout().get('destinations').fidWhere({customerContactId: customerContactId});
+            if(destination){
+                return destination.saveDestinationAsync().then(function(data){
+                    self.set('destinationId', data.data.id);
+                    return self.getCheckout().apiUpdateCheckoutItemDestination({id: self.getCheckout().get('id'), itemId: self.get('id'), destinationId: data.data.id});
+                });
+            }
         }
-        return self.getCheckout().apiUpdateCheckoutItemDestination({id: self.getCheckout().get('id'), itemId: self.get('id'), destinationId: fulfillmentId});
+        self.set('destinationId', destinationId);
+        return self.getCheckout().apiUpdateCheckoutItemDestination({id: self.getCheckout().get('id'), itemId: self.get('id'), destinationId: destinationId});
     },
     splitCheckoutItem : function(){
         var self = this;

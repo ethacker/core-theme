@@ -24,7 +24,7 @@
 				   <option value="" class="mz-shipping-destination-address"> </option>
 			       <option value="new" class="mz-shipping-destination-address-select-new-address">{{ labels.shippingDestinationNewAddress }}</option>
 		            {% for destination in model.selectableDestinations %}
-		            	<option class="mz-shipping-destination-address-select" value="{{ destination.id }}" data-mz-isCustomerContact="{{destination.isCustomerContact}}" {% if model.destinationId == destination.id %} selected="selected" {% endif %}>{{ destination.destinationContact.address.address1 }}, {{ destination.destinationContact.address.cityOrTown }} {{ destination.destinationContact.address.stateOrProvince }}</option>
+		            	<option class="mz-shipping-destination-address-select" value="{{ destination.id }}" data-mz-customerContactId="{{destination.customerContactId}}" {% if model.destinationId == destination.id %} selected="selected" {% endif %}>{{ destination.destinationContact.address.address1 }}, {{ destination.destinationContact.address.cityOrTown }} {{ destination.destinationContact.address.stateOrProvince }}</option>
 		            {% endfor %}
         		</select>
         		{% if model.destinationId %}

@@ -154,13 +154,13 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
             var shippingDestination = self.getDestinations().at(0);
             self.isLoading('true');
             if(!shippingDestination.get('id')) {
-                self.getDestinations().addApiShippingDestination(shippingDestination).then(function(data){
+                self.getDestinations().apiSaveDestinationAsync(shippingDestination).then(function(data){
                     self.getCheckout().apiSetAllShippingDestinations({destinationId: data.data.id}).then(function(){
                         self.completeStep();
                     });
                 });
             } else {
-                self.getDestinations().updateShippingDestination(shippingDestination).then(function(data){
+                self.getDestinations().updateShippingDestinationAsync(shippingDestination).then(function(data){
                     self.getCheckout().apiSetAllShippingDestinations({destinationId: data.data.id}).then(function(){
                         self.completeStep();
                     });
