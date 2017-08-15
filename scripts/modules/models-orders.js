@@ -418,7 +418,7 @@ define(["modules/api", 'underscore', "modules/backbone-mozu", "hyprlive", "modul
                     //Update quanity of items by comparing with packaged items
                     _.each(packages, function(type, typeKey, typeList) {
                         _.each(type, function(myPackage, key, list) {
-                            for (i = 0; i < groupedItems[typeKey].length; i++) {
+                            for (var i = 0; i < groupedItems[typeKey].length; i++) {
                             //_.each(groupedItems[typeKey], function(item, key) {
                                 if (groupedItems[typeKey][i].uniqueProductCode() === myPackage.get('productCode')) {
                                     if (groupedItems[typeKey][i].get('optionAttributeFQN') && groupedItems[typeKey][i].get('optionAttributeFQN') != myPackage.get('optionAttributeFQN')) {
@@ -431,7 +431,7 @@ define(["modules/api", 'underscore', "modules/backbone-mozu", "hyprlive", "modul
                                     groupedItems[typeKey][i].set('quantity', groupedItems[typeKey][i].get('quantity') - 1);
                                     return false;
                                 }
-                            };
+                            }
                         });
                     });
 
