@@ -111,12 +111,11 @@ var CheckoutOrder = OrderModels.Order.extend({
         
         if(customerContact) {
             var destination = self.getCheckout().get('destinations').get(fulfillmentId);
-            self.getCheckout().get('destinations').addApiShippingDestination(destination).then(function(data){
-                self.getCheckout().apiUpdateCheckoutItemDestination({id: self.getCheckout().get('id'), itemId: self.get('id'), destinationId: data.data.id});
+            return self.getCheckout().get('destinations').addApiShippingDestination(destination).then(function(data){
+                return self.getCheckout().apiUpdateCheckoutItemDestination({id: self.getCheckout().get('id'), itemId: self.get('id'), destinationId: data.data.id});
             });
-            return false;
         }
-        self.getCheckout().apiUpdateCheckoutItemDestination({id: self.getCheckout().get('id'), itemId: self.get('id'), destinationId: fulfillmentId});
+        return self.getCheckout().apiUpdateCheckoutItemDestination({id: self.getCheckout().get('id'), itemId: self.get('id'), destinationId: fulfillmentId});
     },
     splitCheckoutItem : function(){
         var self = this;
@@ -196,14 +195,13 @@ var CheckoutPage = Backbone.MozuModel.extend({
             defaults: {
                 "isMultiShipMode" : false
             },
-            renderOnChange: [
-                'isMultiShipMode'
-            ],
             setMultiShipMode : function(){
-               if(this.get('destinations').length > 1) {
-                    return this.set('isMultiShipMode', true);
-                }
-                return this.set('isMultiShipMode', false);
+            var directShipItems = this.get('items').where({fulfillmentMethod: "Ship"});
+            var destinationCount = _.countBy(directShipItems, function(item){
+                    return item.get('destinationId');
+                });
+
+            return (_.size(destinationCount) > 1) ? this.set('isMultiShipMode', true) : this.set('isMultiShipMode', false);
             },
             
             addCustomerContacts : function(){

@@ -56,12 +56,11 @@ define(['modules/backbone-mozu','modules/jquery-mozu','underscore', 'hyprlivecon
                         if(!item){
                             item = checkout.get('items').at(0);
                         }
-                        //item.model.isLoading(true);
+                        item.isLoading(true);
                         item.updateCheckoutDestination(data.data.id).then(function(){
-                            item.model.set('editingDestination', false);
-                            self.trigger('sync');
+                            item.set('editingDestination', false);
                             self.trigger('destinationsUpdate');
-                            //item.model.isLoading(false);
+                            item.isLoading(false);
                         });
                     }).ensure(function () {
                          self.model.trigger('closeDialog');    

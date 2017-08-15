@@ -80,7 +80,6 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                 return item.get('destinationId'); 
             });
             return _.size(destinationCount);
-            
         },
         selectedDestination : function(){
             var selectedId = this.getCheckout().get('items').at(0).get('destinationId');
