@@ -1,23 +1,23 @@
-require(["modules/jquery-mozu", 
-    "underscore", 
-    "hyprlive", 
-    "modules/backbone-mozu", 
-    "modules/views-messages", 
-    "modules/cart-monitor", 
-    'hyprlivecontext', 
-    'modules/editable-view', 
+require(["modules/jquery-mozu",
+    "underscore",
+    "hyprlive",
+    "modules/backbone-mozu",
+    "modules/views-messages",
+    "modules/cart-monitor",
+    'hyprlivecontext',
+    'modules/editable-view',
     'modules/preserve-element-through-render',
     'modules/checkout/models-checkout-page',
     'modules/checkout/views-checkout-step',
     'modules/checkout/views/views-shipping-destinations',
     'modules/checkout/views/views-shipping-methods',
     'modules/checkout/views/views-payments',
-    'modules/checkout/views/contact-dialog'], 
-    function ($, _, Hypr, Backbone, messageViewFactory, CartMonitor, HyprLiveContext, EditableView, preserveElements, 
+    'modules/checkout/views/contact-dialog'],
+    function ($, _, Hypr, Backbone, messageViewFactory, CartMonitor, HyprLiveContext, EditableView, preserveElements,
         CheckoutModels, CheckoutStepView, ShippingDestinationsView, ShippingMethodsView, PaymentView, ContactDialogView) {
 
     var OrderSummaryView = Backbone.MozuView.extend({
-        templateName: 'modules/checkout/checkout-order-summary',
+        templateName: 'modules/multi-ship-checkout/checkout-order-summary',
 
         initialize: function () {
             this.listenTo(this.model.get('billingInfo'), 'orderPayment', this.onOrderCreditChanged, this);
@@ -26,7 +26,7 @@ require(["modules/jquery-mozu",
         editCart: function () {
             window.location =  (HyprLiveContext.locals.siteContext.siteSubdirectory||'') + "/cart";
         },
-        
+
         onOrderCreditChanged: function (order, scope) {
             this.render();
         },
@@ -36,7 +36,7 @@ require(["modules/jquery-mozu",
     });
 
     var poCustomFields = function() {
-        
+
         var fieldDefs = [];
 
         var isEnabled = HyprLiveContext.locals.siteContext.checkoutSettings.purchaseOrder &&
@@ -57,12 +57,12 @@ require(["modules/jquery-mozu",
 
     var visaCheckoutSettings = HyprLiveContext.locals.siteContext.checkoutSettings.visaCheckout;
     var pageContext = require.mozuData('pagecontext');
-    
+
 
     var CouponView = Backbone.MozuView.extend({
         templateName: 'modules/checkout/coupon-code-field',
         handleLoadingChange: function (isLoading) {
-            // override adding the isLoading class so the apply button 
+            // override adding the isLoading class so the apply button
             // doesn't go loading whenever other parts of the order change
         },
         initialize: function () {
@@ -190,7 +190,7 @@ require(["modules/jquery-mozu",
         conf.el.css('opacity',1);
         if (mask) mask.remove();
       }
-      conf.model.on('refresh', killMask); 
+      conf.model.on('refresh', killMask);
       conf.model.on('error', killMask);
       return conf;
     };
@@ -254,7 +254,7 @@ require(["modules/jquery-mozu",
             window.location = (HyprLiveContext.locals.siteContext.siteSubdirectory||'') + "/checkout/" + checkoutModel.get('id') + "/confirmation";
         });
 
-        
+
 
         var $reviewPanel = $('#step-review');
         checkoutModel.on('change:isReady',function (model, isReady) {
@@ -262,10 +262,11 @@ require(["modules/jquery-mozu",
                 setTimeout(function () { window.scrollTo(0, $reviewPanel.offset().top); }, 750);
             }
         });
- 
+
         _.invoke(checkoutViews.steps, 'initStepView');
         checkoutViews.contactDialog.render();
+        checkoutViews.orderSummary.render();
         $checkoutView.noFlickerFadeIn();
-        
+
     });
 });

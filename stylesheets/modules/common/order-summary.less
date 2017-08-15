@@ -45,6 +45,83 @@
     }
 }
 
+
+//Multishipt
+.mz-confirmation-price-summary {
+  background-color: #f7f7f7;
+  width: 100%;
+  // padding: @gutter/2 0 @gutter/2 0;
+  margin: @gutter/2 0 @gutter/2 0;
+  box-sizing: border-box;
+
+   .mz-ordersummary-ms2-checkout {
+     border-bottom: 0px;
+   }
+
+   @media only screen {
+       @media (max-width: 768px) {
+         width: 100%
+       }
+     }
+
+}
+
+.mz-ordersummary-ms2-checkout {
+    background: #eee;
+    width: 100%;
+
+    margin: @gutter/4 0px @gutter/4 0px;
+    th {
+        text-align: right;
+        padding: @gutter/2 @gutter;
+        border-bottom: 1px solid #fff;
+        &.mz-ordersummary-header-product {
+            text-align: left;
+        }
+    }
+    td {
+        background-color: #f7f7f7;
+        text-align: right;
+        padding: @gutter/2 @gutter;
+        &.mz-ordersummary-item-product {
+            text-align: left;
+        }
+    }
+    .mz-ordersummary-lineitems tr:last-child td {
+        border-bottom: 1px solid #fff;
+    }
+    .mz-ordersummary-totals {
+        float: right;
+        td:last-child {
+            padding-right: 0;
+        }
+    }
+    .mz-ordersummary-totalname {
+        display: inline-block;
+        padding-right: @gutter;
+    }
+    .mz-ordersummary-grandtotal {
+        font-size: @fontSizeLarge;
+    }
+    .mz-ordersummary-totalvalue, .mz-ordersummary-itemtotal {
+        font-weight: bold;
+
+    }
+    .mz-item-rowtotal{
+      color: #900;
+    }
+
+        .mz-item-discount {
+        font-weight: bold;
+
+        .mz-item-discountamt {
+            color: #900;
+        }
+    }
+}
+
+
+
 .mz-ordersummary-checkout {
     margin-bottom: @gutter;
     .mz-formstep-header {
