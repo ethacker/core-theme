@@ -62,7 +62,7 @@ define([
             }, this);
         }
 
-var CheckoutOrder = OrderModels.OrderItem.extend({
+var CheckoutOrder = OrderModels.Order.extend({
     helpers : ['selectableDestinations', 'isOriginalCartItem'],
     validation : {
         destinationId : {
@@ -108,10 +108,9 @@ var CheckoutOrder = OrderModels.OrderItem.extend({
     updateOrderItemDestination: function(destinationId, customerContactId){
         var self = this;        
         if(!destinationId) {
-            var destination = self.getCheckout().get('destinations').fidWhere({customerContactId: customerContactId});
+            var destination = self.getCheckout().get('destinations').findWhere({customerContactId: customerContactId});
             if(destination){
                 return destination.saveDestinationAsync().then(function(data){
-                    self.set('destinationId', data.data.id);
                     return self.getCheckout().apiUpdateCheckoutItemDestination({id: self.getCheckout().get('id'), itemId: self.get('id'), destinationId: data.data.id});
                 });
             }

@@ -143,7 +143,8 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
         },
         saveDestinationAsync: function(){
             var self = this;
-            return self.getCheckout().get('destinations').apiSaveDestinationAsync(destination).then(function(data){
+            return self.collection.apiSaveDestinationAsync(self).then(function(data){
+                self.trigger('sync');
                 return data
             });
         }

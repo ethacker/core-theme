@@ -90,9 +90,22 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
         getCheckout: function(){
             return this.parent;
         },
-        updateSingleCheckoutDestination: function(destinationId){
+        isCustomerContactDestination: function(customerContactId){
+            
+        },
+        updateSingleCheckoutDestination: function(destinationId, customerContactId){
             var self = this;
-            return self.getCheckout().apiSetAllShippingDestinations({destinationId: destinationId}); 
+            if(destinationId){
+                return self.getCheckout().apiSetAllShippingDestinations({destinationId: destinationId}); 
+            }
+
+            var destination = self.getCheckout().get('destinations').findWhere({customerContactId: customerContactId});
+            if(destination){
+                return destination.saveDestinationAsync().then(function(data){
+                    return self.getCheckout().apiSetAllShippingDestinations({destinationId: destinationId});
+                });
+            }
+            
         },
         addNewContact: function(){
             this.getCheckout().get('dialogContact').get("destinationContact").clear();

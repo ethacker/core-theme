@@ -6,7 +6,7 @@
       <option>{{labels.selectSavedAddress}}</option>
       {% for destination in model %}
     
-          <option value="{{ destination.id }}"  {% if destination.id == destinationId %} selected {% endif %}> {% include "modules/common/address-list" with model=destination.destinationContact %}</option>
+          <option value="{{ destination.id }}" data-mz-customerContactId="{{destination.customerContactId}}" {% if destination.id == destinationId %} selected {% endif %}> {% include "modules/common/address-list" with model=destination.destinationContact %}</option>
    
       {% endfor %}
     </select> 
