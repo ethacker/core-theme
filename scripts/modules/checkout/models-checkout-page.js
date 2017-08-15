@@ -218,6 +218,7 @@ var CheckoutPage = Backbone.MozuModel.extend({
                             }
                         }
                     });
+                    //self.get('destinations').trigger('destinationsUpdate');
                 }
             },
             initialize: function (data) {
@@ -226,10 +227,11 @@ var CheckoutPage = Backbone.MozuModel.extend({
                     user = require.mozuData('user');
                     //self.get('shippingStep').initSet();
                     
-                    
+                     
                 _.defer(function() {
                     self.setMultiShipMode();
                     self.addCustomerContacts();
+                    
                     var latestPayment = self.apiModel.getCurrentPayment(),
                         activePayments = self.apiModel.getActivePayments(),
                         //fulfillmentInfo = self.get('fulfillmentInfo'),
