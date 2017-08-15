@@ -34,10 +34,9 @@
     {% include "modules/common/message-bar" with model=model.messages %}
 
     <div class="mz-l-column" id="checkout-rightcol">
-
-        <div class="mz-formstep mz-checkoutform-ordersummary" id="order-summary">
-            {% include "modules/multi-ship-checkout/checkout-order-summary" %}
-        </div>
+      <div class="mz-formstep mz-checkoutform-ordersummary" id="order-summary">
+        {% include "modules/multi-ship-checkout/checkout-order-summary" %}
+      </div>
 
         <div class="mz-l-formfieldgroup">
             <div class="mz-checkoutform-couponcode mz-l-formfieldgroup-row" id="coupon-code-field" >

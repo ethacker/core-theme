@@ -17,7 +17,7 @@ require(["modules/jquery-mozu",
         CheckoutModels, CheckoutStepView, ShippingDestinationsView, ShippingMethodsView, PaymentView, ContactDialogView) {
 
     var OrderSummaryView = Backbone.MozuView.extend({
-        templateName: 'modules/checkout/checkout-order-summary',
+        templateName: 'modules/multi-ship-checkout/checkout-order-summary',
 
         initialize: function () {
             this.listenTo(this.model.get('billingInfo'), 'orderPayment', this.onOrderCreditChanged, this);
