@@ -39,10 +39,22 @@ define(["modules/jquery-mozu",
                 CheckoutStepView.prototype.initStepView.apply(this, arguments);
 
                 if(this.model.getCheckout().get('shippingStep').stepStatus() == "complete") {
-                    this.model.updateShippingMethods().ensure(function(){
-                        self.model.isLoading(false);
-                        self.render();
-                    });
+                    if(!this.model.getCheckout().get('shippingMethods')) {
+                        this.model.updateShippingMethods().ensure(function(){
+                            self.model.setDefaultShippingMethods().ensure(function(){
+                                self.model.isLoading(false);
+                                self.model.calculateStepStatus();
+                                self.model.getCheckout().get('billingInfo').calculateStepStatus();
+                            });
+                        });
+                    } else {
+                        self.model.setDefaultShippingMethods().ensure(function(){
+                            self.model.isLoading(false);
+                            self.model.calculateStepStatus();
+                            self.model.getCheckout().get('billingInfo').calculateStepStatus();
+                        });
+                    }
+
                 }
             },
             updateShippingMethod: function (e) {

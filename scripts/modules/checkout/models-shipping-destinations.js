@@ -106,7 +106,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
                 this.set('quantity', this.get('quantity') - 1);
                 this.collection.parent.addNewDestination(newOrderItem);
             }
-        },
+        }
 
     });
 
@@ -145,7 +145,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
             var self = this;
             return self.collection.apiSaveDestinationAsync(self).then(function(data){
                 self.trigger('sync');
-                return data
+                return data;
             });
         }
     });

@@ -10,102 +10,6 @@ define([
 ],
 function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, FulfillmentContact) {
 
- var FulfillmentInfoItem = Backbone.MozuModel.extend({
-        relations: {
-            fulfillmentContact: FulfillmentContact
-        },
-        validation: {
-            shippingMethodCode: {
-                required: true,
-                msg: Hypr.getLabel('chooseShippingMethod')
-            }
-        },
-        getOrder: function() {
-                return this.collection.parent.parent;
-            },
-        compareShippingMethods: function(newMethods){
-            var self = this;
-            return _.isMatch(self.get('availableShippingMethods'), newMethods);
-        },
-        getShippingMethodsFromContact: function(){
-                var self = this;
-                self.isLoading(true);
-                self.getOrder().apiModel.getShippingMethodsFromContact().then(function (methods) {
-                    if(!self.compareShippingMethods(methods)) {
-                        self.refreshShippingMethods(methods);
-                        self.chooseDefaultShippingMethod();
-                    }
-                }).ensure(function () {
-                    //addr.set('candidateValidatedAddresses', null);
-                    self.isLoading(false);
-                    //Redundent
-                    //parent.isLoading(false);
-                    self.calculateStepStatus();
-                    //Redundent
-                    //parent.calculateStepStatus();
-                });  
-            },
-            refreshShippingMethods: function (methods) {
-                this.set({
-                    availableShippingMethods: methods
-                });
-
-                //Side Affect, Refresh should refresh nothing more
-                // //always make them choose again
-                //_.each(['shippingMethodCode', 'shippingMethodName'], this.unset, this);
-                
-                //Side Affect, Refresh should refresh nothing more
-                // //after unset we need to select the cheapest option
-                //this.updateShippingMethod();
-            },
-            chooseDefaultShippingMethod : function(){
-                _.each(['shippingMethodCode', 'shippingMethodName'], this.unset, this);
-                //after unset we need to select the cheapest option
-                this.updateShippingMethod();
-            },
-            
-            updateShippingMethod: function (code, resetMessage) {
-                var available = this.get('availableShippingMethods'),
-                    newMethod = _.findWhere(available, { shippingMethodCode: code }),
-                    lowestValue = _.min(available, function(ob) { return ob.price; }); // Returns Infinity if no items in collection.
-
-                if (!newMethod && available && available.length && lowestValue) {
-                    newMethod = lowestValue;
-                }
-                if (newMethod) {
-                    this.set(newMethod);
-                    this.applyShipping(resetMessage);
-                }
-            },
-            applyShipping: function(resetMessage) {
-                if (this.validate()) return false;
-                var me = this;
-                this.isLoading(true);
-                var order = this.getOrder();
-                if (order) {
-                    order.apiModel.update({ fulfillmentInfo: me.toJSON() })
-                        .then(function (o) {
-                            var billingInfo = me.parent.get('billingInfo');
-                            if (billingInfo) {
-                                billingInfo.loadCustomerDigitalCredits();
-                                // This should happen only when order doesn't have payments..
-                                billingInfo.updatePurchaseOrderAmount();
-                            }
-                        })
-                        .ensure(function() {
-                            me.isLoading(false);
-                            me.calculateStepStatus();
-                            me.parent.get('billingInfo').calculateStepStatus();
-                            if(resetMessage) {
-                                me.parent.messages.reset(me.parent.get('messages'));
-                            }
-                        });
-                }
-            }
-    });
-    
-    
-    
     var FulfillmentInfo = CheckoutStep.extend({ 
             helpers : ['groupings'],
             validation: {
@@ -158,6 +62,18 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, FulfillmentC
                     //self.trigger('shippingInfoUpdated');     
                     //self.calculateStepStatus();
                 });
+            },
+            setDefaultShippingMethods : function(){
+                var self = this;
+                if(self.getCheckout().get('shippingMethods').length){
+                    var shippingMethodsPayload = [];
+                    self.getCheckout().get('groupings').each(function(group){
+                        var methods = self.getCheckout().get('shippingMethods').findWhere({groupingId :group.id});
+                        var lowestShippingRate = _.min(methods.get('shippingRates'), function(method){return method.price;});
+                        shippingMethodsPayload.push({groupingId: group.id, shippingRate: lowestShippingRate});
+                    });
+                    return self.getCheckout().apiSetShippingMethods({id: self.getCheckout().get('id'), postdata: shippingMethodsPayload});
+                }
             },
             validateModel: function() {
                 var validationObj = this.validate();
