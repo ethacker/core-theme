@@ -65,8 +65,8 @@ define(["modules/jquery-mozu",
                     this.handleNewContact();
                     return;
                 }
-                var isCustomerContact = $target.find(":selected").data("mzIscustomercontact");
-                self.model.updateCheckoutDestination($target.val(), isCustomerContact);
+                var customerContactId = $target.find(":selected").data("mzCustomercontactid");
+                self.model.updateOrderItemDestination($target.val(), customerContactId);
                 self.render();
 
             },
@@ -140,8 +140,8 @@ define(["modules/jquery-mozu",
                     this.handleNewContact();
                     return;
                 }
-
-                self.model.updateSingleCheckoutDestination($target.val()).ensure(function(){
+                var customerContactId = $target.find(":selected").data("mzCustomercontactid");
+                self.model.updateSingleCheckoutDestination($target.val(), customerContactId).ensure(function(){
                    //self.render(); 
                 });
             },

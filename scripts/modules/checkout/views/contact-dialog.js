@@ -47,17 +47,17 @@ define(['modules/backbone-mozu','modules/jquery-mozu','underscore', 'hyprlivecon
 
             var saveAddress = function(){
                 if(self.model.get('id')) {
-                        self.model.parent.get('destinations').updateShippingDestination(self.model).ensure(function () {
+                        self.model.parent.get('destinations').updateShippingDestinationAsync(self.model).ensure(function () {
                              self.model.trigger('closeDialog');
                         });
                 } else {
-                    self.model.parent.get('destinations').addShippingDestination(self.model).then(function(data){
+                    self.model.parent.get('destinations').saveShippingDestinationAsync(self.model).then(function(data){
                         var item = checkout.get('items').findWhere({editingDestination: true});
                         if(!item){
                             item = checkout.get('items').at(0);
                         }
                         item.isLoading(true);
-                        item.updateCheckoutDestination(data.data.id).then(function(){
+                        item.updateOrderItemDestination(data.data.id).then(function(){
                             item.set('editingDestination', false);
                             self.trigger('destinationsUpdate');
                             item.isLoading(false);

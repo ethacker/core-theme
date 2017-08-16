@@ -90,9 +90,30 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
         getCheckout: function(){
             return this.parent;
         },
-        updateSingleCheckoutDestination: function(destinationId){
+        isCustomerContactDestination: function(customerContactId){
+            
+        },
+        updateSingleCheckoutDestination: function(destinationId, customerContactId){
             var self = this;
-            return self.getCheckout().apiSetAllShippingDestinations({destinationId: destinationId}); 
+            self.isLoading(true);
+            if(destinationId){
+                return self.getCheckout().apiSetAllShippingDestinations({
+                    destinationId: destinationId
+                }).ensure(function(){
+                     self.isLoading(false);
+                }); 
+            }
+
+            var destination = self.getCheckout().get('destinations').findWhere({customerContactId: customerContactId});
+            if(destination){
+                return destination.saveDestinationAsync().then(function(data){
+                    return self.getCheckout().apiSetAllShippingDestinations({
+                        destinationId: destinationId
+                    }).ensure(function(){
+                        self.isLoading(false);
+                    }); 
+                });
+            }
         },
         addNewContact: function(){
             this.getCheckout().get('dialogContact').get("destinationContact").clear();
@@ -154,13 +175,13 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
             var shippingDestination = self.getDestinations().at(0);
             self.isLoading('true');
             if(!shippingDestination.get('id')) {
-                self.getDestinations().addApiShippingDestination(shippingDestination).then(function(data){
+                self.getDestinations().apiSaveDestinationAsync(shippingDestination).then(function(data){
                     self.getCheckout().apiSetAllShippingDestinations({destinationId: data.data.id}).then(function(){
                         self.completeStep();
                     });
                 });
             } else {
-                self.getDestinations().updateShippingDestination(shippingDestination).then(function(data){
+                self.getDestinations().updateShippingDestinationAsync(shippingDestination).then(function(data){
                     self.getCheckout().apiSetAllShippingDestinations({destinationId: data.data.id}).then(function(){
                         self.completeStep();
                     });
@@ -268,8 +289,8 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                 checkout.get('shippingInfo').updateShippingMethods().ensure(function() {
                     self.stepStatus('complete');
                     self.isLoading(false);
-                    checkout.get('shippingInfo').calculateStepStatus();
                     checkout.get('shippingInfo').isLoading(false);
+                    checkout.get('shippingInfo').calculateStepStatus();
                 });
             },
             // Breakup for validation

@@ -107,9 +107,6 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
                 this.collection.parent.addNewDestination(newOrderItem);
             }
         },
-        saveNewContact: function(){
-            
-        }
 
     });
 
@@ -140,6 +137,16 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
         removeDestination: function(lineId, id){
             var self = this;
             self.get(lineId).get('items').remove(id);
+        },
+        isDestinationSaved: function(){
+            return (this.get('id')) ? true : false;
+        },
+        saveDestinationAsync: function(){
+            var self = this;
+            return self.collection.apiSaveDestinationAsync(self).then(function(data){
+                self.trigger('sync');
+                return data
+            });
         }
     });
 
@@ -156,10 +163,8 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
 
             if(isCustomerAddress && contact.get('id')){
                destination.customerContactId = contact.get('id');
-               destination.id = contact.get('id');
             }
 
-            destination.isCustomerContact = true;
             var shippingDestination = new ShippingDestination(destination);
             this.add(shippingDestination);
             return shippingDestination;
@@ -167,7 +172,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
         hasDestination: function(destinationContact){
             var self = this;
             var foundDestinations = self.filter(function(destination){
-                return self.compareObjects(destination.get('destinationContact').get('address'), destinationContact.get('address'));
+                return self.compareObjects(destination.get('destinationContact').get('address').toJSON(), destinationContact.get('address').toJSON());
             });
             return (foundDestinations.length) ? true : false;
         },
@@ -183,18 +188,18 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
             });
             return (itemValidations.length) ? itemValidations : null; 
         },
-        addApiShippingDestination : function(destination){
+        apiSaveDestinationAsync : function(destination){
             var self = this;
             return self.getCheckout().apiModel.addShippingDestination({DestinationContact : destination.get('destinationContact').toJSON()});
         },
-        addShippingDestination: function(destination){
+        saveShippingDestinationAsync: function(destination){
             var self = this;
-            return self.addApiShippingDestination(destination).then(function(data){
-                self.add(new ShippingDestination(data.data));
+            return self.apiSaveDestinationAsync(destination).then(function(data){
+                self.add(data.data);
                 return data;
             });
         },
-        updateShippingDestination: function(destination){
+        updateShippingDestinationAsync: function(destination){
             var self = this;
             var dest = destination.toJSON();
             dest.destinationId = dest.id;
