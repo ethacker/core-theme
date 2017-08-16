@@ -32,7 +32,7 @@
     </div>
 
     <div class="mz-shipping-row-item">
-      <a class="mz-shipping-destination-add-address-link" {% if model.quantity < 2 %} style="visibility:hidden" {% endif %} data-mz-action="handleSplitOrderItem" {% if model.isLoading %} disabled {% endif %}> + {{ labels.shippingDestinationAddAddress }} </a>
+      <a class="mz-shipping-destination-add-address-link mz-checkout-button-link" {% if model.quantity < 2 %} style="visibility:hidden" {% endif %} data-mz-action="handleSplitOrderItem" {% if model.isLoading %} disabled {% endif %}> + {{ labels.shippingDestinationAddAddress }} </a>
   </div>
 
 </div>

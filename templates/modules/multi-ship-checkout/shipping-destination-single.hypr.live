@@ -1,22 +1,12 @@
 {% if not model.address.candidateValidatedAddresses %}
-  {% if model.requiresDigitalFulfillmentContact %}
-    <div class="mz-formstep-fields mz-l-formfieldgroup mz-checkoutform mz-checkoutform-active">
-      {% include "modules/checkout/checkout-digital-fulfillment" with editingContact=model %}
-    </div>
-    <div class="mz-formstep-summary mz-addresssummary mz-checkoutform-active">
-      <span>Gift Card Email: {{ model.email }}</span>
-    </div>
-  {% endif %}
 
   {% if model.requiresFulfillmentInfo  %}
 
     <div class="mz-formstep-fields mz-l-formfieldgroup mz-checkoutform  mz-checkoutform-shipping mz-checkoutform-active">
-      <a data-mz-action="toggleMultiShipMode">{{ labels.toggleToMultiShip }}</a>
+      <p><a class="mz-checkout-button-link" data-mz-action="toggleMultiShipMode">{{ labels.toggleToMultiShip }}</a></p>
       {% if model.selectableDestinations.length > 1 %}
-       
           {% include "modules/checkout/checkout-shipping-contact-selector" with model=model.selectableDestinations destinationId=model.selectedDestination.id isLoading=model.isLoading%}
-
-        {% else %}
+      {% else %}
          <div data-mz-shipping-destination-single>
           {% include "modules/common/address-form" with model=model.destinationContact countries=pageContext.shippingCountries states=pageContext.shippingStates %}
          </div>
@@ -25,7 +15,7 @@
 
     <div class="mz-formstep-summary mz-addresssummary mz-checkoutform">
       {% if model.requiresFulfillmentInfo %}
-        {% include "modules/common/address-summary" with model=model.selectedDestination.destinationContact %}      
+        {% include "modules/common/address-summary" with model=model.selectedDestination.destinationContact %}
       {% else %}
         {{ labels.noFulfillmentInfoRequired }}
       {% endif %}
