@@ -319,7 +319,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                     return self.nextDigitalOnly();
                 }
 
-                if (!this.isMultiShipMode() && this.getCheckout().get('destinations').length < 2) {
+                if (!this.isMultiShipMode()) {
                     return self.nextSingleShippingAddress();
                 }
 
