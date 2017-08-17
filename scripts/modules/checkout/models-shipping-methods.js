@@ -65,15 +65,15 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, FulfillmentC
             },
             setDefaultShippingMethods : function(){
                 var self = this;
-                if(self.getCheckout().get('shippingMethods').length){
-                    var shippingMethodsPayload = [];
-                    self.getCheckout().get('groupings').each(function(group){
-                        var methods = self.getCheckout().get('shippingMethods').findWhere({groupingId :group.id});
-                        var lowestShippingRate = _.min(methods.get('shippingRates'), function(method){return method.price;});
-                        shippingMethodsPayload.push({groupingId: group.id, shippingRate: lowestShippingRate});
-                    });
-                    return self.getCheckout().apiSetShippingMethods({id: self.getCheckout().get('id'), postdata: shippingMethodsPayload});
-                }
+
+                var shippingMethodsPayload = [];
+                self.getCheckout().get('groupings').each(function(group){
+                    var methods = self.getCheckout().get('shippingMethods').findWhere({groupingId :group.id});
+                    var lowestShippingRate = _.min(methods.get('shippingRates'), function(method){return method.price;});
+                    shippingMethodsPayload.push({groupingId: group.id, shippingRate: lowestShippingRate});
+                });
+                return self.getCheckout().apiSetShippingMethods({id: self.getCheckout().get('id'), postdata: shippingMethodsPayload});
+
             },
             validateModel: function() {
                 var validationObj = this.validate();

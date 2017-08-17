@@ -202,7 +202,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
 
                 if (!this.requiresFulfillmentInfo() && !this.requiresDigitalFulfillmentContact()) return this.stepStatus('complete');
 
-                if(this.validate()) return this.stepStatus('incomplete');
+                if(!this.validateModel()) return this.stepStatus('incomplete');
                 return CheckoutStep.prototype.calculateStepStatus.apply(this);
             },
         validateModel: function() {
