@@ -6,13 +6,14 @@
 
 {% block body-content %}
 
-{% preload_json model "order" %}
+{% preload_json model "checkout" %}
+{% require_script "pages/confirmationv2" %}
 
-{% require_script "pages/confirmation" %}
 
 <div id="confirmation-container">
-  {% include "modules/confirmation/confirmation-detail" %}
+  {% include "modules/confirmationv2/confirmation-detail" %}
 </div>
+
 {% endblock body-content %}
 
 {% block trailing-scripts %}

@@ -3,7 +3,7 @@ define([
     'underscore',
     'hyprlive',
     'modules/backbone-mozu',
-    'modules/api',  
+    'modules/api',
     'hyprlivecontext',
     'modules/checkout/models-checkout-step',
     'modules/checkout/models-shipping-destinations',
@@ -12,7 +12,7 @@ define([
 function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDestinationModels, CustomerModels) {
 
     var ShippingStep = CheckoutStep.extend({
-        helpers : ['orderItems', 'selectableDestinations', 'selectedDestination', 'selectedDestinationsCount'],
+        helpers : ['orderItems', 'selectableDestinations', 'selectedDestination', 'selectedDestinationsCount', 'totalQuantity'],
         validation: this.multiShipValidation,
         digitalOnlyValidation: {
             'email': {
@@ -20,9 +20,9 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                 msg: Hypr.getLabel('emailMissing')
             }
         },
-        singleShippingAddressValidation : { 
+        singleShippingAddressValidation : {
             singleShippingAddess : {
-                fn : function(value, attr){ 
+                fn : function(value, attr){
                     var destination = this.parent.get('destinations').at(0);
 
                     if(destination){
@@ -76,10 +76,17 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
             return this.parent.get('destinations').toJSON();
         },
         selectedDestinationsCount : function(){
-            var destinationCount = this.parent.get("items").countBy(function(item){ 
-                return item.get('destinationId'); 
+            var destinationCount = this.parent.get("items").countBy(function(item){
+                return item.get('destinationId');
             });
             return _.size(destinationCount);
+        },
+        totalQuantity: function(){
+          var totalQty = 0;
+          this.parent.get("items").forEach(function(item){
+              totalQty+=item.get("quantity");
+          });
+          return totalQty;
         },
         selectedDestination : function(){
             var selectedId = this.getCheckout().get('items').at(0).get('destinationId');
@@ -91,7 +98,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
             return this.parent;
         },
         isCustomerContactDestination: function(customerContactId){
-            
+
         },
         updateSingleCheckoutDestination: function(destinationId, customerContactId){
             var self = this;
@@ -101,7 +108,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                     destinationId: destinationId
                 }).ensure(function(){
                      self.isLoading(false);
-                }); 
+                });
             }
 
             var destination = self.getCheckout().get('destinations').findWhere({customerContactId: customerContactId});
@@ -111,7 +118,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                         destinationId: destinationId
                     }).ensure(function(){
                         self.isLoading(false);
-                    }); 
+                    });
                 });
             }
         },
@@ -215,7 +222,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                         
                         this.nextSingleShippingAddress();
                         return false;
-                    } 
+                    }
 
                     Object.keys(validationObj.ShippingDestinations).forEach(function(key) {
                         Object.keys(validationObj.ShippingDestinations[key]).forEach(function(keyLevel2) {
@@ -299,8 +306,8 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                 //     self.isLoading(false);
                 //     checkout.get('shippingInfo').isLoading(false);
                 // });
-                // 
-                
+                //
+
                 checkout.get('shippingInfo').updateShippingMethods().then(function() {
                     self.stepStatus('complete');
                 }).ensure(function(){
@@ -309,8 +316,8 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                     checkout.get('shippingInfo').isLoading(false);
                     checkout.get('shippingInfo').calculateStepStatus();
                 });
-                
-                
+
+
             },
             // Breakup for validation
             // Break for compelete step
@@ -324,9 +331,9 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                     return self.nextSingleShippingAddress();
                 }
 
-                if (!self.validateModel()) {  
-                  return false;  
-                } 
+                if (!self.validateModel()) {
+                  return false;
+                }
 
                 self.completeStep();
             }

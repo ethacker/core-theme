@@ -3,7 +3,9 @@
   {% if model.requiresFulfillmentInfo  %}
 
     <div class="mz-formstep-fields mz-l-formfieldgroup mz-checkoutform  mz-checkoutform-shipping mz-checkoutform-active">
+      {% if model.totalQuantity>1 %}
       <p><a class="mz-checkout-button-link" data-mz-action="toggleMultiShipMode">{{ labels.toggleToMultiShip }}</a></p>
+      {% endif %}
       {% if model.selectableDestinations.length > 1 %}
           {% include "modules/checkout/checkout-shipping-contact-selector" with model=model.selectableDestinations destinationId=model.selectedDestination.id isLoading=model.isLoading%}
       {% else %}
