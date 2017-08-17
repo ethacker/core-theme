@@ -1,4 +1,4 @@
-﻿    <h3 class="mz-formstep-header mz-checkoutform-header">
+ <h3 class="mz-formstep-header mz-checkoutform-header">
         {{ labels.shippingInformation }}
         {% if model.requiresFulfillmentInfo %}
         <a href="javascript:;" class="mz-formstep-edit" data-mz-action="edit">{{ labels.change }}</a>
@@ -24,7 +24,7 @@
           {% endif %}
         </div>
         {% endif %}
-
+        {% comment %} Not sure if this is necessary....{% endcomment %}
         {% if model.requiresDigitalFulfillmentContact %}
         <div class="mz-formstep-fields mz-l-formfieldgroup mz-checkoutform mz-checkoutform-active">
           {% include "modules/checkout/checkout-digital-fulfillment" with editingContact=model %}
