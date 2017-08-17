@@ -159,6 +159,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
         nextSingleShippingAddress: function() {
             var self = this,
             checkout = this.getCheckout();
+            this.validation = this.singleShippingAddressValidation;
             var validationObj = self.validate();
 
             if (validationObj) {
@@ -211,7 +212,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
 
                 if (validationObj) {
                     if (!this.isMultiShipMode() && this.getCheckout().get('destinations').length < 2) {
-                        this.validation = this.singleShippingAddressValidation;
+                        
                         this.nextSingleShippingAddress();
                         return false;
                     } 
@@ -319,7 +320,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                     return self.nextDigitalOnly();
                 }
 
-                if (!this.isMultiShipMode()) {
+                if (!this.isMultiShipMode() && this.getCheckout().get('destinations').length < 2) {
                     return self.nextSingleShippingAddress();
                 }
 

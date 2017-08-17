@@ -36,17 +36,6 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, FulfillmentC
                 });
                 return groups;
             },
-            // updateGroupingShippingMethod: function(e) {
-            //     var self = this;
-            //     var groupingId = $(e.currentTarget).attr('data-mz-grouping-id');
-            //     var grouping = self.getCheckout().get('groupings').findWhere({id: groupingId});
-
-            //     grouping.set('shippingMethodCode', $(e.currentTarget).val());
-            //     self.getCheckout().syncApiModel();
-            //     self.getCheckout().apiModel.updateCheckoutItemFulfillment().then(function(){
-
-            //     })
-            // },
             refreshShippingMethods: function (methods) {
                 if(this.parent.get('shippingMethods')) {
                     this.parent.get('shippingMethods').reset();

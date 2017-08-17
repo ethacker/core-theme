@@ -60,6 +60,10 @@ define(["modules/jquery-mozu",
             handleChangeDestinationAddress: function(e){
                 var self = this;
                 var $target = $(e.currentTarget);
+                
+                if($target.val() === "") {
+                    return false;
+                }
 
                 if($target.val() === "new"){
                     this.handleNewContact();
