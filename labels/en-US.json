@@ -295,6 +295,7 @@
     "payPalTagline": "The safer, easier way to pay.",
     "phone": "Phone",
     "phoneMissing": "Phone number required",
+    "pickupAt": "Pick up at:",
     "placeOrder": "Place Order",
     "pleaseSelect": "Please Select",
     "positionError": "Your position could not be determined. Displaying stores out of order.",

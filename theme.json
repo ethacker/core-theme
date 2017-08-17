@@ -83,6 +83,12 @@
             "title": "Your Order Has Shipped"
         },
         {
+            "id": "order.changed2",
+            "properties": { },
+            "template": "email/order-confirmation-v2",
+            "title": "Multiship Order Confirmation"
+        },
+        {
             "id": "order.changed",
             "customEditor": "email-orderconfirmation",
             "properties": { },
