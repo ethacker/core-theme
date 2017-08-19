@@ -8,6 +8,14 @@ define(["modules/jquery-mozu",
     'modules/checkout/models-shipping-destinations'], 
     function ($, _, Hypr, Backbone, HyprLiveContext, CheckoutStepView, EditableView, ShippingDestinationModels) {
 
+        
+        var GiftCardDestinationView = Backbone.MozuView.extend({
+            templateName: 'modules/multi-ship-checkout/gift-card-destination',
+            autoUpdate: [
+                'email'
+            ]
+        });
+
         var ShippingDestinationSingleView = Backbone.MozuView.extend({
             templateName: 'modules/common/address-form',
             autoUpdate: [
@@ -198,23 +206,20 @@ define(["modules/jquery-mozu",
                     });
                     shippingDestinationSingleView.render();
                 });
+
+                $.each(this.$el.find('[data-mz-gift-card-destination]'), function(index, val) {
+                    var giftCardDestination = self.model.getCheckout().get('destinations').findWhere({'isGiftCardDestination': true});;
+                    if(!giftCardDestination) {
+                        giftCardDestination = self.model.getCheckout().get('destinations').newGiftCardDestination();
+                    }
+                    var giftCardDestinationView = new GiftCardDestinationView({
+                        el: $(this),
+                        model: giftCardDestination.get('destinationContact')
+                    });
+                    giftCardDestinationView.render();
+                });
             }
         });
-
-        
-
-        // if(this.model.isMultiShipMode){
-        //     return MultiShippingAddressView;
-        // }
-        // 
-        var determineView = function(options){
-            if(options.model) {
-                if(options.model.isMultiShipMode()){
-                    return new ComboShippingAddressView(options);
-                } else {
-                    return new ComboShippingAddressView(options);
-                }
-            }
-        };
-        return determineView;
+         
+        return ComboShippingAddressView;
 });

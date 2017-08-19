@@ -98,10 +98,10 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, FulfillmentC
                 // Incomplete status for shipping is basically only used to show the Shipping Method's Next button,
                 // which does nothing but show the Payment Info step.
                 // var billingInfo = this.parent.get('billingInfo');
-                // if (!billingInfo || billingInfo.stepStatus() === 'new') return this.stepStatus('incomplete');
+                 if (!this.parent.get('billingInfo') || this.parent.get('billingInfo').stepStatus() === 'new') return this.stepStatus('incomplete');
 
                 // Payment Info step has been initialized. Complete status hides the Shipping Method's Next button.
-                return this.stepStatus('complete');
+                return CheckoutStep.prototype.calculateStepStatus.apply(this);
             },
             next: function () {
                 if(!this.validateModel()) {

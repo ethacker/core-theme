@@ -11,105 +11,6 @@ define([
 ],
 function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutStep, ModalDialog) {
 
-    var ShippingDestinationItem = Backbone.MozuModel.extend({
-        //validation: CustomerModels.Contact.prototype.validation,
-        dataTypes: {
-            fulfillmentInfoId: function(val) {
-                    return (val === 'new') ? val : Backbone.MozuModel.DataTypes.Int(val);
-                },
-            fulfillmentContactId: function(val) {
-                    return (val === 'new') ? val : Backbone.MozuModel.DataTypes.Int(val);
-                }
-        },
-        helpers: ['fulfillmentContacts'],
-        idAttribute: "fulfillmentContactId",
-        validation: {
-            'fulfillmentContactId': function (value) {
-                    if (!value || typeof value !== "number") return Hypr.getLabel('passwordMissing');
-                }
-
-        },
-        initialize: function(){
-            var self = this;
-
-            //TODO : Remove
-            //TEMP
-            //Placeholder for fulfillmentContactID
-            
-            self.set('fulfillmentContactId', 'new');
-
-            //Placeholder for fulfillmentInfoID
-            //
-            //self.set('fulfillmentInfoId', _.uniqueId());
-            //
-            //
-            
-            
-        },
-        
-        decreaseQuanitiyByOne: function(){
-            var quantity = this.get('quantity');
-            if(quantity > 1) {
-                this.updateDestinationQuanitiy(quantity - 1);
-            }
-        },
-        fulfillmentContacts : function(){
-           return this.collection.parent.fulfillmentContacts();
-        },
-        /**
-         * Calls the SDK to update the checkout qunaity for that item. 
-         * Returning a new checkout model containing updated quantity and price info
-         */
-        updateDestinationQuanitiy: function(quantity){
-            var self = this;
-            self.set('quantity', quantity);
-            return this;
-        },
-        /**
-         * Sets the checkout items fulfillmentInfoId and saves this via the SDK 
-         * 
-         */
-        toggleSelectedContact :function(fulfillmentId){
-            var self = this;
-            var contact = _.findWhere(self.fulfillmentContacts(), {id: Number(fulfillmentId)});
-            if(contact)
-                contact.selected = (contact.selected) ? false : true; 
-        },
-        changeDestinationAddress: function(fulfillmentId){
-            var self = this;
-            self.toggleSelectedContact(self.get('fulfillmentContactId'));
-            self.toggleSelectedContact(fulfillmentId);
-            self.set({fulfillmentContactId: fulfillmentId});
-
-
-
-            //self.addFulfillmentInfo(fulfillmentId);
-
-
-            self.collection.parent.trigger('changeDestination');
-        },
-
-        /**
-         * Gets the apporperate fulfillmentContact and fires the [] event to 
-         * open our fulfillmentContact modal editor.
-         */
-        editSavedContact: function(){
-            this.get('fulfillmentContactId'); 
-        },
-        splitOrderItem: function(){
-            //if(!this.validate())
-            
-            if(this.get('quantity') > 1) {
-                var oderItemId = this.get('id');
-                var newOrderItem = this.collection.parent.getCheckout().apiModel.splitOrderItem(oderItemId);
-
-                this.set('quantity', this.get('quantity') - 1);
-                this.collection.parent.addNewDestination(newOrderItem);
-            }
-        }
-
-    });
-
     var ShippingDestination = Backbone.MozuModel.extend({
         relations: {
             destinationContact: CustomerModels.Contact
@@ -119,17 +20,38 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
                 return (val === 'new') ? val : Backbone.MozuModel.DataTypes.Int(val);
             }
         },
-        validation: {
+        validation: this.validationDefault,
+        validationDefault : {
             'destinationId': function (value) {
                 if (!value || typeof value !== "number") return Hypr.getLabel('passwordMissing');
             }
         },
-        getCheckout : function(){
-            return this.collection.parent.parent;
+        validationDigitalDestination : {
+            "destinationContact.email" : {
+                fn: function (value) {
+                    if (!value || !value.match(Backbone.Validation.patterns.email)) return Hypr.getLabel('emailMissing');
+                }
+            }
         },
-    
-        //validation: CustomerModels.Contact.prototype.validation,
+        initialize : function(){
+            var self = this;
+            //Set Validation and Flag for Gift Card Destination
+            if(self.get('destinationContact').get('email') && !self.get('destinationContact').get('address').get('address1')){
+                self.validation = self.validationDigitalDestination;
+                self.set('isGiftCardDestination', true);
+            }
+        },
+        getCheckout : function(){
+            return this.collection.parent;
+        },
+        validateDigitalDestination: function(){
+            this.validation = this.validationDigitalDestination();
+            var validationErrors =  this.validate();
 
+            this.validation = this.validationDefault;
+
+            return validationErrors;
+        },
         selectedFulfillmentAddress : function(){
             var self = this;
             return self.collection.pluck("id");
@@ -155,6 +77,14 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
          validation: {
             ShippingDestination : "validateShippingDestination"
         },
+        validateShippingDestination : function(value, attr, computedState){
+            var itemValidations =[];
+            this.collection.each(function(item,idx){
+                var validation = item.validate();
+                if(validation.ShippingDestinationItem.length) itemValidations = itemValidations.concat(validation.ShippingDestinationItem);
+            });
+            return (itemValidations.length) ? itemValidations : null; 
+        },
         getCheckout : function(){
             return this.parent;
         },
@@ -169,6 +99,17 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
             this.add(shippingDestination);
             return shippingDestination;
         },
+        newGiftCardDestination : function(){
+            var self = this;
+            var destination = {destinationContact : new CustomerModels.Contact({})};
+            var giftCardDestination = new ShippingDestination(destination);
+
+            giftCardDestination.validation = giftCardDestination.validationDigitalDestination;
+            giftCardDestination.set('isGiftCardDestination', true);
+
+            self.add(giftCardDestination);
+            return giftCardDestination;
+        },
         hasDestination: function(destinationContact){
             var self = this;
             var foundDestinations = self.filter(function(destination){
@@ -179,14 +120,6 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
         compareObjects: function(obj1, obj2) {
             var areEqual = _.isEqual(obj1, obj2);
             return areEqual;
-        },
-        validateShippingDestination : function(value, attr, computedState){
-            var itemValidations =[];
-            this.collection.each(function(item,idx){
-                var validation = item.validate();
-                if(validation.ShippingDestinationItem.length) itemValidations = itemValidations.concat(validation.ShippingDestinationItem);
-            });
-            return (itemValidations.length) ? itemValidations : null; 
         },
         apiSaveDestinationAsync : function(destination){
             var self = this;
@@ -218,11 +151,9 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
             });
         }
     });
-
    
     return {
         ShippingDestinations: ShippingDestinations,
-        ShippingDestination : ShippingDestination,
-        ShippingDestinationItem : ShippingDestinationItem
+        ShippingDestination : ShippingDestination
     };
 });

@@ -15,9 +15,16 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
         helpers : ['orderItems', 'selectableDestinations', 'selectedDestination', 'selectedDestinationsCount', 'totalQuantity'],
         validation: this.multiShipValidation,
         digitalOnlyValidation: {
-            'email': {
-                pattern: 'email',
-                msg: Hypr.getLabel('emailMissing')
+            fn: function(value, attr){
+                var destinationErrors = [];
+
+                var giftCardDestination = this.parent.get('destinations').find(function(destination, idx){
+                    return (destination.get('isGiftCardDestination'));   
+                });
+
+                var destinationErrors = giftCardDestination.validate();
+
+                return (destinationErrors) ? destinationErrors : false;
             }
         },
         singleShippingAddressValidation : {
@@ -51,23 +58,30 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                 }
             }
         },
-        autoUpdate: [
-            'digitalContactEmail'
-        ],
+        initStep: function () {
+            var self = this;
+            if (self.requiresDigitalFulfillmentContact()) {
+                var giftCardDestination = self.getCheckout().get('destinations').findWhere({'isGiftCardDestination': true});;
+                if(!giftCardDestination) {
+                    giftCardDestination = self.getCheckout().get('destinations').newGiftCardDestination();
+                }
+            }
+            CheckoutStep.prototype.initStep.apply(this, arguments);
+        },
         initialize : function() {
             //TO-DO: This is a work around for the api sync rerendering collections.
             // Replace before using in Prod
             var self = this;
         },
-        digitalGiftDestination :function() {
-            //TO-DO : Primary Addresss select First
-            var shippingDestinations = this.getCheckout().get('destinations');
-            var dGDestination = shippingDestinations.findWhere({digitalGiftDestination: true});
-            if(dGDestination){
-                return dGDestination.toJSON();
-            }
-            return new ShippingDestinationModels.ShippingDestination({});
-        },
+        // digitalGiftDestination :function() {
+        //     //TO-DO : Primary Addresss select First
+        //     var shippingDestinations = this.getCheckout().get('destinations');
+        //     var dGDestination = shippingDestinations.findWhere({digitalGiftDestination: true});
+        //     if(dGDestination){
+        //         return dGDestination.toJSON();
+        //     }
+        //     return new ShippingDestinationModels.ShippingDestination({});
+        // },
         orderItems : function(){
             return this.parent.get("items").sortBy('originalCartItemId');
         },
@@ -144,13 +158,48 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
         },
         //Rename for clear
         // Breakup into seperate api update for fulfillment
-        nextDigitalOnly: function() {
-            var self = this,
-            checkout = this.getCheckout();
+        
+        digitalGiftCardValidate :function(){
+            var self = this;
+            self.validation = self.digitalOnlyValidation;
 
-            if (self.validate()) {
+           var validationObj = self.validate();
+
+            if (validationObj) {
+                if (validationObj) {
+                    Object.keys(validationObj.fn).forEach(function(key) {
+                        this.trigger('error', {
+                            message: validationObj.fn[key]
+                        });
+                    }, this);
+                }
                 return false;
             }
+            return true;
+        },
+        nextDigitalGiftCard: function() {
+            var self = this,
+            checkout = self.getCheckout();
+            
+            if(self.digitalGiftCardValidate()){
+
+                var giftCardDestination = this.parent.get('destinations').find(function(destination, idx){
+                    return (destination.get('isGiftCardDestination'));   
+                });
+
+                if(giftCardDestination) {
+                    if(!giftCardDestination.get('id')) {
+                        self.getDestinations().apiSaveDestinationAsync(giftCardDestination).then(function(data){
+                        });
+                    } else {
+                        self.getDestinations().updateShippingDestinationAsync(giftCardDestination).then(function(data){
+                        });
+                    }
+                }
+
+            }
+
+
 
             //if(digitalGiftDestination) {}
 
@@ -217,9 +266,13 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                 this.validation = this.multiShipValidation;
                 var validationObj = this.validate();
 
+                if(this.requiresDigitalFulfillmentContact()){
+                     var digitalValid = this.digitalGiftCardValidate();
+                     if(!digitalValid) { return false; }
+                }
+
                 if (validationObj) {
-                    if (!this.isMultiShipMode() && this.getCheckout().get('destinations').length < 2) {
-                        
+                    if (!this.isMultiShipMode() && this.getCheckout().get('destinations').length < 2) { 
                         this.nextSingleShippingAddress();
                         return false;
                     }
@@ -290,6 +343,10 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                 var self = this;
                 var checkout = self.getCheckout();
 
+                if (self.requiresDigitalFulfillmentContact()) {
+                    self.nextDigitalGiftCard();
+                }
+
                 checkout.messages.reset();
                 checkout.syncApiModel();
                 self.isLoading(true);
@@ -323,9 +380,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
             // Break for compelete step
             next: function() {
                 var self = this;
-                if (!self.requiresFulfillmentInfo() && self.requiresDigitalFulfillmentContact()) {
-                    return self.nextDigitalOnly();
-                }
+               
 
                 if (!this.isMultiShipMode() && this.getCheckout().get('destinations').length < 2) {
                     return self.nextSingleShippingAddress();
@@ -334,6 +389,8 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                 if (!self.validateModel()) {
                   return false;
                 }
+
+                 
 
                 self.completeStep();
             }
