@@ -22,7 +22,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                     return (destination.get('isGiftCardDestination'));   
                 });
 
-                var destinationErrors = giftCardDestination.validate();
+                destinationErrors = giftCardDestination.validate();
 
                 return (destinationErrors) ? destinationErrors : false;
             }
@@ -61,7 +61,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
         initStep: function () {
             var self = this;
             if (self.requiresDigitalFulfillmentContact()) {
-                var giftCardDestination = self.getCheckout().get('destinations').findWhere({'isGiftCardDestination': true});;
+                var giftCardDestination = self.getCheckout().get('destinations').findWhere({'isGiftCardDestination': true});
                 if(!giftCardDestination) {
                     giftCardDestination = self.getCheckout().get('destinations').newGiftCardDestination();
                 }

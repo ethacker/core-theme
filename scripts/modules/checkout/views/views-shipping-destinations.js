@@ -208,7 +208,7 @@ define(["modules/jquery-mozu",
                 });
 
                 $.each(this.$el.find('[data-mz-gift-card-destination]'), function(index, val) {
-                    var giftCardDestination = self.model.getCheckout().get('destinations').findWhere({'isGiftCardDestination': true});;
+                    var giftCardDestination = self.model.getCheckout().get('destinations').findWhere({'isGiftCardDestination': true});
                     if(!giftCardDestination) {
                         giftCardDestination = self.model.getCheckout().get('destinations').newGiftCardDestination();
                     }
