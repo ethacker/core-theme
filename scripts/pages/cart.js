@@ -8,7 +8,7 @@ define(['modules/api',
         'hyprlive',
         'modules/preserve-element-through-render',
         'modules/modal-dialog',
-        'modules/xpressPaypal.js'
+        'modules/xpressPaypal'
       ], function (api, Backbone, _, $, CartModels, CartMonitor, HyprLiveContext, Hypr, preserveElement, modalDialog, paypal) {
 
 
