@@ -38,7 +38,7 @@ define(["modules/jquery-mozu",
                  self.model.isLoading(true);
                 CheckoutStepView.prototype.initStepView.apply(this, arguments);
                 this.model.getCheckout().get('shippingStep').calculateStepStatus();
-                if(this.model.getCheckout().get('shippingStep').stepStatus() == "complete") {
+                if(this.model.getCheckout().get('requiresFulfillmentInfo') && this.model.getCheckout().get('shippingStep').stepStatus() == "complete") {
                     if(!this.model.getCheckout().get('shippingMethods').length) {
                         this.model.updateShippingMethods().then(function(){
                             self.model.setDefaultShippingMethods().ensure(function(){

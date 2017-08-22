@@ -498,9 +498,28 @@ var CheckoutPage = Backbone.MozuModel.extend({
                     
                 }
             },
-            // addBillingContact: function () {
-            //     return this.addCustomerContact('billingInfo', 'billingContact', [{ name: 'Billing' }]);
-            // },
+            addShippingContacts: function(){
+                var customer = this.get('customer');
+                var destinations = this.get('destinations');
+                var contacts = [];
+
+                destinations.each(function(destination){
+                    var contact = destination.get('destinationContact').toJSON();
+                    contact.types =  {
+                        "name": "Shipping",
+                        "isPrimary": "false"
+                    };
+                    contacts.push(contact);
+                });
+
+                 return customer.apiModel.updateCustomerContacts({id: customer.id, postdata:contacts}).then(function(contactResult) {
+                     return contactResult;
+                 });
+                
+            },
+            addBillingContact: function () {
+                //return this.addCustomerContact('billingInfo', 'billingContact', [{ name: 'Billing' }]);
+            },
             // addShippingContact: function () {
             //     return this.addCustomerContact('fulfillmentInfo', 'fulfillmentContact', [{ name: 'Shipping' }]);
             // },
@@ -620,14 +639,14 @@ var CheckoutPage = Backbone.MozuModel.extend({
                     return doSaveCard();
                 }
             },
-            setFulfillmentContactEmail: function () {
-                var fulfillmentEmail = this.get('fulfillmentInfo.fulfillmentContact.email'),
-                    orderEmail = this.get('email');
+            // setFulfillmentContactEmail: function () {
+            //     var fulfillmentEmail = this.get('fulfillmentInfo.fulfillmentContact.email'),
+            //         orderEmail = this.get('email');
 
-                if (!fulfillmentEmail) {
-                    this.set('fulfillmentInfo.fulfillmentContact.email', orderEmail);
-                }
-            },
+            //     if (!fulfillmentEmail) {
+            //         this.set('fulfillmentInfo.fulfillmentContact.email', orderEmail);
+            //     }
+            // },
             syncBillingAndCustomerEmail: function () {
                 var billingEmail = this.get('billingInfo.billingContact.email'),
                     customerEmail = this.get('emailAddress') || require.mozuData('user').email;
@@ -668,7 +687,7 @@ var CheckoutPage = Backbone.MozuModel.extend({
             },
 
             submit: function () {
-                var order = this,
+                var checkout = this,
                     billingInfo = this.get('billingInfo'),
                     billingContact = billingInfo.get('billingContact'),
                     isSameBillingShippingAddress = billingInfo.get('isSameBillingShippingAddress'),
@@ -679,9 +698,9 @@ var CheckoutPage = Backbone.MozuModel.extend({
                     requiresFulfillmentInfo = this.get('requiresFulfillmentInfo'),
                     requiresBillingInfo = nonStoreCreditTotal > 0,
                     process = [function() {
-                        return order.update({
-                            ipAddress: order.get('ipAddress'),
-                            shopperNotes: order.get('shopperNotes').toJSON()
+                        return checkout.apiUpdateCheckout({
+                            ipAddress: checkout.get('ipAddress'),
+                            shopperNotes: checkout.get('shopperNotes').toJSON()
                         });
                     }];
 
@@ -689,7 +708,7 @@ var CheckoutPage = Backbone.MozuModel.extend({
                 if(storefrontOrderAttributes && storefrontOrderAttributes.length > 0) {
                     var updateAttrs = [];
                     storefrontOrderAttributes.forEach(function(attr){
-                        var attrVal = order.get('orderAttribute-' + attr.attributeFQN);
+                        var attrVal = checkout.get('orderAttribute-' + attr.attributeFQN);
                         if(attrVal) {
                             updateAttrs.push({
                                 'fullyQualifiedName': attr.attributeFQN,
@@ -700,9 +719,9 @@ var CheckoutPage = Backbone.MozuModel.extend({
 
                     if(updateAttrs.length > 0){
                         process.push(function(){
-                            return order.apiUpdateAttributes(updateAttrs);
+                            return checkout.apiUpdateAttributes(updateAttrs);
                         }, function() {
-                            return order.apiGet();
+                            return checkout.apiGet();
                         });
                     }
                 }
@@ -719,7 +738,7 @@ var CheckoutPage = Backbone.MozuModel.extend({
                 }
 
                 this.syncBillingAndCustomerEmail();
-                this.setFulfillmentContactEmail();
+                //this.setFulfillmentContactEmail();
 
                 // skip payment validation, if there are no payments, but run the attributes and accept terms validation.
                 // if ((nonStoreCreditTotal > 0 && this.validate()) || this.validateReviewCheckoutFields()) {
@@ -753,6 +772,7 @@ var CheckoutPage = Backbone.MozuModel.extend({
 
                 //save contacts
                 if (isAuthenticated || isSavingNewCustomer) {
+
                     // if (!isSameBillingShippingAddress && !isSavingCreditCard) {
                     //     if (requiresFulfillmentInfo) process.push(this.addShippingContact);
                     //     if (requiresBillingInfo) process.push(this.addBillingContact);
@@ -785,8 +805,8 @@ var CheckoutPage = Backbone.MozuModel.extend({
             runForAllSteps: function(cb) {
                 var me = this;
                 _.each([
-                       'fulfillmentInfo.fulfillmentContact',
-                       'fulfillmentInfo',
+                       'shippingStep',
+                       'shippingInfo',
                        'billingInfo'
                 ], function(name) {
                     cb.call(me.get(name));

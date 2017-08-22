@@ -15,9 +15,16 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
         helpers : ['orderItems', 'selectableDestinations', 'selectedDestination', 'selectedDestinationsCount', 'totalQuantity'],
         validation: this.multiShipValidation,
         digitalOnlyValidation: {
-            'email': {
-                pattern: 'email',
-                msg: Hypr.getLabel('emailMissing')
+            fn: function(value, attr){
+                var destinationErrors = [];
+
+                var giftCardDestination = this.parent.get('destinations').find(function(destination, idx){
+                    return (destination.get('isGiftCardDestination'));   
+                });
+
+                destinationErrors = giftCardDestination.validate();
+
+                return (destinationErrors) ? destinationErrors : false;
             }
         },
         singleShippingAddressValidation : {
@@ -51,23 +58,30 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                 }
             }
         },
-        autoUpdate: [
-            'digitalContactEmail'
-        ],
+        initStep: function () {
+            var self = this;
+            if (self.requiresDigitalFulfillmentContact()) {
+                var giftCardDestination = self.getCheckout().get('destinations').findWhere({'isGiftCardDestination': true});
+                if(!giftCardDestination) {
+                    giftCardDestination = self.getCheckout().get('destinations').newGiftCardDestination();
+                }
+            }
+            CheckoutStep.prototype.initStep.apply(this, arguments);
+        },
         initialize : function() {
             //TO-DO: This is a work around for the api sync rerendering collections.
             // Replace before using in Prod
             var self = this;
         },
-        digitalGiftDestination :function() {
-            //TO-DO : Primary Addresss select First
-            var shippingDestinations = this.getCheckout().get('destinations');
-            var dGDestination = shippingDestinations.findWhere({digitalGiftDestination: true});
-            if(dGDestination){
-                return dGDestination.toJSON();
-            }
-            return new ShippingDestinationModels.ShippingDestination({});
-        },
+        // digitalGiftDestination :function() {
+        //     //TO-DO : Primary Addresss select First
+        //     var shippingDestinations = this.getCheckout().get('destinations');
+        //     var dGDestination = shippingDestinations.findWhere({digitalGiftDestination: true});
+        //     if(dGDestination){
+        //         return dGDestination.toJSON();
+        //     }
+        //     return new ShippingDestinationModels.ShippingDestination({});
+        // },
         orderItems : function(){
             return this.parent.get("items").sortBy('originalCartItemId');
         },
@@ -144,30 +158,50 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
         },
         //Rename for clear
         // Breakup into seperate api update for fulfillment
-        nextDigitalOnly: function() {
-            var self = this,
-            checkout = this.getCheckout();
+        
+        digitalGiftCardValid :function(){
+            var self = this;
+            self.validation = self.digitalOnlyValidation;
 
-            if (self.validate()) {
+           var validationObj = self.validate();
+
+            if (validationObj) {
+                if (validationObj) {
+                    Object.keys(validationObj.fn).forEach(function(key) {
+                        this.trigger('error', {
+                            message: validationObj.fn[key]
+                        });
+                    }, this);
+                }
                 return false;
             }
-
-            //if(digitalGiftDestination) {}
-
-            // return self.getCheckout().apiModel.addShippingDestination({DestinationContact : {email: self.get('email')}}).then(function(data){
-            //     self.isLoading(false);
-            //     order.messages.reset();
-            //     order.syncApiModel();
-
-            //     self.calculateStepStatus();
-            //     return order.get('billingInfo').calculateStepStatus();
-            // });
+            return true;
         },
-        nextSingleShippingAddress: function() {
+        saveDigitalGiftCard: function() {
             var self = this,
-            checkout = this.getCheckout();
+            checkout = self.getCheckout();
+            
+            if(self.digitalGiftCardValid()){
+
+                var giftCardDestination = this.parent.get('destinations').find(function(destination, idx){
+                    return (destination.get('isGiftCardDestination'));   
+                });
+
+                if(giftCardDestination) {
+                    if(!giftCardDestination.get('id')) {
+                        self.getDestinations().apiSaveDestinationAsync(giftCardDestination).then(function(data){
+                        });
+                    } else {
+                        self.getDestinations().updateShippingDestinationAsync(giftCardDestination).then(function(data){
+                        });
+                    }
+                }
+
+            }
+        },
+        singleShippingAddressValid : function(){
             this.validation = this.singleShippingAddressValidation;
-            var validationObj = self.validate();
+            var validationObj = this.validate();
 
             if (validationObj) {
                 if (validationObj) {
@@ -179,47 +213,57 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                 }
                 return false;
             }
+            return true;
+        },
+        nextSingleShippingAddress: function() {
+            var self = this,
+            checkout = this.getCheckout();
+            
+            if(this.singleShippingAddressValid){
 
             var shippingDestination = self.getDestinations().at(0);
-            self.isLoading('true');
-            if(!shippingDestination.get('id')) {
-                self.getDestinations().apiSaveDestinationAsync(shippingDestination).then(function(data){
-                    self.getCheckout().apiSetAllShippingDestinations({destinationId: data.data.id}).then(function(){
-                        self.completeStep();
+                self.isLoading('true');
+                if(!shippingDestination.get('id')) {
+                    self.getDestinations().apiSaveDestinationAsync(shippingDestination).then(function(data){
+                        self.getCheckout().apiSetAllShippingDestinations({destinationId: data.data.id}).then(function(){
+                            self.completeStep();
+                        });
                     });
-                });
-            } else {
-                self.getDestinations().updateShippingDestinationAsync(shippingDestination).then(function(data){
-                    self.getCheckout().apiSetAllShippingDestinations({destinationId: data.data.id}).then(function(){
-                        self.completeStep();
+                } else {
+                    self.getDestinations().updateShippingDestinationAsync(shippingDestination).then(function(data){
+                        self.getCheckout().apiSetAllShippingDestinations({destinationId: data.data.id}).then(function(){
+                            self.completeStep();
+                        });
                     });
-                });
+                }
             }
         },
         calculateStepStatus: function() {
 
-                if (!this.requiresFulfillmentInfo() && this.requiresDigitalFulfillmentContact()) {
-                    this.validation = this.digitalOnlyValidation;
-                }
+            if (!this.requiresFulfillmentInfo() && !this.requiresDigitalFulfillmentContact()) return this.stepStatus('complete');
 
-                if(this.validate()) return this.stepStatus('incomplete');
+            if (!this.requiresFulfillmentInfo() && this.requiresDigitalFulfillmentContact()) {
+                this.validation = this.digitalOnlyValidation;
+            }
 
-                if (!this.isMultiShipMode() && this.getCheckout().get('destinations').length < 2) {
-                    this.validation = this.singleShippingAddressValidation;
-                }
 
-                if (!this.requiresFulfillmentInfo() && !this.requiresDigitalFulfillmentContact()) return this.stepStatus('complete');
-
+            if (!this.isMultiShipMode() && this.getCheckout().get('destinations').length < 2) {
                 if(!this.validateModel()) return this.stepStatus('incomplete');
-                return CheckoutStep.prototype.calculateStepStatus.apply(this);
-            },
+            }
+            
+            return CheckoutStep.prototype.calculateStepStatus.apply(this);
+        },
         validateModel: function() {
                 this.validation = this.multiShipValidation;
                 var validationObj = this.validate();
 
-                if (validationObj) {
-                    if (!this.isMultiShipMode() && this.getCheckout().get('destinations').length < 2) {
-                        
+                if(this.requiresDigitalFulfillmentContact()){
+                     var digitalValid = this.digitalGiftCardValid();
+                     if(!digitalValid) { return false; }
+                }
+
+                if (this.getCheckout().requiresFulfillmentInfo && validationObj) {
+                    if (!this.isMultiShipMode() && this.getCheckout().get('destinations').length < 2) { 
                         this.nextSingleShippingAddress();
                         return false;
                     }
@@ -292,7 +336,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
 
                 checkout.messages.reset();
                 checkout.syncApiModel();
-                self.isLoading(true);
+
                 // checkout.apiModel.mergeDuplicateCheckoutItems().then(function(){
                 //     checkout.get('shippingInfo').updateShippingMethods().then(function() {
                 //         self.stepStatus('complete');
@@ -308,31 +352,38 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                 // });
                 //
 
-                checkout.get('shippingInfo').updateShippingMethods().then(function() {
-                    self.stepStatus('complete');
-                }).ensure(function(){
-                    checkout.trigger('sync');
-                    self.isLoading(false);
-                    checkout.get('shippingInfo').isLoading(false);
-                    checkout.get('shippingInfo').calculateStepStatus();
-                });
-
-
+                if(self.requiresFulfillmentInfo()){
+                    self.isLoading(true);
+                    checkout.get('shippingInfo').updateShippingMethods().then(function() {
+                        self.stepStatus('complete');
+                    }).ensure(function(){
+                        checkout.trigger('sync');
+                        self.isLoading(false);
+                        checkout.get('shippingInfo').isLoading(false);
+                        checkout.get('shippingInfo').calculateStepStatus();
+                    });
+                } else {
+                   self.stepStatus('complete'); 
+                }
             },
             // Breakup for validation
             // Break for compelete step
             next: function() {
                 var self = this;
-                if (!self.requiresFulfillmentInfo() && self.requiresDigitalFulfillmentContact()) {
-                    return self.nextDigitalOnly();
+
+                if (self.requiresDigitalFulfillmentContact()) {
+                    self.saveDigitalGiftCard();
                 }
 
-                if (!this.isMultiShipMode() && this.getCheckout().get('destinations').length < 2) {
-                    return self.nextSingleShippingAddress();
-                }
+                if(self.requiresFulfillmentInfo()){
+                    if (!this.isMultiShipMode() && this.getCheckout().get('destinations').length < 2) {
+                        return self.nextSingleShippingAddress();
+                    }
 
-                if (!self.validateModel()) {
-                  return false;
+                    if (!self.validateModel()) {
+                      return false;
+                    }
+
                 }
 
                 self.completeStep();

@@ -21,8 +21,6 @@ define(['modules/api',
           $(document).ready(function(){
 
             var confModel = ConfirmationModel.fromCurrent();
-            console.log("v2 confmodel");
-            console.log(confModel);
             var confirmationView = new ConfirmationView({
                 el: $('#confirmation-container'),
                 model: confModel

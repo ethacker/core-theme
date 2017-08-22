@@ -207,7 +207,7 @@ require(["modules/jquery-mozu",
                   model: checkoutModel
                 }),
                 steps: {
-                    shippingAddress: ShippingDestinationsView({
+                    shippingAddress: new ShippingDestinationsView({
                         el: $('#step-shipping-address'),
                         model: checkoutModel.get("shippingStep")
                     }),
