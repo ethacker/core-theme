@@ -15,7 +15,7 @@
 
 {% block body-content %}
 
-{% require_script "pages/multi-ship-checkout" %}
+{% require_script "pages/checkout" %}
 
 {% preload_json model "checkout" %}
 
@@ -35,7 +35,7 @@
 
     <div class="mz-l-column" id="checkout-rightcol">
       <div class="mz-formstep mz-checkoutform-ordersummary" id="order-summary">
-        {% include "modules/multi-ship-checkout/checkout-order-summary" %}
+        {% include "modules/checkout/checkout-order-summary" %}
       </div>
 
         <div class="mz-l-formfieldgroup">
