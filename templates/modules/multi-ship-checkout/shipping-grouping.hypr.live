@@ -1,14 +1,9 @@
-<h4 class="mz-shipping-method-header">{{lables.shippingMethodsToText}}</h4>
-    
+
 <div class="mz-shipping-method-items">
-    {{labels.shippingTo}} 
-</div> 
-<br />
-<div class="mz-l-formfieldgroup-row mz-shipping-method-address"> 
-        <div class="mz-l-formfieldgroup-cell">
-            {{labels.shippingMethodsAddresssLabel}} 
-        </div>
-        <div class="mz-l-formfieldgroup-cell">
+    <h4>{{labels.shippingTo}}:</h4>
+</div>
+<div class="mz-l-formfieldgroup-row mz-shipping-method-address">
+        <div class="mz-l-formfieldgroup-cell" style="border-right: 1px solid #CCC;">
             <div>{{model.groupingDestinationInfo.destinationContact.firstName}} {{model.groupingDestinationInfo.destinationContact.lastNameOrSurname}}</div>
             <div>{{model.groupingDestinationInfo.destinationContact.phoneNumbers.home}}</div>
         </div>
@@ -22,18 +17,18 @@
 <div class="mz-shipping-method-items">
     {% for group in model.groupingItemInfo %}
     <div>
-        <span class="shipping-method-items-qty">{{ labels.shippingMethodsQuantity }} {{ group.quantity }}<span> 
+        <span class="shipping-method-items-qty">{{ labels.shippingMethodsQuantity }} {{ group.quantity }}<span>
         <span class="shipping-method-items-name">{{ group.product.name }}</span>
-    </div> 
+    </div>
     {% endfor %}
-</div> 
+</div>
 
-<div class="mz-shipping-method-section"> 
+<div class="mz-shipping-method-section">
     <div class="mz-l-formfieldgroup-row">
         <div class="mz-l-formfieldgroup-cell">
             {{labels.shippingMethodSelector}}
         </div>
-    
+
       <div class="mz-formstep-fields mz-l-formfieldgroup mz-checkoutform mz-checkoutform-active">
          <div class="mz-l-formfieldgroup-cell">
          {% if isLoading %}
@@ -60,6 +55,4 @@
       </div>
 
     </div>
-</div> 
-
-     
+</div>

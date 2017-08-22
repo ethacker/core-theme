@@ -61,6 +61,7 @@
     .mz-shipping-row {
       margin: @gutter/4;
       display: flex;
+      flex-wrap: wrap;
       .mz-shipping-row-item{
         display: flex;
         align-items: center;
@@ -101,6 +102,30 @@
     padding: 0 0 @gutter/8;
     font-size: @fontSizeLarger;
     border-bottom: none;
+}
+
+.mz-shipping-method-address{
+  width: 100%;
+  display: flex;
+    .mz-l-formfieldgroup-cell {
+      flex-grow: 1;
+      margin-left: @gutter;
+      padding: @gutter/4 0px @gutter/4 0px;
+
+    }
+
+}
+
+.mz-shipping-method-items {
+  div {
+    margin-left: @gutter;
+  }
+  span {
+    padding: @gutter/4;
+  }
+}
+.mz-shipping-method-section {
+  margin: @gutter/2;
 }
 
 .mz-l-formfieldgroup {

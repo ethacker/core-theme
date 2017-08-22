@@ -1,4 +1,3 @@
-<h4 class="mz-shipping-method-header">{{lables.shippingMethodsToText}}</h4>
     <div class="mz-shipping-method-address">
         <div class="mz-l-formfieldgroup-row mz-shipping-method">
             <div class="mz-l-formfieldgroup-cell">
@@ -18,7 +17,7 @@
 
     <div class="mz-shipping-method-order-items">
     </div>
-    
+
     <div class="mz-shipping-method-section">
         <div class="mz-l-formfieldgroup-row">
             <div class="mz-l-formfieldgroup-cell">
@@ -41,4 +40,4 @@
                 {% endif %}
             </div>
         </div>
-    </div>   
+    </div>
