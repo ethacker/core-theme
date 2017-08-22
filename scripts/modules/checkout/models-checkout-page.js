@@ -698,7 +698,7 @@ var CheckoutPage = Backbone.MozuModel.extend({
                     requiresFulfillmentInfo = this.get('requiresFulfillmentInfo'),
                     requiresBillingInfo = nonStoreCreditTotal > 0,
                     process = [function() {
-                        return checkout.update({
+                        return checkout.apiUpdateCheckout({
                             ipAddress: checkout.get('ipAddress'),
                             shopperNotes: checkout.get('shopperNotes').toJSON()
                         });
@@ -805,8 +805,8 @@ var CheckoutPage = Backbone.MozuModel.extend({
             runForAllSteps: function(cb) {
                 var me = this;
                 _.each([
-                       'fulfillmentInfo.fulfillmentContact',
-                       'fulfillmentInfo',
+                       'shippingStep',
+                       'shippingInfo',
                        'billingInfo'
                 ], function(name) {
                     cb.call(me.get(name));

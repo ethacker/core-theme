@@ -159,7 +159,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
         //Rename for clear
         // Breakup into seperate api update for fulfillment
         
-        digitalGiftCardValidate :function(){
+        digitalGiftCardValid :function(){
             var self = this;
             self.validation = self.digitalOnlyValidation;
 
@@ -177,11 +177,11 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
             }
             return true;
         },
-        nextDigitalGiftCard: function() {
+        saveDigitalGiftCard: function() {
             var self = this,
             checkout = self.getCheckout();
             
-            if(self.digitalGiftCardValidate()){
+            if(self.digitalGiftCardValid()){
 
                 var giftCardDestination = this.parent.get('destinations').find(function(destination, idx){
                     return (destination.get('isGiftCardDestination'));   
@@ -198,23 +198,8 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                 }
 
             }
-
-
-
-            //if(digitalGiftDestination) {}
-
-            // return self.getCheckout().apiModel.addShippingDestination({DestinationContact : {email: self.get('email')}}).then(function(data){
-            //     self.isLoading(false);
-            //     order.messages.reset();
-            //     order.syncApiModel();
-
-            //     self.calculateStepStatus();
-            //     return order.get('billingInfo').calculateStepStatus();
-            // });
         },
-        nextSingleShippingAddress: function() {
-            var self = this,
-            checkout = this.getCheckout();
+        singleShippingAddressValid : function(){
             this.validation = this.singleShippingAddressValidation;
             var validationObj = self.validate();
 
@@ -228,50 +213,56 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                 }
                 return false;
             }
+            return true
+        },
+        nextSingleShippingAddress: function() {
+            var self = this,
+            checkout = this.getCheckout();
+            
+            if(this.singleShippingAddressValid){
 
             var shippingDestination = self.getDestinations().at(0);
-            self.isLoading('true');
-            if(!shippingDestination.get('id')) {
-                self.getDestinations().apiSaveDestinationAsync(shippingDestination).then(function(data){
-                    self.getCheckout().apiSetAllShippingDestinations({destinationId: data.data.id}).then(function(){
-                        self.completeStep();
+                self.isLoading('true');
+                if(!shippingDestination.get('id')) {
+                    self.getDestinations().apiSaveDestinationAsync(shippingDestination).then(function(data){
+                        self.getCheckout().apiSetAllShippingDestinations({destinationId: data.data.id}).then(function(){
+                            self.completeStep();
+                        });
                     });
-                });
-            } else {
-                self.getDestinations().updateShippingDestinationAsync(shippingDestination).then(function(data){
-                    self.getCheckout().apiSetAllShippingDestinations({destinationId: data.data.id}).then(function(){
-                        self.completeStep();
+                } else {
+                    self.getDestinations().updateShippingDestinationAsync(shippingDestination).then(function(data){
+                        self.getCheckout().apiSetAllShippingDestinations({destinationId: data.data.id}).then(function(){
+                            self.completeStep();
+                        });
                     });
-                });
+                }
             }
         },
         calculateStepStatus: function() {
 
-                if (!this.requiresFulfillmentInfo() && this.requiresDigitalFulfillmentContact()) {
-                    this.validation = this.digitalOnlyValidation;
-                }
+            if (!this.requiresFulfillmentInfo() && !this.requiresDigitalFulfillmentContact()) return this.stepStatus('complete');
 
-                if(this.validate()) return this.stepStatus('incomplete');
+            if (!this.requiresFulfillmentInfo() && this.requiresDigitalFulfillmentContact()) {
+                this.validation = this.digitalOnlyValidation;
+            }
 
-                if (!this.isMultiShipMode() && this.getCheckout().get('destinations').length < 2) {
-                    this.validation = this.singleShippingAddressValidation;
-                }
 
-                if (!this.requiresFulfillmentInfo() && !this.requiresDigitalFulfillmentContact()) return this.stepStatus('complete');
-
+            if (!this.isMultiShipMode() && this.getCheckout().get('destinations').length < 2) {
                 if(!this.validateModel()) return this.stepStatus('incomplete');
-                return CheckoutStep.prototype.calculateStepStatus.apply(this);
-            },
+            }
+            
+            return CheckoutStep.prototype.calculateStepStatus.apply(this);
+        },
         validateModel: function() {
                 this.validation = this.multiShipValidation;
                 var validationObj = this.validate();
 
                 if(this.requiresDigitalFulfillmentContact()){
-                     var digitalValid = this.digitalGiftCardValidate();
+                     var digitalValid = this.digitalGiftCardValid();
                      if(!digitalValid) { return false; }
                 }
 
-                if (validationObj) {
+                if (this.getCheckout().requiresFulfillmentInfo && validationObj) {
                     if (!this.isMultiShipMode() && this.getCheckout().get('destinations').length < 2) { 
                         this.nextSingleShippingAddress();
                         return false;
@@ -343,13 +334,9 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                 var self = this;
                 var checkout = self.getCheckout();
 
-                if (self.requiresDigitalFulfillmentContact()) {
-                    self.nextDigitalGiftCard();
-                }
-
                 checkout.messages.reset();
                 checkout.syncApiModel();
-                self.isLoading(true);
+
                 // checkout.apiModel.mergeDuplicateCheckoutItems().then(function(){
                 //     checkout.get('shippingInfo').updateShippingMethods().then(function() {
                 //         self.stepStatus('complete');
@@ -365,32 +352,39 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                 // });
                 //
 
-                checkout.get('shippingInfo').updateShippingMethods().then(function() {
-                    self.stepStatus('complete');
-                }).ensure(function(){
-                    checkout.trigger('sync');
-                    self.isLoading(false);
-                    checkout.get('shippingInfo').isLoading(false);
-                    checkout.get('shippingInfo').calculateStepStatus();
-                });
-
-
+                if(self.requiresFulfillmentInfo()){
+                    self.isLoading(true);
+                    checkout.get('shippingInfo').updateShippingMethods().then(function() {
+                        self.stepStatus('complete');
+                    }).ensure(function(){
+                        checkout.trigger('sync');
+                        self.isLoading(false);
+                        checkout.get('shippingInfo').isLoading(false);
+                        checkout.get('shippingInfo').calculateStepStatus();
+                    });
+                } else {
+                   self.stepStatus('complete'); 
+                }
             },
             // Breakup for validation
             // Break for compelete step
             next: function() {
                 var self = this;
-               
 
-                if (!this.isMultiShipMode() && this.getCheckout().get('destinations').length < 2) {
-                    return self.nextSingleShippingAddress();
+                if (self.requiresDigitalFulfillmentContact()) {
+                    self.saveDigitalGiftCard();
                 }
 
-                if (!self.validateModel()) {
-                  return false;
-                }
+                if(self.requiresFulfillmentInfo()){
+                    if (!this.isMultiShipMode() && this.getCheckout().get('destinations').length < 2) {
+                        return self.nextSingleShippingAddress();
+                    }
 
-                 
+                    if (!self.validateModel()) {
+                      return false;
+                    }
+
+                }
 
                 self.completeStep();
             }
