@@ -5,7 +5,6 @@ define(["backbone", 'hyprlive', 'modules/models-customer', 'modules/models-dialo
             destinationContact : CustomerModels.Contact
         },
         resetDestinationContact: function(){
-        	var contact = this.get('destinationContact');
         	this.set('destinationContact', new CustomerModels.Contact({address: {}}));
         },
         initialize: function () {

@@ -1,4 +1,5 @@
-{% if not model.address.candidateValidatedAddresses %}
+
+{% if not model.selectedDestination.destinationContact.address.candidateValidatedAddresses %}
 
   {% if model.requiresFulfillmentInfo  %}
 
@@ -24,18 +25,18 @@
     </div>
   {% endif %}
 
-  {% else %}
+{% else %}
 
   <div class="mz-formstep-fields mz-l-formfieldgroup mz-checkoutform  mz-checkoutform-shipping mz-checkoutform-active">
   {{ labels.selectValidAddress }}
 
-  {% for addr in model.address.candidateValidatedAddresses %}
+  {% for addr in model.selectedDestination.destinationContact.address.candidateValidatedAddresses %}
   <label class="mz-l-formfieldgroup-row">
       <div class="mz-l-formfieldgroup-cell">
       <span>{{ labels.suggestionNum|string_format(forloop.index) }}</span>
     </div>
     <div class="mz-l-formfieldgroup-cell">
-      <input data-mz-action="choose" name="candidateValidatedAddresses" type="radio" value="{{forloop.index0}}" />
+      <input data-mz-action="chooseCandidateAddress" name="candidateValidatedAddresses" type="radio" value="{{forloop.index0}}" />
     </div>
     <div class="mz-l-formfieldgroup-cell">
       {{addr.address1}}<br />
@@ -50,12 +51,12 @@
         <span>Original</span>
     </div>
     <div class="mz-l-formfieldgroup-cell">
-      <input data-mz-action="choose" name="candidateValidatedAddresses" type="radio" value="-1" />
+      <input data-mz-action="chooseCandidateAddress" name="candidateValidatedAddresses" type="radio" value="-1" />
     </div>
     <div class="mz-l-formfieldgroup-cell">
-      {{model.address.address1}}<br />
-      {% if model.address.address2 %}{{model.address.address2}}<br />{% endif %}
-      {{model.address.cityOrTown}}, {{model.address.stateOrProvince}} {{model.address.postalOrZipCode}} {{model.address.countryCode}}
+      {{model.selectedDestination.destinationContact.address.address1}}<br />
+      {% if model.selectedDestination.destinationContact.address.address2 %}{{model.selectedDestination.destinationContact.address.address2}}<br />{% endif %}
+      {{model.selectedDestination.destinationContact.address.cityOrTown}}, {{model.selectedDestination.destinationContact.address.stateOrProvince}} {{model.selectedDestination.destinationContact.address.postalOrZipCode}} {{model.selectedDestination.destinationContact.address.countryCode}}
     </div>
   </label>
   {% endif %}
