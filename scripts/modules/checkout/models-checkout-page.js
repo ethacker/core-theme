@@ -86,7 +86,7 @@ var CheckoutOrder = OrderModels.Order.extend({
     },
     addNewContact: function(){
         
-        this.getCheckout().get('dialogContact').get("destinationContact").clear();
+        this.getCheckout().get('dialogContact').resetDestinationContact();
         this.getCheckout().get('dialogContact').unset('id');
 
         this.getCheckout().get('dialogContact').trigger('openDialog');

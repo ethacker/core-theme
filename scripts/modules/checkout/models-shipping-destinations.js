@@ -89,7 +89,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
             return this.parent;
         },
         newDestination : function(contact, isCustomerAddress){
-            var destination = {destinationContact : contact || new CustomerModels.Contact({})};
+            var destination = {destinationContact : contact || new CustomerModels.Contact()};
 
             if(isCustomerAddress && contact.get('id')){
                destination.customerContactId = contact.get('id');

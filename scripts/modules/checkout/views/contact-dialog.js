@@ -16,7 +16,17 @@ define(['modules/backbone-mozu','modules/jquery-mozu','underscore', 'hyprlivecon
                 'phoneNumbers.home',
                 'contactId',
                 'email'
-            ]
+            ],
+        choose: function(e) {
+            var idx = parseInt($(e.currentTarget).val(), 10);
+            if (idx !== -1) {
+                var addr = this.model.get('address');
+                var valAddr = addr.get('candidateValidatedAddresses')[idx];
+                for (var k in valAddr) {
+                    addr.set(k, valAddr[k]);
+                }
+            }
+        }
     });
 
 	var ContactModalView = ModalDialogView.extend({
@@ -95,7 +105,7 @@ define(['modules/backbone-mozu','modules/jquery-mozu','underscore', 'hyprlivecon
                                 checkout.messages.reset();
                                 saveAddress();
                             } else { 
-                                //checkout.messages.reset({ message: Hypr.getLabel('addressValidationError') });
+                                checkout.messages.reset({ message: Hypr.getLabel('addressValidationError') });
                             }
                         });
                     } else {
@@ -115,6 +125,7 @@ define(['modules/backbone-mozu','modules/jquery-mozu','underscore', 'hyprlivecon
                 contactModalContactView.render();
             });  
         },
+
         render : function() {
             var self = this;
             self.setInit();
