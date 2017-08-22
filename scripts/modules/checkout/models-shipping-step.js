@@ -201,7 +201,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
         },
         singleShippingAddressValid : function(){
             this.validation = this.singleShippingAddressValidation;
-            var validationObj = self.validate();
+            var validationObj = this.validate();
 
             if (validationObj) {
                 if (validationObj) {
@@ -213,7 +213,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                 }
                 return false;
             }
-            return true
+            return true;
         },
         nextSingleShippingAddress: function() {
             var self = this,
