@@ -250,8 +250,7 @@ require(["modules/jquery-mozu",
 
         checkoutModel.on('complete', function() {
             CartMonitor.setCount(0);
-
-            window.location = (HyprLiveContext.locals.siteContext.siteSubdirectory||'') + "/checkout/" + checkoutModel.get('id') + "/confirmation";
+            window.location = (HyprLiveContext.locals.siteContext.siteSubdirectory||'') + "/checkoutv2/" + checkoutModel.get('id') + "/confirmation";
         });
 
 
