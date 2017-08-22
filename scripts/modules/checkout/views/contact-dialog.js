@@ -1,4 +1,4 @@
-define(['modules/backbone-mozu','modules/jquery-mozu','underscore', 'hyprlivecontext', 'modules/views-modal-dialog'], function(Backbone, $, _, HyprLiveContext, ModalDialogView, CustomerModels) {
+define(['modules/backbone-mozu','hyprlive', 'modules/jquery-mozu','underscore', 'hyprlivecontext', 'modules/views-modal-dialog'], function(Backbone, Hypr, $, _, HyprLiveContext, ModalDialogView, CustomerModels) {
 
     var ContactModalContactView = Backbone.MozuView.extend({
         templateName : "modules/multi-ship-checkout/address-dialog",
