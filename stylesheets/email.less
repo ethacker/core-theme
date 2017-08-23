@@ -173,9 +173,12 @@ dl.mz-orderheader {
         td {
             text-align: right;
             padding: @gutter/2 @gutter/2;
-            &.mz-ordersummary-item-product {
+            &.mz-ordersummary-item-product, &.mz-addresssummary {
                 text-align: left;
             }
+        }
+        tr:last-child {
+          border-bottom: 1px solid #ddd;
         }
 
 

@@ -1,0 +1,120 @@
+<table class="mz-ordersummary-email">
+  <thead>
+    <tr>
+      <th class="mz-ordersummary-header-product">{{ labels.product }}</th>
+      <th class="mz-ordersummary-header-qty">{{ labels.qty }}</th>
+      <th class="mz-ordersummary-header-each">{{ labels.each }}</th>
+      <th class="mz-ordersummary-header-total">{{ labels.total }}</th>
+    </tr>
+  </thead>
+  <tbody>
+
+<!-- SHIPPING ITEMS -->
+    {% for item in items %}
+      {% if item.fulfillmentMethod == "Ship" %}
+        <tr class="mz-ordersummary-line mz-ordersummary-line-item {% if item.discountTotal > 0 %}is-discounted{% endif %}">
+          <td class="mz-ordersummary-item-product">
+            {{ item.product.name }}
+            {% if item.product.bundledProducts.length %}
+            <dl class="mz-propertylist">
+              {% for bundledProduct in item.product.bundledProducts %}
+              <dt>{{ bundledProduct.productCode }}</dt>&nbsp;
+              <dd>{{ bundledProduct.name }} ({{ bundledProduct.quantity }})</dd>
+              {% endfor %}
+            </dl>
+            {% endif %}
+          </td>
+          <td>{{ item.quantity }}</td>
+          <td>
+            {% include "modules/common/item-price" with item=item %}
+          </td>
+          <td>{% include "modules/common/item-total" with item=item %}
+          </td>
+        </tr>
+        {% if forloop.last %}
+        <tr>
+          <td class="mz-addresssummary" colspan="2"><b>{{ labels.shipTo }}</b>{% include "modules/common/address-summary" with model=fulfillmentInfo.fulfillmentContact %}</td>
+          <td class="mz-addresssummary" colspan="2"><b>{{ labels.shippingMethod }}</b>: {{ fulfillmentInfo.shippingMethodName }}</td>
+        </tr>
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+    <!-- -->
+
+
+<!-- Pickup Items -->
+{% for location in fulfillmentLocations %}
+  {% for item in items %}
+    {% if item.fulfillmentMethod=="Pickup" && item.fulfillmentLocationCode==location.id %}
+    <tr class="mz-ordersummary-line mz-ordersummary-line-item {% if item.discountTotal > 0 %}is-discounted{% endif %}">
+      <td class="mz-ordersummary-item-product">
+        {{ item.product.name }}
+        {% if item.product.bundledProducts.length %}
+        <dl class="mz-propertylist">
+          {% for bundledProduct in item.product.bundledProducts %}
+          <dt>{{ bundledProduct.productCode }}</dt>&nbsp;
+          <dd>{{ bundledProduct.name }} ({{ bundledProduct.quantity }})</dd>
+          {% endfor %}
+        </dl>
+        {% endif %}
+      </td>
+      <td>{{ item.quantity }}</td>
+      <td>
+        {% include "modules/common/item-price" with item=item %}
+      </td>
+      <td>{% include "modules/common/item-total" with item=item %}
+      </td>
+    </tr>
+    {% if forloop.last %}
+    <tr>
+      <td>
+        <b>{{ labels.pickupAt }}</b>
+      <div>
+        {% with location.locationInfo as locationInfo %}
+        <div>{{ locationInfo.name }}</div>
+        <div>{{ locationInfo.address.address1}}</div>
+        {% if locationInfo.address.address2 %}<div>{{ locationInfo.address.address2 }}</div>{% endif %}
+        {% if locationInfo.address.address3 %}<div>{{ locationInfo.address.address3 }}</div>{% endif %}
+        {% if locationInfo.address.address4 %}<div>{{ locationInfo.address.address4 }}</div>{% endif %}
+        <div>{{locationInfo.address.cityOrTown}}, {{locationInfo.address.stateOrProvince}} {{locationInfo.address.postalOrZipCode}}</div>
+       {% endwith %}
+      </div>
+    </td>
+    </tr>
+    {% endif %}
+
+    {% endif %}
+  {% endfor %}
+{% endfor %}
+<!-- -->
+
+<!-- Digital Items -->
+
+{% for item in items %}
+  {% if item.fulfillmentMethod == digital %}
+  <tr class="mz-ordersummary-line mz-ordersummary-line-item {% if item.discountTotal > 0 %}is-discounted{% endif %}">
+    <td class="mz-ordersummary-item-product">
+      {{ item.product.name }}
+      {% if item.product.bundledProducts.length %}
+      <dl class="mz-propertylist">
+        {% for bundledProduct in item.product.bundledProducts %}
+        <dt>{{ bundledProduct.productCode }}</dt>&nbsp;
+        <dd>{{ bundledProduct.name }} ({{ bundledProduct.quantity }})</dd>
+        {% endfor %}
+      </dl>
+      {% endif %}
+    </td>
+    <td>{{ item.quantity }}</td>
+    <td>
+      {% include "modules/common/item-price" with item=item %}
+    </td>
+    <td>{% include "modules/common/item-total" with item=item %}
+    </td>
+  </tr>
+  {% endif %}
+{% endfor %}
+
+<!-- -->
+
+  </tbody>
+</table>
