@@ -77,7 +77,13 @@ var CheckoutOrder = OrderModels.Order.extend({
         return this.getCheckout().get('destinations');
     },
     selectableDestinations : function(){
-        return this.getCheckout().get('destinations').toJSON();
+        var selectable = []
+       this.getCheckout().get('destinations').each(function(destination){
+            if(!destination.get('isGiftCardDestination')){
+                selectable.push(destination.toJSON());
+            }
+        });
+        return selectable;   
     },
     isOriginalCartItem : function(){
         var self = this;
