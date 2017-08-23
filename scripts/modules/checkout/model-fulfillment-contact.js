@@ -105,16 +105,7 @@ define([
             //     // since this is one step further away from the order, it has to be accessed differently
             //     return this.parent.parent;
             // },
-            choose: function(e) {
-                var idx = parseInt($(e.currentTarget).val(), 10);
-                if (idx !== -1) {
-                    var addr = this.get('address');
-                    var valAddr = addr.get('candidateValidatedAddresses')[idx];
-                    for (var k in valAddr) {
-                        addr.set(k, valAddr[k]);
-                    }
-                }
-            },
+            
             toJSON: function() {
                 if (this.requiresFulfillmentInfo() || this.requiresDigitalFulfillmentContact()) {
                     return CheckoutStep.prototype.toJSON.apply(this, arguments);

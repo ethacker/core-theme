@@ -40,6 +40,16 @@ define(["modules/jquery-mozu",
             },
             saveSingleDestination: function(){
 
+            },
+            chooseCandidateAddress: function(e) {
+                var idx = parseInt($(e.currentTarget).val(), 10);
+                if (idx !== -1) {
+                    var addr = this.model.get('address');
+                    var valAddr = addr.get('candidateValidatedAddresses')[idx];
+                    for (var k in valAddr) {
+                        addr.set(k, valAddr[k]);
+                    }
+                }
             }
         });
 
@@ -178,6 +188,16 @@ define(["modules/jquery-mozu",
                 this.listenTo(this.model.getDestinations(), 'destinationsUpdate', function() {
                     self.render();
                 });
+            },
+            chooseCandidateAddress: function(e) {
+                var idx = parseInt($(e.currentTarget).val(), 10);
+                if (idx !== -1) {
+                    var addr = this.model.singleAddressDestination().get('destinationContact').get('address');
+                    var valAddr = addr.get('candidateValidatedAddresses')[idx];
+                    for (var k in valAddr) {
+                        addr.set(k, valAddr[k]);
+                    }
+                }
             },
             render: function(){
                 var self = this;

@@ -108,6 +108,12 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                 return this.getCheckout().get('destinations').get(selectedId).toJSON();
             }
         },
+        singleAddressDestination : function(){
+            var selectedId = this.getCheckout().get('items').at(0).get('destinationId');
+            if(selectedId){
+                return this.getCheckout().get('destinations').get(selectedId);
+            }
+        },
         getCheckout: function(){
             return this.parent;
         },
@@ -137,7 +143,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
             }
         },
         addNewContact: function(){
-            this.getCheckout().get('dialogContact').get("destinationContact").clear();
+            this.getCheckout().get('dialogContact').resetDestinationContact();
             this.getCheckout().get('dialogContact').unset('id');
 
             this.getCheckout().get('dialogContact').trigger('openDialog');
@@ -221,7 +227,22 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
             
             if(this.singleShippingAddressValid){
 
+                self.validateAddresses();
+                
+            }
+        },
+        validateAddresses : function(){
+
+            var self = this;
+            var checkout = this.parent;
+
+            var isAddressValidationEnabled = HyprLiveContext.locals.siteContext.generalSettings.isAddressValidationEnabled,
+                    allowInvalidAddresses = HyprLiveContext.locals.siteContext.generalSettings.allowInvalidAddresses;
+
             var shippingDestination = self.getDestinations().at(0);
+            var addr = shippingDestination.get('destinationContact').get('address');
+
+            var saveAddress = function(){
                 self.isLoading('true');
                 if(!shippingDestination.get('id')) {
                     self.getDestinations().apiSaveDestinationAsync(shippingDestination).then(function(data){
@@ -235,6 +256,38 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                             self.completeStep();
                         });
                     });
+                }
+            };
+
+            if (!isAddressValidationEnabled) {
+                saveAddress();
+            } else {
+                if (!addr.get('candidateValidatedAddresses')) {
+                    var methodToUse = allowInvalidAddresses ? 'validateAddressLenient' : 'validateAddress';
+                    addr.syncApiModel();
+                    addr.apiModel[methodToUse]().then(function (resp) {
+                        if (resp.data && resp.data.addressCandidates && resp.data.addressCandidates.length) {
+                            if (_.find(resp.data.addressCandidates, addr.is, addr)) {
+                                addr.set('isValidated', true);
+                                    saveAddress();
+                                    return;
+                                }
+                            addr.set('candidateValidatedAddresses', resp.data.addressCandidates);
+                            self.trigger('sync');
+                        } else {
+                            saveAddress();
+                        }
+                    }, function (e) {
+                        if (allowInvalidAddresses) {
+                            // TODO: sink the exception.in a better way.
+                            checkout.messages.reset();
+                            saveAddress();
+                        } else { 
+                            checkout.messages.reset({ message: Hypr.getLabel('addressValidationError') });
+                        }
+                    });
+                } else {
+                    saveAddress();
                 }
             }
         },
@@ -278,57 +331,6 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                     return false;
                 }
                 return true;
-            },
-        validateAddresses: function() {
-                var self = this,
-                    order = this.getOrder(),
-                    addr = this.get('address'),
-                    deferredValidate = api.defer(),
-                    isAddressValidationEnabled = HyprLiveContext.locals.siteContext.generalSettings.isAddressValidationEnabled,
-                    allowInvalidAddresses = HyprLiveContext.locals.siteContext.generalSettings.allowInvalidAddresses;
-
-                var promptValidatedAddress = function() {
-                    order.syncApiModel();
-                    self.isLoading(false);
-                    // Redundent
-                    //parent.isLoading(false);
-                    self.stepStatus('invalid');
-                };
-
-                if (!isAddressValidationEnabled) {
-                    deferredValidate.resolve();
-                } else {
-                    if (!addr.get('candidateValidatedAddresses')) {
-                        var methodToUse = allowInvalidAddresses ? 'validateAddressLenient' : 'validateAddress';
-                        addr.syncApiModel();
-                        addr.apiModel[methodToUse]().then(function(resp) {
-                            if (resp.data && resp.data.addressCandidates && resp.data.addressCandidates.length) {
-                                if (_.find(resp.data.addressCandidates, addr.is, addr)) {
-                                    addr.set('isValidated', true);
-                                    deferredValidate.resolve();
-                                    return;
-                                }
-                                addr.set('candidateValidatedAddresses', resp.data.addressCandidates);
-                                promptValidatedAddress();
-                            } else {
-                                deferredValidate.resolve();
-                            }
-                        }, function(e) {
-                            if (allowInvalidAddresses) {
-                                // TODO: sink the exception.in a better way.
-                                order.messages.reset();
-                                deferredValidate.reject();
-                            } else {
-                                order.messages.reset({
-                                    message: Hypr.getLabel('addressValidationError')
-                                });
-                            }
-                        });
-                    } else {
-                        deferredValidate.reject();
-                    }
-                }
-                return deferredValidate.promise;
             },
             completeStep : function(){
                 var self = this;
