@@ -64,6 +64,7 @@
       {% if siteContext.checkoutSettings.visaCheckout.isEnabled %}
       <div>
         <p>or checkout with</p>
+        <img id="btn_xpressPaypal" class="p-button" alt="Check out with PayPal" role="button" src="https://www.paypalobjects.com/webstatic/en_US/i/buttons/checkout-logo-medium.png" width="170px" height="32px" align="left" style="margin-top:12px; float:right;"/>
         <img alt="Visa Checkout" class="v-button" role="button"
           src="{{pageContext.visaCheckoutButtonUrl}}"/>
       </div>

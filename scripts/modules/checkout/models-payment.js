@@ -768,6 +768,11 @@ define([
                     }
                 }
             },
+            isNonMozuCheckout: function() {
+                var activePayments = this.getOrder().apiModel.getActivePayments();
+                if (activePayments && activePayments.length === 0) return false;
+                return (activePayments && (_.findWhere(activePayments, { paymentType: 'PayPalExpress2' })));
+            },
             calculateStepStatus: function () {
                 var shippingStepComplete = this.parent.get('shippingStep').stepStatus() === 'complete',
                     shippingInfoComplete = this.parent.get('shippingInfo').stepStatus() === 'complete',
@@ -776,6 +781,7 @@ define([
                     paymentTypeIsCard = activePayments && !!_.findWhere(activePayments, { paymentType: 'CreditCard' }),
                     balanceNotPositive = this.parent.get('amountRemainingForPayment') <= 0;
 
+                if (this.isNonMozuCheckout()) return this.stepStatus("complete");
                 if (paymentTypeIsCard && !Hypr.getThemeSetting('isCvvSuppressed')) return this.stepStatus('incomplete'); // initial state for CVV entry
 
                 if (!shippingStepComplete || !shippingInfoComplete) return this.stepStatus('new');

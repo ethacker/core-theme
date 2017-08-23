@@ -4,8 +4,9 @@ define(["modules/jquery-mozu",
     "modules/backbone-mozu",  
     'hyprlivecontext', 
     'modules/preserve-element-through-render',
-    'modules/checkout/views-checkout-step'],
-    function ($, _, Hypr, Backbone, HyprLiveContext, preserveElements, CheckoutStepView) {
+    'modules/checkout/views-checkout-step',
+    'modules/xpresspaypal'],
+    function ($, _, Hypr, Backbone, HyprLiveContext, preserveElements, CheckoutStepView,PayPal) {
         
     var BillingInfoView = CheckoutStepView.extend({
             templateName: 'modules/checkout/step-payment-info',
@@ -83,7 +84,7 @@ define(["modules/jquery-mozu",
                 this.model.setPurchaseOrderPaymentTerm(e.target.value);
             },
             render: function() {
-                preserveElements(this, ['.v-button'], function() {
+                preserveElements(this, ['.v-button', '.p-button'], function() {
                     CheckoutStepView.prototype.render.apply(this, arguments);
                 });
                 var status = this.model.stepStatus();
@@ -92,6 +93,9 @@ define(["modules/jquery-mozu",
                 //     require([pageContext.visaCheckoutJavaScriptSdkUrl]);
                 //     this.visaCheckoutInitialized = true;
                 // }
+
+                if (this.$(".p-button").length > 0)
+                    PayPal.loadScript();
             },
             updateAcceptsMarketing: function(e) {
                 this.model.getOrder().set('acceptsMarketing', $(e.currentTarget).prop('checked'));

@@ -86,8 +86,13 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
             return this.parent.get("items").sortBy('originalCartItemId');
         },
         selectableDestinations : function(){
-           // return this.parent.get('destinations').filter(function(destination){ return !destination.get('digitalGiftDestination') }).toJSON();
-            return this.parent.get('destinations').toJSON();
+           var selectable = [];
+           this.getCheckout().get('destinations').each(function(destination){
+                if(!destination.get('isGiftCardDestination')){
+                    selectable.push(destination.toJSON());
+                }
+            });
+            return selectable;
         },
         selectedDestinationsCount : function(){
             var destinationCount = this.parent.get("items").countBy(function(item){
@@ -188,7 +193,6 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
             checkout = self.getCheckout();
             
             if(self.digitalGiftCardValid()){
-
                 var giftCardDestination = this.parent.get('destinations').find(function(destination, idx){
                     return (destination.get('isGiftCardDestination'));   
                 });
@@ -202,7 +206,9 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                         });
                     }
                 }
-
+                return true;
+            } else {
+                return false;
             }
         },
         singleShippingAddressValid : function(){
@@ -225,7 +231,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
             var self = this,
             checkout = this.getCheckout();
             
-            if(this.singleShippingAddressValid){
+            if(this.singleShippingAddressValid()){
 
                 self.validateAddresses();
                 
@@ -299,11 +305,13 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                 this.validation = this.digitalOnlyValidation;
             }
 
-
             if (!this.isMultiShipMode() && this.getCheckout().get('destinations').length < 2) {
-                if(!this.validateModel()) return this.stepStatus('incomplete');
+                this.validation = this.singleShippingAddressValidation;
             }
             
+
+            if(!this.validate()) return this.stepStatus('incomplete');
+
             return CheckoutStep.prototype.calculateStepStatus.apply(this);
         },
         validateModel: function() {
@@ -317,7 +325,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
 
                 if (this.getCheckout().requiresFulfillmentInfo && validationObj) {
                     if (!this.isMultiShipMode() && this.getCheckout().get('destinations').length < 2) { 
-                        this.nextSingleShippingAddress();
+                        this.singleShippingAddressValid();
                         return false;
                     }
 
@@ -374,11 +382,13 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                 var self = this;
 
                 if (self.requiresDigitalFulfillmentContact()) {
-                    self.saveDigitalGiftCard();
+                    if(!self.saveDigitalGiftCard()) { 
+                        return false;
+                    }
                 }
 
                 if(self.requiresFulfillmentInfo()){
-                    if (!this.isMultiShipMode() && this.getCheckout().get('destinations').length < 2) {
+                    if (!this.isMultiShipMode()) {
                         return self.nextSingleShippingAddress();
                     }
 
