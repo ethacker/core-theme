@@ -13,14 +13,14 @@
 
   <div class="mz-table-header">
     <span style="font-size:20px">{{labels.orderDetails}}</span>
-    <span style="float:right"> order number</span>
+    <span style="float:right"> {{labels.orderNumber}}: {{model.number}}</span>
   </div>
 <!-- Purchase summaries -->
 {% for order in model.orders %}
 
   <div class="mz-email-section">
     <div class="mz-container-header">
-      Order Reference Number Goes Here
+      {{order.orderNumber}}
     </div>
     <div class="mz-email-summary-container">
       {% include "modules/common/email-order-summary-v2" with order.items=items model.fulfillmentInfo=fulfillmentInfo model.fulfillmentLocations=fulfillmentLocations %}
@@ -49,7 +49,7 @@
               <div>{{ model.billingInfo.billingContact.email }}</div>
           </div>
       {% endif %}
-      {% if model.billingInfo.paymentType == "StoreCredit" or model.billingInfo.paymentType == "GiftCard" or model.billingInfo.paymentType == "" %}
+      {% if model.billingInfo.paymentType == "StoreCredit" or model.billingInfo.paymentType == "GiftCard" %}
           <div class="mz-l-stack-item">
               <small>{{ labels.digitalCreditCode }}</small>
               <div>{{ model.billingInfo.storeCreditCode }}</div>
@@ -90,13 +90,12 @@
       {% endif %}
   </div>
   </div>
-
-  </div>
-  <!-- -->
-
   <!-- ******Price Details*******-->
  {% include "modules/confirmationv2/confirmation-price-summary" %}
-  <!-- *************************** -->
+  <!-- *************************** -->  </div>
+  <!-- -->
+
+
 
   {{ labels.emailClosing|string_format(siteContext.generalSettings.websiteName)|safe }}
 </div>
