@@ -107,16 +107,20 @@ define(["modules/jquery-mozu",
             },
             beginEditingCard: function() {
                 var me = this;
-                var isVisaCheckout = this.model.visaCheckoutFlowComplete();
-                if (!isVisaCheckout) {
+
+                if (!this.model.isExternalCheckoutFlowComplete()) {
                     this.editing.savedCard = true;
                     this.render();
                 } else {
-                    this.doModelAction('cancelVisaCheckout').then(function() {
-                        me.editing.savedCard = false;
-                        me.render();
-                    });
+                    this.cancelExternalCheckout();
                 }
+            },
+            cancelExternalCheckout: function () {
+                var me = this;
+                this.doModelAction('cancelExternalCheckout').then(function () {
+                    me.editing.savedCard = false;
+                    me.render();
+                });
             },
             beginEditingBillingAddress: function() {
                 this.editing.savedBillingAddress = true;
