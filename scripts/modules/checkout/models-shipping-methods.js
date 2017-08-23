@@ -57,13 +57,31 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, FulfillmentC
 
                 var shippingMethodsPayload = [];
                 self.getCheckout().get('groupings').each(function(group){
+
                     var methods = self.getCheckout().get('shippingMethods').findWhere({groupingId :group.id});
+
                     if(methods){
+                        if(group.get('shippingMethodCode')){
+                            var selectedMethod = _.findWhere(methods.get('shippingRates'), {shippingMethodCode :group.get('shippingMethodCode')});
+                            if(selectedMethod) { return; } 
+                        }
                         var lowestShippingRate = _.min(methods.get('shippingRates'), function(method){return method.price;});
                         shippingMethodsPayload.push({groupingId: group.id, shippingRate: lowestShippingRate});
                     }
                 });
-                return self.getCheckout().apiSetShippingMethods({id: self.getCheckout().get('id'), postdata: shippingMethodsPayload});
+                
+                if(shippingMethodsPayload.length) {
+                    self.getCheckout().apiSetShippingMethods({id: self.getCheckout().get('id'), postdata: shippingMethodsPayload}).ensure(function(){
+                        self.isLoading(false);
+                        self.calculateStepStatus();
+                        self.getCheckout().get('billingInfo').calculateStepStatus();
+                    });
+                    return;
+                }
+
+                self.isLoading(false);
+                self.calculateStepStatus();
+                self.getCheckout().get('billingInfo').calculateStepStatus();
 
             },
             validateModel: function() {

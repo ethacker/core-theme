@@ -225,7 +225,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
             var self = this,
             checkout = this.getCheckout();
             
-            if(this.singleShippingAddressValid){
+            if(this.singleShippingAddressValid()){
 
                 self.validateAddresses();
                 
@@ -299,11 +299,13 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                 this.validation = this.digitalOnlyValidation;
             }
 
-
             if (!this.isMultiShipMode() && this.getCheckout().get('destinations').length < 2) {
-                if(!this.validateModel()) return this.stepStatus('incomplete');
+                this.validation = this.singleShippingAddressValidation;
             }
             
+            
+            if(!this.validateModel()) return this.stepStatus('incomplete');
+
             return CheckoutStep.prototype.calculateStepStatus.apply(this);
         },
         validateModel: function() {
@@ -317,7 +319,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
 
                 if (this.getCheckout().requiresFulfillmentInfo && validationObj) {
                     if (!this.isMultiShipMode() && this.getCheckout().get('destinations').length < 2) { 
-                        this.nextSingleShippingAddress();
+                        this.singleShippingAddressValid();
                         return false;
                     }
 

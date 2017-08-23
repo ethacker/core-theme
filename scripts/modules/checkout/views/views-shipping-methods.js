@@ -41,30 +41,20 @@ define(["modules/jquery-mozu",
                 if(this.model.getCheckout().get('requiresFulfillmentInfo') && this.model.getCheckout().get('shippingStep').stepStatus() == "complete") {
                     if(!this.model.getCheckout().get('shippingMethods').length) {
                         this.model.updateShippingMethods().then(function(){
-                            self.model.setDefaultShippingMethods().ensure(function(){
-                                self.model.isLoading(false);
-                                self.model.calculateStepStatus();
-                                self.model.getCheckout().get('billingInfo').calculateStepStatus();
-                            });
+                            self.model.setDefaultShippingMethods();
                         }, function(){
                             self.model.isLoading(false);
                             self.model.calculateStepStatus();
                         });
                     } else {
-                        self.model.setDefaultShippingMethods().ensure(function(){
-                            self.model.isLoading(false);
-                            self.model.calculateStepStatus();
-                            self.model.getCheckout().get('billingInfo').calculateStepStatus();
-                        });
+                        self.model.setDefaultShippingMethods();
                     }
 
                 }
             },
-            updateShippingMethod: function (e) {
-                this.model.updateShippingMethod(this.$('[data-mz-shipping-method]:checked').val());
-            },
             updateGroupingShippingMethod: function(e) {
                 var self = this;
+                self.model.isLoading(true);
                 var groupingId = $(e.currentTarget).attr('data-mz-grouping-id');
                 var grouping = self.model.getCheckout().get('groupings').findWhere({id: groupingId});
                 var shippingRates = self.model.getCheckout().get('shippingMethods').findWhere({groupingId: groupingId}).get('shippingRates');
@@ -75,8 +65,8 @@ define(["modules/jquery-mozu",
                 self.model.getCheckout().syncApiModel();
 
                 if(!$(e.currentTarget).selected) {
-                    self.model.getCheckout().apiSetShippingMethod({groupId: groupingId, shippingRate: shippingRate}).then(function(){
-
+                    self.model.getCheckout().apiSetShippingMethod({groupId: groupingId, shippingRate: shippingRate}).ensure(function(){
+                        self.model.isLoading(false);
                     });
                     // self.model.getCheckout().apiSetShippingMethods().then(function(){
 
