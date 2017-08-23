@@ -75,7 +75,6 @@
           {% endfor %}
       </div>
       {% endif %}
-
       {% with groupings|findwhere('fulfillmentMethod', 'Pickup') as grouping %}
       {% if grouping %}
         <div class="mz-l-stack-section" id="mz-pickup-section">
@@ -93,7 +92,7 @@
               </thead>
               <tbody>
                 {% for item in model.items %}
-                  {% if item.fulfillmentLocationCode == location.id %}
+                  {% if item.fulfillmentLocationCode == location.id && item.fulfillmentMethod == "Pickup" %}
                   <tr class="mz-ordersummary-line mz-ordersummary-line-item {% if item.discountTotal > 0 %}is-discounted{% endif %}">
                     <td class="mz-ordersummary-item-product">
                       {{ item.product.name }} {% if item.product.bundledProducts.length %}
