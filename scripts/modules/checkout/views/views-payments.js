@@ -1,13 +1,13 @@
-define(["modules/jquery-mozu", 
-    "underscore", 
-    "hyprlive", 
-    "modules/backbone-mozu",  
-    'hyprlivecontext', 
+define(["modules/jquery-mozu",
+    "underscore",
+    "hyprlive",
+    "modules/backbone-mozu",
+    'hyprlivecontext',
     'modules/preserve-element-through-render',
     'modules/checkout/views-checkout-step',
-    'modules/xpresspaypal'],
+    'modules/xpress-paypal'],
     function ($, _, Hypr, Backbone, HyprLiveContext, preserveElements, CheckoutStepView,PayPal) {
-        
+
     var BillingInfoView = CheckoutStepView.extend({
             templateName: 'modules/checkout/step-payment-info',
             autoUpdate: [
@@ -167,7 +167,7 @@ define(["modules/jquery-mozu",
                     return;
                 }
                 var amtToApply = this.stripNonNumericAndParseFloat(val);
-                
+
                 this.model.applyDigitalCredit(creditCode, amtToApply, true);
                 this.render();
             },
@@ -232,7 +232,7 @@ define(["modules/jquery-mozu",
                     me.model.parent.processDigitalWallet('VisaCheckout', payment);
                 });
 
-              
+
 
                 window.V.init({
                     apikey: apiKey,
