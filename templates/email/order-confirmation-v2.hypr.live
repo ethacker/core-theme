@@ -3,27 +3,30 @@
 {% block body-content %}
 
 <br>
-<p>{{ labels.orderWelcome }} {{ model.billingInfo.billingContact.firstName }} {{ model.billingInfo.billingContact.lastNameOrSurname }}!</p>
+<p>{{ labels.orderWelcome }}
+  {% with model.payments|first as payment %}
+   {{ payment.billingInfo.billingContact.firstName }} {{ payment.billingInfo.billingContact.lastNameOrSurname }}!</p>
+   {% endwith %}
 <br>
 <p>{{ labels.orderConfirmationBlob1|string_format(siteContext.generalSettings.websiteName, domainName)|safe }}</p>
 
 
-
 <div class="mz-multiship-email">
 
-  <div class="mz-table-header">
-    <span style="font-size:20px">{{labels.orderDetails}}</span>
-    <span style="float:right"> {{labels.orderNumber}}: {{model.number}}</span>
+  <div class="mz-table-header" style="padding:15px">
+    <span style="font-size:25px">{{labels.orderDetails}}</span>
+    <span style="font-size:15px;float:right"> {{labels.orderNumber}}: {{model.number}}</span>
   </div>
+  <br/>
 <!-- Purchase summaries -->
-{% for order in model.orders %}
 
+{% for order in model.orders %}
   <div class="mz-email-section">
     <div class="mz-container-header">
-      {{order.orderNumber}}
+      Customer Care Number: {{order.orderNumber}}
     </div>
     <div class="mz-email-summary-container">
-      {% include "modules/common/email-order-summary-v2" with order.items=items model.fulfillmentInfo=fulfillmentInfo model.fulfillmentLocations=fulfillmentLocations %}
+      {% include "modules/common/email-order-summary-v2" with items=order.items fulfillmentInfo=order.fulfillmentInfo locations=model.locations %}
     </div>
   </div>
 
@@ -33,57 +36,58 @@
   <!--- Payment details ****************** -->
   <div class="mz-email-section">
     <h3>{{labels.payments}}</h3>
+    {% for payment in model.payments %}
     <div class="mz-checkout-payment mz-email-summary-container">
       <h4 class="mz-checkout-paymenttitle">
         <strong>
-          {% if model.amountCollected > 0 %}
-          {{ model.amountCollected|currency }} &mdash;
+          {% if payment.amountCollected > 0 %}
+          {{ payment.amountCollected|currency }} &mdash;
           {% else %}
-          {{ model.amountRequested|currency }}
-         </strong> {% endif %} {% if model.billingInfo.paymentType == "Check" %}{{ labels.checkByMail }} {% endif %}{% if model.billingInfo.paymentType == "CreditCard" %}{{ labels.creditCard }}{% endif %}{% if model.billingInfo.paymentType == "StoreCredit" or model.billingInfo.paymentType == "GiftCard" %}{{ labels.digitalCredit }}{% endif %}{% if model.billingInfo.paymentType == "PurchaseOrder" %}{{ labels.purchaseOrder }} - {{ model.billingInfo.purchaseOrder.purchaseOrderNumber }}{% endif %}</h4>
+          {{ payment.amountRequested|currency }}
+        </strong> {% endif %} {% if payment.billingInfo.paymentType == "Check" %}{{ labels.checkByMail }} {% endif %}{% if payment.billingInfo.paymentType == "CreditCard" %}{{ labels.creditCard }}{% endif %}{% if payment.billingInfo.paymentType == "StoreCredit" or payment.billingInfo.paymentType == "GiftCard" %}{{ labels.digitalCredit }}{% endif %}{% if payment.billingInfo.paymentType == "PurchaseOrder" %}{{ labels.purchaseOrder }} - {{ payment.billingInfo.purchaseOrder.purchaseOrderNumber }}{% endif %}</h4>
 
     <div style="display:inline-flex;justify-content:space-around;width:100%">
-      {% if model.billingInfo.billingContact.email %}
+      {% if payment.billingInfo.billingContact.email %}
           <div class="mz-l-stack-item">
               <small>{{ labels.billingEmail }}</small>
-              <div>{{ model.billingInfo.billingContact.email }}</div>
+              <div>{{ payment.billingInfo.billingContact.email }}</div>
           </div>
       {% endif %}
-      {% if model.billingInfo.paymentType == "StoreCredit" or model.billingInfo.paymentType == "GiftCard" or model.billingInfo.paymentType|lower == "paypalexpress2" %}
+      {% if payment.billingInfo.paymentType == "StoreCredit" or payment.billingInfo.paymentType == "GiftCard" or payment.billingInfo.paymentType|lower == "paypalexpress2" %}
           <div class="mz-l-stack-item">
-            {% if model.billingInfo.paymentType|lower == "paypalexpress2" %}
+            {% if payment.billingInfo.paymentType|lower == "paypalexpress2" %}
                 <div>
                     <img alt="PayPal" src="https://www.paypalobjects.com/webstatic/en_US/i/buttons/PP_logo_h_100x26.png" align="left" width="100px" height="26px" style="margin-right:7px;">
                 </div>
             {% else %}
               <small>{{ labels.digitalCreditCode }}</small>
-              <div>{{ model.billingInfo.storeCreditCode }}</div>
+              <div>{{ payment.billingInfo.storeCreditCode }}</div>
               {% endif %}
           </div>
           {% else %}
           <div class="mz-l-stack-item">
               <small>{{ labels.billingName }}</small>
-              <div>{{ model.billingInfo.billingContact.firstName }} {{ model.billingInfo.billingContact.lastNameOrSurname }}</div>
+              <div>{{ payment.billingInfo.billingContact.firstName }} {{ payment.billingInfo.billingContact.lastNameOrSurname }}</div>
           </div>
           <div class="mz-l-stack-item">
               <small>{{ labels.billingAddress }}</small>
-              <div class="mz-addresssummary">{% include "modules/common/address-summary" with model=model.billingInfo.billingContact %}</div>
+              <div class="mz-addresssummary">{% include "modules/common/address-summary" with model=payment.billingInfo.billingContact %}</div>
           </div>
           {% endif %}
-          {% if model.billingInfo.paymentType == "CreditCard" %}
+          {% if payment.billingInfo.paymentType == "CreditCard" %}
           <div class="mz-l-stack-item">
               <small>{{ labels.cardtype }}</small>
-              <div>{{ model.billingInfo.card.paymentOrCardtype }}</div>
+              <div>{{ payment.billingInfo.card.paymentOrCardtype }}</div>
           </div>
           <div class="mz-l-stack-item">
               <small>{{ labels.cardNumber }}</small>
-              <div>{{ model.billingInfo.card.cardNumberPartOrMask|default("****************") }}</div>
+              <div>{{ payment.billingInfo.card.cardNumberPartOrMask|default("****************") }}</div>
           </div>
           {% endif %}
-          {% if model.billingInfo.paymentType == "Check" %}
+          {% if payment.billingInfo.paymentType == "Check" %}
           <!--
           <small>{{ labels.checkNumber }}</small>
-          <div>{{ model.billingInfo.check.checkNumber }}</div>
+          <div>{{ payment.billingInfo.check.checkNumber }}</div>
           -->
           <div class="mz-l-stack-item">
               <small><strong>{{ labels.mailCheckTo }}</strong></small>
@@ -96,9 +100,12 @@
       {% endif %}
   </div>
   </div>
+  {% endfor %}
   <!-- ******Price Details*******-->
  {% include "modules/confirmationv2/confirmation-price-summary" %}
-  <!-- *************************** -->  </div>
+  <!-- *************************** -->
+
+</div>
   <!-- -->
 
 

@@ -8,10 +8,10 @@
     </tr>
   </thead>
   <tbody>
-
 <!-- SHIPPING ITEMS -->
     {% for item in items %}
       {% if item.fulfillmentMethod == "Ship" %}
+
         <tr class="mz-ordersummary-line mz-ordersummary-line-item {% if item.discountTotal > 0 %}is-discounted{% endif %}">
           <td class="mz-ordersummary-item-product">
             {{ item.product.name }}
@@ -31,19 +31,18 @@
           <td>{% include "modules/common/item-total" with item=item %}
           </td>
         </tr>
-        {% if forloop.last %}
-        <tr>
-          <td class="mz-addresssummary" colspan="2"><b>{{ labels.shipTo }}</b>{% include "modules/common/address-summary" with model=fulfillmentInfo.fulfillmentContact %}</td>
-          <td class="mz-addresssummary" colspan="2"><b>{{ labels.shippingMethod }}</b>: {{ fulfillmentInfo.shippingMethodName }}</td>
-        </tr>
-        {% endif %}
       {% endif %}
     {% endfor %}
+
+    <tr class="mz-email-fulfillment-info">
+      <td class="mz-addresssummary" colspan="2"><b>{{ labels.shipTo }}</b>{% include "modules/common/address-summary" with model=fulfillmentInfo.fulfillmentContact %}</td>
+      <td class="mz-addresssummary" colspan="2"><b>{{ labels.shippingMethod }}</b>: {{ fulfillmentInfo.shippingMethodName }}</td>
+    </tr>
     <!-- -->
 
 
 <!-- Pickup Items -->
-{% for location in fulfillmentLocations %}
+{% for location in locations %}
   {% for item in items %}
     {% if item.fulfillmentMethod=="Pickup" && item.fulfillmentLocationCode==location.id %}
     <tr class="mz-ordersummary-line mz-ordersummary-line-item {% if item.discountTotal > 0 %}is-discounted{% endif %}">
@@ -66,18 +65,16 @@
       </td>
     </tr>
     {% if forloop.last %}
-    <tr>
-      <td>
+    <tr class="mz-email-fulfillment-info">
+      <td class="mz-addresssummary" colspan="4">
         <b>{{ labels.pickupAt }}</b>
       <div>
-        {% with location.locationInfo as locationInfo %}
-        <div>{{ locationInfo.name }}</div>
-        <div>{{ locationInfo.address.address1}}</div>
-        {% if locationInfo.address.address2 %}<div>{{ locationInfo.address.address2 }}</div>{% endif %}
-        {% if locationInfo.address.address3 %}<div>{{ locationInfo.address.address3 }}</div>{% endif %}
-        {% if locationInfo.address.address4 %}<div>{{ locationInfo.address.address4 }}</div>{% endif %}
-        <div>{{locationInfo.address.cityOrTown}}, {{locationInfo.address.stateOrProvince}} {{locationInfo.address.postalOrZipCode}}</div>
-       {% endwith %}
+        <div>{{ location.name }}</div>
+        <div>{{ location.address.address1}}</div>
+        {% if location.address.address2 %}<div>{{ location.address.address2 }}</div>{% endif %}
+        {% if location.address.address3 %}<div>{{ location.address.address3 }}</div>{% endif %}
+        {% if location.address.address4 %}<div>{{ location.address.address4 }}</div>{% endif %}
+        <div>{{location.address.cityOrTown}}, {{location.address.stateOrProvince}} {{location.address.postalOrZipCode}}</div>
       </div>
     </td>
     </tr>
@@ -91,7 +88,7 @@
 <!-- Digital Items -->
 
 {% for item in items %}
-  {% if item.fulfillmentMethod == digital %}
+  {% if item.fulfillmentMethod == "Digital" %}
   <tr class="mz-ordersummary-line mz-ordersummary-line-item {% if item.discountTotal > 0 %}is-discounted{% endif %}">
     <td class="mz-ordersummary-item-product">
       {{ item.product.name }}
