@@ -86,14 +86,8 @@
           "id": "checkout.changed",
           "customEditor": "email-orderconfirmation-v2",
           "properties": {},
-          "template": "email/order-confirmation",
-          "title": "Order Confirmation"
-        },
-        {
-            "id": "order.changed2",
-            "properties": { },
-            "template": "email/order-confirmation-v2",
-            "title": "Multiship Order Confirmation"
+          "template": "email/order-confirmation-v2",
+          "title": "Order Confirmation V2"
         },
         {
             "id": "order.changed",
