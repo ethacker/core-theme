@@ -174,7 +174,9 @@ define(["modules/jquery-mozu",
                 var self = this;
             },
             handleEditContact: function(e){
-                var destinationId = this.model.get('destinationId');
+                var destinationId = $(e.target).data("mzDestinationid");
+
+                this.model.get('destinationId');
                 if(destinationId) {
                     //this.model.set('editingDestination', true);
                     this.model.editContact(destinationId);    

@@ -153,6 +153,19 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
 
             this.getCheckout().get('dialogContact').trigger('openDialog');
         },
+        editContact: function(destinationId){
+            var destination = this.getDestinations().findWhere({'id': destinationId});
+        
+            if(destination){
+                var destCopy = destination.toJSON();
+                destCopy = new ShippingDestinationModels.ShippingDestination(destCopy);
+                //destCopy.set('destinationContact', new CustomerModels.Contact(destCopy.get('destinationContact')));
+                //this.getCheckout().get('dialogContact').get("destinationContact").clear();
+                this.getCheckout().set('dialogContact', destCopy);
+                this.getCheckout().get('dialogContact').set("destinationContact", new CustomerModels.Contact(destCopy.get('destinationContact').toJSON()));
+                this.getCheckout().get('dialogContact').trigger('openDialog');
+            }
+        },
         getDestinations : function() {
             return this.parent.get("destinations");
         },
@@ -301,6 +314,8 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
 
             if (!this.requiresFulfillmentInfo() && !this.requiresDigitalFulfillmentContact()) return this.stepStatus('complete');
 
+            this.validation = this.multiShipValidation;
+
             if (!this.requiresFulfillmentInfo() && this.requiresDigitalFulfillmentContact()) {
                 this.validation = this.digitalOnlyValidation;
             }
@@ -309,8 +324,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                 this.validation = this.singleShippingAddressValidation;
             }
             
-
-            if(!this.validate()) return this.stepStatus('incomplete');
+            if(!this.validate()) return this.stepStatus('complete');
 
             return CheckoutStep.prototype.calculateStepStatus.apply(this);
         },
