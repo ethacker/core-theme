@@ -193,7 +193,7 @@ var CheckoutPage = Backbone.MozuModel.extend({
             handlesMessages: true,
             relations: {
                 items : Backbone.Collection.extend({
-                    model : CheckoutOrder,
+                    model : CheckoutOrder
                 }),
                 groupings : Backbone.Collection.extend({
                     model : CheckoutGrouping 
@@ -558,7 +558,7 @@ var CheckoutPage = Backbone.MozuModel.extend({
                         if(isPrimaryBilling){
                             self.get('billingInfo').set('billingContact', contact);
                         }  
-                      })  
+                      });
                      return contactResult;
                 });
                 
