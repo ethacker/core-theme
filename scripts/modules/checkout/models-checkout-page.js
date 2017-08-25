@@ -436,13 +436,31 @@ var CheckoutPage = Backbone.MozuModel.extend({
                     errorHandled = false;
                 order.isLoading(false);
                 if (!error || !error.items || error.items.length === 0) {
-                    error = {
-                        items: [
-                            {
-                                message: error.message || Hypr.getLabel('unknownError')
-                            }
-                        ]
-                    };
+                    if (error.message.indexOf('10486') != -1){
+                        var siteContext = HyprLiveContext.locals.siteContext,
+                            externalPayment = _.findWhere(siteContext.checkoutSettings.externalPaymentWorkflowSettings, {"name" : "PayPalExpress2"}),
+                            environment = _.findWhere(externalPayment.credentials, {"apiName" : "environment"}),
+                            url = "";
+
+                        if (environment.value.toLowerCase() === "sandbox"){
+                            url = "https://www.sandbox.paypal.com";
+                        }
+                        else{
+                            url = "https://www.paypal.com";
+                        }
+
+                        window.location.href = url + "/cgi-bin/webscr?cmd=_express-checkout&token=" + order.get('payments')[order.get('payments').length-1].externalTransactionId;
+
+                        return;
+                    } else {
+                        error = {
+                            items: [
+                                {
+                                    message: error.message || Hypr.getLabel('unknownError')
+                                }
+                            ]
+                        };
+                    }
                 }
                 $.each(error.items, function (ix, errorItem) {
                     if (errorItem.name === 'ADD_CUSTOMER_FAILED' && errorItem.message.toLowerCase().indexOf('invalid parameter: password')) {

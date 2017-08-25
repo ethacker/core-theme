@@ -34,7 +34,7 @@ function($, Api, CartModels, hyprlivecontext, _) {
                         window.paypal.checkout.startFlow(url);
                     },
                     error: function (responseData, textStatus, errorThrown) {
-                        console.log("Error in ajax post " + responseData.statusText);
+                        //console.log("Error in ajax post " + responseData.statusText);
                         //Gracefully Close the minibrowser in case of AJAX errors
                         window.paypal.checkout.closeFlow();
                     }
@@ -50,10 +50,9 @@ function($, Api, CartModels, hyprlivecontext, _) {
        if (this.scriptLoaded) return;
         this.scriptLoaded = true;
       $.getScript("//www.paypalobjects.com/api/checkout.js").done(function(scrit, textStatus){
-        console.log(textStatus);
-
+        //console.log(textStatus);
       }).fail(function(jqxhr, settings, exception) {
-        console.log(jqxhr);
+        //console.log(jqxhr);
       });
     }
    };

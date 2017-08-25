@@ -1,13 +1,13 @@
-define(["modules/jquery-mozu", 
-    "underscore", 
-    "hyprlive", 
-    "modules/backbone-mozu",  
-    'hyprlivecontext', 
+define(["modules/jquery-mozu",
+    "underscore",
+    "hyprlive",
+    "modules/backbone-mozu",
+    'hyprlivecontext',
     'modules/preserve-element-through-render',
     'modules/checkout/views-checkout-step',
-    'modules/xpressPaypal'],
+    'modules/xpress-paypal'],
     function ($, _, Hypr, Backbone, HyprLiveContext, preserveElements, CheckoutStepView,PayPal) {
-        
+
     var BillingInfoView = CheckoutStepView.extend({
             templateName: 'modules/checkout/step-payment-info',
             autoUpdate: [
@@ -107,16 +107,20 @@ define(["modules/jquery-mozu",
             },
             beginEditingCard: function() {
                 var me = this;
-                var isVisaCheckout = this.model.visaCheckoutFlowComplete();
-                if (!isVisaCheckout) {
+
+                if (!this.model.isExternalCheckoutFlowComplete()) {
                     this.editing.savedCard = true;
                     this.render();
                 } else {
-                    this.doModelAction('cancelVisaCheckout').then(function() {
-                        me.editing.savedCard = false;
-                        me.render();
-                    });
+                    this.cancelExternalCheckout();
                 }
+            },
+            cancelExternalCheckout: function () {
+                var me = this;
+                this.doModelAction('cancelExternalCheckout').then(function () {
+                    me.editing.savedCard = false;
+                    me.render();
+                });
             },
             beginEditingBillingAddress: function() {
                 this.editing.savedBillingAddress = true;
@@ -163,7 +167,7 @@ define(["modules/jquery-mozu",
                     return;
                 }
                 var amtToApply = this.stripNonNumericAndParseFloat(val);
-                
+
                 this.model.applyDigitalCredit(creditCode, amtToApply, true);
                 this.render();
             },
@@ -228,7 +232,7 @@ define(["modules/jquery-mozu",
                     me.model.parent.processDigitalWallet('VisaCheckout', payment);
                 });
 
-              
+
 
                 window.V.init({
                     apikey: apiKey,

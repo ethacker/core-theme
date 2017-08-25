@@ -54,14 +54,17 @@ define([
 
             },
             helpers: ['acceptsMarketing', 'savedPaymentMethods', 'availableStoreCredits', 'applyingCredit', 'maxCreditAmountToApply',
-              'activeStoreCredits', 'nonStoreCreditTotal', 'activePayments', 'hasSavedCardPayment', 'availableDigitalCredits', 'digitalCreditPaymentTotal', 'isAnonymousShopper', 'visaCheckoutFlowComplete'],
+              'activeStoreCredits', 'nonStoreCreditTotal', 'activePayments', 'hasSavedCardPayment', 'availableDigitalCredits', 'digitalCreditPaymentTotal', 'isAnonymousShopper', 'visaCheckoutFlowComplete','isExternalCheckoutFlowComplete'],
             acceptsMarketing: function () {
                 return this.getOrder().get('acceptsMarketing');
+            },
+            isExternalCheckoutFlowComplete: function () {
+                return this.get('paymentWorkflow') !== "Mozu";
             },
             visaCheckoutFlowComplete: function() {
                 return this.get('paymentWorkflow') === 'VisaCheckout';
             },
-            cancelVisaCheckout: function() {
+            cancelExternalCheckout: function () {
                 var self = this;
                 var order = this.getOrder();
                 var currentPayment = order.apiModel.getCurrentPayment();
@@ -746,7 +749,7 @@ define([
                 _.bindAll(this, 'applyPayment', 'markComplete');
             },
             selectPaymentType: function(me, newPaymentType) {
-                if (!me.changed || !me.changed.paymentWorkflow) {
+                if ((!me.changed || !me.changed.paymentWorkflow) && !me.get('paymentWorkflow')) {
                     me.set('paymentWorkflow', 'Mozu');
                 }
                 me.get('check').selected = newPaymentType === 'Check';

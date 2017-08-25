@@ -132,6 +132,7 @@ dl.mz-orderheader {
 }
 
 .mz-multiship-email{
+  width: 75%;
 
   // Styles only applying to the multiship email confirmation.
   .mz-table-header{
@@ -173,9 +174,17 @@ dl.mz-orderheader {
         td {
             text-align: right;
             padding: @gutter/2 @gutter/2;
-            &.mz-ordersummary-item-product {
+            &.mz-ordersummary-item-product, &.mz-addresssummary {
                 text-align: left;
             }
+        }
+        tr:last-child {
+          border-bottom: 1px solid #ddd;
+        }
+
+        .mz-email-fulfillment-info {
+          border-top: 1px solid #ddd;
+          border-bottom: 1px solid #ddd;
         }
 
 

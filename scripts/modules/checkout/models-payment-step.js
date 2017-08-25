@@ -755,6 +755,7 @@ define([
                     }
                 }
             },
+
             isNonMozuCheckout: function() {
                 var activePayments = this.getCheckout().apiModel.getActivePayments();
                 if (activePayments && activePayments.length === 0) return false;
