@@ -5,7 +5,7 @@ define(["modules/jquery-mozu",
     'hyprlivecontext', 
     'modules/preserve-element-through-render',
     'modules/checkout/views-checkout-step',
-    'modules/xpresspaypal'],
+    'modules/xpressPaypal'],
     function ($, _, Hypr, Backbone, HyprLiveContext, preserveElements, CheckoutStepView,PayPal) {
         
     var BillingInfoView = CheckoutStepView.extend({
