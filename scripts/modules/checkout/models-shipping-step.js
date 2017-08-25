@@ -85,6 +85,14 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
         orderItems : function(){
             return this.parent.get("items").sortBy('originalCartItemId');
         },
+        splitCheckoutItem: function(itemId, quantity){
+            //Move isLoading to SDK
+            var self = this;
+            self.isLoading(true);
+            this.getCheckout().apiSplitCheckoutItem({itemId : itemId, quantity : quantity}).ensure(function(data){
+                self.isLoading(false);
+            });
+        },
         selectableDestinations : function(){
            var selectable = [];
            this.getCheckout().get('destinations').each(function(destination){

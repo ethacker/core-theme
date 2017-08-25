@@ -70,6 +70,9 @@ var CheckoutOrder = OrderModels.Order.extend({
             msg: Hypr.getLabel("shippingDestinationRequiredError")
         }
     },
+    initialize: function(){
+        
+    },
     getCheckout : function(){
         return this.collection.parent;
     },
@@ -139,9 +142,8 @@ var CheckoutOrder = OrderModels.Order.extend({
     },
     splitCheckoutItem : function(){
         var self = this;
-        this.getCheckout().apiSplitCheckoutItem({itemId : self.get('id'), quantity : 1 }).then(function(data){
-            
-        });
+        var me = this;
+        this.getCheckout().get('shippingStep').splitCheckoutItem(self.get('id'), 1);
     }
 });
 
@@ -191,7 +193,7 @@ var CheckoutPage = Backbone.MozuModel.extend({
             handlesMessages: true,
             relations: {
                 items : Backbone.Collection.extend({
-                    model : CheckoutOrder 
+                    model : CheckoutOrder,
                 }),
                 groupings : Backbone.Collection.extend({
                     model : CheckoutGrouping 
