@@ -152,7 +152,11 @@ define(["modules/jquery-mozu",
                 "change [data-mz-single-fulfillment-contact]": "handleChangeSingleAddress"
             },
             isMultiShipMode: function(){
-                (this.model.isMultiShipMode()) ? this.model.set('isMultiShipMode', true) : this.model.set('isMultiShipMode', false);
+                if(this.model.isMultiShipMode()){
+                    this.model.set('isMultiShipMode', true);
+                } else {
+                    this.model.set('isMultiShipMode', false);
+                }
                 return this.model.get('isMultiShipMode');
             },
             handleChangeSingleAddress: function(e){
