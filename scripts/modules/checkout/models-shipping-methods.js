@@ -48,6 +48,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, FulfillmentC
                 var self = this;
                 return this.getCheckout().apiGetAvaiableShippingMethods().then(function (methods) {
                     self.refreshShippingMethods(methods);
+                    return methods;
                     //self.trigger('shippingInfoUpdated');     
                     //self.calculateStepStatus();
                 });
@@ -55,10 +56,12 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, FulfillmentC
             //
             //Break  this guy up we need to be able to return a promise to determine when to calculate Step status.
             //
-            setDefaultShippingMethods : function(){
+            //
+            //
+            shippingMethodDefaults:function(){
                 var self = this;
 
-                var shippingMethodsPayload = [];
+                var shippingMethodDefaults = [];
                 self.getCheckout().get('groupings').each(function(group){
 
                     var methods = self.getCheckout().get('shippingMethods').findWhere({groupingId :group.id});
@@ -69,23 +72,20 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, FulfillmentC
                             if(selectedMethod) { return; } 
                         }
                         var lowestShippingRate = _.min(methods.get('shippingRates'), function(method){return method.price;});
-                        shippingMethodsPayload.push({groupingId: group.id, shippingRate: lowestShippingRate});
+                        shippingMethodDefaults.push({groupingId: group.id, shippingRate: lowestShippingRate});
                     }
                 });
-                
-                if(shippingMethodsPayload.length) {
-                    self.getCheckout().apiSetShippingMethods({id: self.getCheckout().get('id'), postdata: shippingMethodsPayload}).ensure(function(){
-                        self.isLoading(false);
-                        self.calculateStepStatus();
-                        self.getCheckout().get('billingInfo').calculateStepStatus();
-                    });
-                    return;
-                }
+                return shippingMethodDefaults
+            },
+            setDefaultShippingMethodsAsync : function(shippingMethodsPayload){
+                var self = this;
+                if (typeof(shippingMethodsPayload) !== 'object') shippingMethodsPayload = [];
 
-                self.isLoading(false);
-                self.calculateStepStatus();
-                self.getCheckout().get('billingInfo').calculateStepStatus();
-
+                self.getCheckout().get('shippingInfo').isLoading(true);
+                return self.getCheckout().apiSetShippingMethods({id: self.getCheckout().get('id'), postdata: shippingMethodsPayload}).ensure(function(){
+                    self.isLoading(false);
+                    self.getCheckout().get('shippingInfo').isLoading(false);
+                });
             },
             validateModel: function() {
                 var validationObj = this.validate();

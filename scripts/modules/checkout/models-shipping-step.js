@@ -386,12 +386,20 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
 
                 if(self.requiresFulfillmentInfo()){
                     self.isLoading(true);
-                    checkout.get('shippingInfo').updateShippingMethods().then(function() {
-                        checkout.get('shippingInfo').setDefaultShippingMethods();
-                        self.stepStatus('complete');
+                    checkout.get('shippingInfo').updateShippingMethods().then(function(methods) {
+                        if(methods){
+                            var defaults = checkout.get('shippingInfo').shippingMethodDefaults()
+                            if(defaults.length){
+                                checkout.get('shippingInfo').setDefaultShippingMethodsAsync(defaults).ensure(function(){
+                                     self.getCheckout().get('shippingInfo').stepStatus('incomplete');
+                                });
+                            } else {
+                                 self.getCheckout().get('shippingInfo').calculateStepStatus();
+                            }
+                        } 
                     }).ensure(function(){
                         self.isLoading(false);
-                        checkout.get('shippingInfo').isLoading(false);
+                        self.stepStatus('complete');
                         checkout.get('shippingInfo').calculateStepStatus();
                     });
                 } else {

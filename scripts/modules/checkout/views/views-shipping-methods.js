@@ -41,13 +41,31 @@ define(["modules/jquery-mozu",
                 if(this.model.getCheckout().get('requiresFulfillmentInfo') && this.model.getCheckout().get('shippingStep').stepStatus() == "complete") {
                     if(!this.model.getCheckout().get('shippingMethods').length) {
                         this.model.updateShippingMethods().then(function(){
-                            self.model.setDefaultShippingMethods();
+                            var defaults = self.model.shippingMethodDefaults()
+                            if(defaults.length){
+                                self.model.getCheckout().get('shippingInfo').setDefaultShippingMethodsAsync(defaults).ensure(function(){
+                                    self.model.calculateStepStatus();
+                                    self.model.getCheckout().get('billingInfo').calculateStepStatus();
+                                });
+                            } else {
+                                 self.model.calculateStepStatus();
+                                 self.model.getCheckout().get('billingInfo').calculateStepStatus();
+                            }
                         }, function(){
                             self.model.isLoading(false);
                             self.model.calculateStepStatus();
                         });
                     } else {
-                        self.model.setDefaultShippingMethods();
+                        var defaults = self.model.shippingMethodDefaults()
+                        if(defaults.length){
+                            self.getCheckout().get('shippingInfo').setDefaultShippingMethodsAsync(defaults).ensure(function(){
+                                self.model.calculateStepStatus();
+                                self.getCheckout().get('billingInfo').calculateStepStatus();
+                            });
+                        } else {
+                             self.model.calculateStepStatus();
+                             self.getCheckout().get('billingInfo').calculateStepStatus();
+                        }
                     }
 
                 }
