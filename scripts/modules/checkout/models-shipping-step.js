@@ -387,9 +387,9 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                 if(self.requiresFulfillmentInfo()){
                     self.isLoading(true);
                     checkout.get('shippingInfo').updateShippingMethods().then(function() {
+                        checkout.get('shippingInfo').setDefaultShippingMethods();
                         self.stepStatus('complete');
                     }).ensure(function(){
-                        checkout.trigger('sync');
                         self.isLoading(false);
                         checkout.get('shippingInfo').isLoading(false);
                         checkout.get('shippingInfo').calculateStepStatus();

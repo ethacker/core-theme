@@ -52,6 +52,9 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, FulfillmentC
                     //self.calculateStepStatus();
                 });
             },
+            //
+            //Break  this guy up we need to be able to return a promise to determine when to calculate Step status.
+            //
             setDefaultShippingMethods : function(){
                 var self = this;
 

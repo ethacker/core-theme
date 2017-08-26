@@ -2,7 +2,7 @@
 module.exports = function (grunt) {
   'use strict';
 
-  //require('process').env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+  require('process').env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // jshint ignore:line
 
   var pkg = grunt.file.readJSON('./package.json'); 
   grunt.loadNpmTasks('grunt-contrib-copy');
