@@ -23,7 +23,7 @@
 {% for order in model.orders %}
   <div class="mz-email-section">
     <div class="mz-container-header">
-      Customer Care Number: {{order.orderNumber}}
+      Customer Care Number: {{order.orderNumber}} <small><a href="http://{{ domainName }}/user/order-status">{{ labels.checkOrderStatus }}</a><br/><br/></small>
     </div>
     <div class="mz-email-summary-container">
       {% include "modules/common/email-order-summary-v2" with items=order.items fulfillmentInfo=order.fulfillmentInfo locations=model.locations %}

@@ -152,7 +152,12 @@ define(["modules/jquery-mozu",
                 "change [data-mz-single-fulfillment-contact]": "handleChangeSingleAddress"
             },
             isMultiShipMode: function(){
-                this.model.isMultiShipMode();
+                if(this.model.isMultiShipMode()){
+                    this.model.set('isMultiShipMode', true);
+                } else {
+                    this.model.set('isMultiShipMode', false);
+                }
+                return this.model.get('isMultiShipMode');
             },
             handleChangeSingleAddress: function(e){
                 var self = this;
@@ -174,7 +179,9 @@ define(["modules/jquery-mozu",
                 var self = this;
             },
             handleEditContact: function(e){
-                var destinationId = this.model.get('destinationId');
+                var destinationId = $(e.target).data("mzDestinationid");
+
+                this.model.get('destinationId');
                 if(destinationId) {
                     //this.model.set('editingDestination', true);
                     this.model.editContact(destinationId);    
@@ -201,9 +208,13 @@ define(["modules/jquery-mozu",
             },
             render: function(){
                 var self = this;
+
+                self.isMultiShipMode();
+
                 this.$el.removeClass('is-new is-incomplete is-complete is-invalid').addClass('is-' + this.model.stepStatus());
                 EditableView.prototype.render.apply(this, arguments);
                 this.resize();
+
 
                 $.each(this.$el.find('[data-mz-shipping-destinations-item]'), function(index, val) {
                     var id = $(this).data('mzItemId');
