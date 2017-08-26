@@ -7,8 +7,9 @@ define(["modules/jquery-mozu",
     'modules/checkout/views-checkout-step',
     'modules/xpress-paypal'],
     function ($, _, Hypr, Backbone, HyprLiveContext, preserveElements, CheckoutStepView,PayPal) {
-
-    var BillingInfoView = CheckoutStepView.extend({
+        var visaCheckoutSettings = HyprLiveContext.locals.siteContext.checkoutSettings.visaCheckout;
+        var pageContext = require.mozuData('pagecontext');
+        var BillingInfoView = CheckoutStepView.extend({
             templateName: 'modules/checkout/step-payment-info',
             autoUpdate: [
                 'savedPaymentMethodId',
@@ -88,11 +89,11 @@ define(["modules/jquery-mozu",
                     CheckoutStepView.prototype.render.apply(this, arguments);
                 });
                 var status = this.model.stepStatus();
-                // if (visaCheckoutSettings.isEnabled && !this.visaCheckoutInitialized && this.$('.v-button').length > 0) {
-                //     window.onVisaCheckoutReady = _.bind(this.initVisaCheckout, this);
-                //     require([pageContext.visaCheckoutJavaScriptSdkUrl]);
-                //     this.visaCheckoutInitialized = true;
-                // }
+                if (visaCheckoutSettings.isEnabled && !this.visaCheckoutInitialized && this.$('.v-button').length > 0) {
+                     window.onVisaCheckoutReady = _.bind(this.initVisaCheckout, this);
+                     require([pageContext.visaCheckoutJavaScriptSdkUrl]);
+                     this.visaCheckoutInitialized = true;
+                }
 
                 if (this.$(".p-button").length > 0)
                     PayPal.loadScript();
@@ -214,7 +215,6 @@ define(["modules/jquery-mozu",
             /* begin visa checkout */
             initVisaCheckout: function () {
                 var me = this;
-                var visaCheckoutSettings = HyprLiveContext.locals.siteContext.checkoutSettings.visaCheckout;
                 var apiKey = visaCheckoutSettings.apiKey || '0H1JJQFW9MUVTXPU5EFD13fucnCWg42uLzRQMIPHHNEuQLyYk';
                 var clientId = visaCheckoutSettings.clientId || 'mozu_test1';
                 var orderModel = this.model.getOrder();
