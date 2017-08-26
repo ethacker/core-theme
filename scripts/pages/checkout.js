@@ -6,8 +6,9 @@ require(["modules/jquery-mozu",
     "modules/cart-monitor", 
     'hyprlivecontext', 
     'modules/editable-view', 
-    'modules/preserve-element-through-render'], 
-    function ($, _, Hypr, Backbone, CheckoutModels, messageViewFactory, CartMonitor, HyprLiveContext, EditableView, preserveElements) {
+    'modules/preserve-element-through-render',
+    'modules/xpress-paypal'], 
+    function ($, _, Hypr, Backbone, CheckoutModels, messageViewFactory, CartMonitor, HyprLiveContext, EditableView, preserveElements,PayPal) {
 
 
     var CheckoutStepView = EditableView.extend({
@@ -209,7 +210,7 @@ require(["modules/jquery-mozu",
             this.model.setPurchaseOrderPaymentTerm(e.target.value);
         },
         render: function() {
-            preserveElements(this, ['.v-button'], function() {
+            preserveElements(this, ['.v-button', '.p-button'], function() {
                 CheckoutStepView.prototype.render.apply(this, arguments);
             });
             var status = this.model.stepStatus();
@@ -218,6 +219,9 @@ require(["modules/jquery-mozu",
                 require([pageContext.visaCheckoutJavaScriptSdkUrl]);
                 this.visaCheckoutInitialized = true;
             }
+
+            if (this.$(".p-button").length > 0)
+                PayPal.loadScript();
         },
         updateAcceptsMarketing: function(e) {
             this.model.getOrder().set('acceptsMarketing', $(e.currentTarget).prop('checked'));
@@ -229,13 +233,18 @@ require(["modules/jquery-mozu",
         },
         beginEditingCard: function() {
             var me = this;
-            var isVisaCheckout = this.model.visaCheckoutFlowComplete();
-            if (!isVisaCheckout) {
+            if (!this.model.isExternalCheckoutFlowComplete()) {
                 this.editing.savedCard = true;
                 this.render();
             } else {
-                this.doModelAction('cancelVisaCheckout').then(function() {
-                    me.editing.savedCard = false;
+                this.cancelExternalCheckout();
+            }
+        },
+        beginEditingExternalPayment: function () {
+            var me = this;
+            if (this.model.isExternalCheckoutFlowComplete()) {
+                this.doModelAction('cancelExternalCheckout').then(function () {
+                    me.editing.savedCard = true;
                     me.render();
                 });
             }
@@ -251,6 +260,13 @@ require(["modules/jquery-mozu",
         cancelApplyCredit: function () {
             this.model.closeApplyCredit();
             this.render();
+        },
+        cancelExternalCheckout: function () {
+            var me = this;
+            this.doModelAction('cancelExternalCheckout').then(function () {
+                me.editing.savedCard = false;
+                me.render();
+            });
         },
         finishApplyCredit: function () {
             var self = this;

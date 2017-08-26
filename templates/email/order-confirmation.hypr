@@ -42,6 +42,9 @@
                             {% endif %}
                             <b>{{ labels.purchaseOrderPaymentTerms }}</b>: {{ model.billingInfo.purchaseOrder.paymentTerm.description }}
                         {% endif %}
+                        {% if  model.billingInfo.paymentType|lower == "paypalexpress2"  %}
+                            <b>{{ labels.paymentMethod }}</b>: {{ labels.paypalExpress }}
+                        {% endif %}
                 </td>
             </tr>
 
