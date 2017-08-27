@@ -116,7 +116,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
           return totalQty;
         },
         selectedDestination : function(){
-            var selectedId = this.getCheckout().get('items').at(0).get('destinationId');
+            var selectedId = this.getCheckout().get('items').findWhere({fulfillmentMethod: "Ship"}).get('destinationId');
             if(selectedId){
                 return this.getCheckout().get('destinations').get(selectedId).toJSON();
             }
@@ -324,8 +324,9 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
 
             this.validation = this.multiShipValidation;
 
-            if (!this.requiresFulfillmentInfo() && this.requiresDigitalFulfillmentContact()) {
+            if (this.requiresDigitalFulfillmentContact()) {
                 this.validation = this.digitalOnlyValidation;
+                if(this.validate()) return this.stepStatus('incomplete');
             }
 
             if (!this.isMultiShipMode() && this.getCheckout().get('destinations').length < 2) {
