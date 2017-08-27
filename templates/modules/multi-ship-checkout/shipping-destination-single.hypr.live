@@ -1,5 +1,4 @@
 
-{% if not model.selectedDestination.destinationContact.address.candidateValidatedAddresses %}
 
   {% if model.requiresFulfillmentInfo  %}
 
@@ -13,7 +12,7 @@
           {% include "modules/checkout/checkout-shipping-contact-selector" with model=model.selectableDestinations destinationId=model.selectedDestination.id isLoading=model.isLoading%}
       {% else %}
          <div data-mz-shipping-destination-single>
-          {% include "modules/common/address-form" with model=model.destinationContact countries=pageContext.shippingCountries states=pageContext.shippingStates %}
+            {% include "modules/multi-ship-checkout/shipping-destination-single-address" %}
          </div>
       {% endif %}
     </div>
@@ -27,40 +26,3 @@
     </div>
   {% endif %}
 
-{% else %}
-
-  <div class="mz-formstep-fields mz-l-formfieldgroup mz-checkoutform  mz-checkoutform-shipping mz-checkoutform-active">
-  {{ labels.selectValidAddress }}
-
-  {% for addr in model.selectedDestination.destinationContact.address.candidateValidatedAddresses %}
-  <label class="mz-l-formfieldgroup-row">
-      <div class="mz-l-formfieldgroup-cell">
-      <span>{{ labels.suggestionNum|string_format(forloop.index) }}</span>
-    </div>
-    <div class="mz-l-formfieldgroup-cell">
-      <input data-mz-action="chooseCandidateAddress" name="candidateValidatedAddresses" type="radio" value="{{forloop.index0}}" />
-    </div>
-    <div class="mz-l-formfieldgroup-cell">
-      {{addr.address1}}<br />
-      {% if addr.address2 %}{{addr.address2}}<br />{% endif %}
-      {{addr.cityOrTown}}, {{addr.stateOrProvince}} {{addr.postalOrZipCode}} {{addr.countryCode}}
-    </div>
-  </label>
-  {% endfor %}
-  {% if siteContext.generalSettings.allowInvalidAddresses %}
-  <label class="mz-l-formfieldgroup-row">
-    <div class="mz-l-formfieldgroup-cell">
-        <span>Original</span>
-    </div>
-    <div class="mz-l-formfieldgroup-cell">
-      <input data-mz-action="chooseCandidateAddress" name="candidateValidatedAddresses" type="radio" value="-1" />
-    </div>
-    <div class="mz-l-formfieldgroup-cell">
-      {{model.selectedDestination.destinationContact.address.address1}}<br />
-      {% if model.selectedDestination.destinationContact.address.address2 %}{{model.selectedDestination.destinationContact.address.address2}}<br />{% endif %}
-      {{model.selectedDestination.destinationContact.address.cityOrTown}}, {{model.selectedDestination.destinationContact.address.stateOrProvince}} {{model.selectedDestination.destinationContact.address.postalOrZipCode}} {{model.selectedDestination.destinationContact.address.countryCode}}
-    </div>
-  </label>
-  {% endif %}
-  </div>
-{% endif %}

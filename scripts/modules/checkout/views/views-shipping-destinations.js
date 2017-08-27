@@ -17,7 +17,7 @@ define(["modules/jquery-mozu",
         });
 
         var ShippingDestinationSingleView = Backbone.MozuView.extend({
-            templateName: 'modules/common/address-form',
+            templateName: 'modules/multi-ship-checkout/shipping-destination-single-address',
             autoUpdate: [
                 'firstName',
                 'lastNameOrSurname',
@@ -233,7 +233,7 @@ define(["modules/jquery-mozu",
                     }
                     var shippingDestinationSingleView = new ShippingDestinationSingleView({
                         el: $(this),
-                        model: shippingDestination.get('destinationContact')
+                        model: shippingDestination
                     });
                     shippingDestinationSingleView.render();
                 });
