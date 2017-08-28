@@ -75,7 +75,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, FulfillmentC
                         shippingMethodDefaults.push({groupingId: group.id, shippingRate: lowestShippingRate});
                     }
                 });
-                return shippingMethodDefaults
+                return shippingMethodDefaults;
             },
             setDefaultShippingMethodsAsync : function(shippingMethodsPayload){
                 var self = this;

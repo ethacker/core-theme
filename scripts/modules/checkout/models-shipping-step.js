@@ -389,7 +389,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                     self.isLoading(true);
                     checkout.get('shippingInfo').updateShippingMethods().then(function(methods) {
                         if(methods){
-                            var defaults = checkout.get('shippingInfo').shippingMethodDefaults()
+                            var defaults = checkout.get('shippingInfo').shippingMethodDefaults();
                             if(defaults.length){
                                 checkout.get('shippingInfo').setDefaultShippingMethodsAsync(defaults).ensure(function(){
                                      self.getCheckout().get('shippingInfo').stepStatus('incomplete');
