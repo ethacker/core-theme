@@ -48,7 +48,7 @@ define(["modules/jquery-mozu",
             chooseCandidateAddress: function(e) {
                 var idx = parseInt($(e.currentTarget).val(), 10);
                 if (idx !== -1) {
-                    var addr = this.model.get('address');
+                    var addr = this.model.get('destinationContact').get('address');
                     var valAddr = addr.get('candidateValidatedAddresses')[idx];
                     for (var k in valAddr) {
                         addr.set(k, valAddr[k]);
@@ -204,7 +204,7 @@ define(["modules/jquery-mozu",
             chooseCandidateAddress: function(e) {
                 var idx = parseInt($(e.currentTarget).val(), 10);
                 if (idx !== -1) {
-                    var addr = this.model.singleAddressDestination().get('destinationContact').get('address');
+                    var addr = this.model.getCheckout().get('destinations').singleShippingDestination().get('destinationContact').get('address');
                     var valAddr = addr.get('candidateValidatedAddresses')[idx];
                     for (var k in valAddr) {
                         addr.set(k, valAddr[k]);

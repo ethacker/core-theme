@@ -114,7 +114,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
             var destinations = this.filter(function(destination, idx){
                 return !destination.get('isGiftCardDestination');
             });
-            return destinations
+            return destinations;
         },
         singleShippingDestination : function(){
             var self = this;

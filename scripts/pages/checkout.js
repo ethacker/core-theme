@@ -535,7 +535,7 @@ require(["modules/jquery-mozu",
                         model: checkoutModel.get('fulfillmentInfo').get('fulfillmentContact')
                     }),
                     shippingInfo: new ShippingInfoView({
-                        el: $('[mz-modal-dialog]'),
+                        el: $('#step-shipping-method'),
                         model: checkoutModel.get('fulfillmentInfo')
                     }),
                     paymentInfo: new BillingInfoView({
