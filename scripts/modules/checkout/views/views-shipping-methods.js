@@ -58,13 +58,16 @@ define(["modules/jquery-mozu",
                     } else {
                         var defaults = self.model.shippingMethodDefaults();
                         if(defaults.length){
-                            self.getCheckout().get('shippingInfo').setDefaultShippingMethodsAsync(defaults).ensure(function(){
+                            self.model.getCheckout().get('shippingInfo').setDefaultShippingMethodsAsync(defaults).ensure(function(){
                                 self.model.calculateStepStatus();
-                                self.getCheckout().get('billingInfo').calculateStepStatus();
+                                self.model.getCheckout().get('billingInfo').calculateStepStatus();
+                                self.model.isLoading(false);
                             });
                         } else {
+                             
                              self.model.calculateStepStatus();
-                             self.getCheckout().get('billingInfo').calculateStepStatus();
+                             self.model.getCheckout().get('billingInfo').calculateStepStatus();
+                             self.model.isLoading(false);
                         }
                     }
 
