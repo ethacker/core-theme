@@ -78,8 +78,9 @@ define(["modules/jquery-mozu",
             handleChangeDestinationAddress: function(e){
                 var self = this;
                 var $target = $(e.currentTarget);
+                var customerContactId = $target.find(":selected").data("mzCustomercontactid");
                 
-                if($target.val() === "") {
+                if($target.val() === "" && !customerContactId) {
                     return false;
                 }
 
@@ -87,7 +88,7 @@ define(["modules/jquery-mozu",
                     this.handleNewContact();
                     return;
                 }
-                var customerContactId = $target.find(":selected").data("mzCustomercontactid");
+                
                 self.model.updateOrderItemDestination($target.val(), customerContactId);
                 self.render();
 
