@@ -116,7 +116,10 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
           return totalQty;
         },
         selectedDestination : function(){
-            var selectedId = this.getCheckout().get('items').findWhere({fulfillmentMethod: "Ship"}).get('destinationId');
+            var directShipItems = this.getCheckout().get('items').findWhere({fulfillmentMethod: "Ship"})
+            if(directShipItems){
+                var selectedId = directShipItems.get('destinationId');
+            }
             if(selectedId){
                 return this.getCheckout().get('destinations').get(selectedId).toJSON();
             }
@@ -405,6 +408,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                     });
                 } else {
                    self.stepStatus('complete'); 
+                   checkout.get('billingInfo').calculateStepStatus();
                 }
             },
             // Breakup for validation
