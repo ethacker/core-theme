@@ -116,10 +116,13 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
           return totalQty;
         },
         selectedDestination : function(){
-            var directShipItems = this.getCheckout().get('items').findWhere({fulfillmentMethod: "Ship"})
+            var directShipItems = this.getCheckout().get('items').findWhere({fulfillmentMethod: "Ship"});
+            var selectedId = "";
+
             if(directShipItems){
-                var selectedId = directShipItems.get('destinationId');
+                selectedId = directShipItems.get('destinationId');
             }
+
             if(selectedId){
                 return this.getCheckout().get('destinations').get(selectedId).toJSON();
             }
