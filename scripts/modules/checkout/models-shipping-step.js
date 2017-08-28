@@ -30,8 +30,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
         singleShippingAddressValidation : {
             singleShippingAddess : {
                 fn : function(value, attr){
-                    var destination = this.parent.get('destinations').at(0);
-
+                    var destination = this.parent.get('destinations').singleShippingDestination();
                     if(destination){
                         var instance = destination.get('destinationContact') instanceof CustomerModels.Contact;
                         if(!instance) {
@@ -272,7 +271,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
             var isAddressValidationEnabled = HyprLiveContext.locals.siteContext.generalSettings.isAddressValidationEnabled,
                     allowInvalidAddresses = HyprLiveContext.locals.siteContext.generalSettings.allowInvalidAddresses;
 
-            var shippingDestination = self.getDestinations().at(0);
+            var shippingDestination = self.getDestinations().singleShippingDestination();
             var addr = shippingDestination.get('destinationContact').get('address');
 
             var saveAddress = function(){
@@ -335,14 +334,14 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                 if(this.validate()) return this.stepStatus('incomplete');
             }
 
-            if (!this.isMultiShipMode() && this.getCheckout().get('destinations').length < 2) {
+            if (!this.isMultiShipMode() && this.getCheckout().get('destinations').nonGiftCardDestinations().length < 2) {
                 this.validation = this.singleShippingAddressValidation;
             }
             
             if(!this.validate()) return this.stepStatus('complete');
 
             return CheckoutStep.prototype.calculateStepStatus.apply(this);
-        },
+        }, 
         validateModel: function() {
                 this.validation = this.multiShipValidation;
                 var validationObj = this.validate();
@@ -353,7 +352,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                 }
 
                 if (this.getCheckout().requiresFulfillmentInfo && validationObj) {
-                    if (!this.isMultiShipMode() && this.getCheckout().get('destinations').length < 2) { 
+                    if (!this.isMultiShipMode() && this.getCheckout().get('destinations').nonGiftCardDestinations().length < 2) { 
                         this.singleShippingAddressValid();
                         return false;
                     }

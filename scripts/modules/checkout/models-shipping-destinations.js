@@ -110,6 +110,35 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
             self.add(giftCardDestination);
             return giftCardDestination;
         },
+        nonGiftCardDestinations : function(){
+            var destinations = this.filter(function(destination, idx){
+                return !destination.get('isGiftCardDestination');
+            });
+            return destinations
+        },
+        singleShippingDestination : function(){
+            var self = this;
+            var shippingDestinations = this.nonGiftCardDestinations();
+            var destination = "";
+
+            if(!shippingDestinations.length) {
+                destination = this.newDestination();
+                destination.set('isSingleShipDestination', true);
+            }
+
+            if(!destination) {
+                destination = this.find(function(destination, idx){
+                    return (destination.get('isSingleShipDestination'));
+                });
+            }
+
+            if(!destination) {
+                destination = shippingDestinations[0];
+            } 
+
+            
+            return destination;
+        },
         hasDestination: function(destinationContact){
             var self = this;
             var foundDestinations = self.filter(function(destination){

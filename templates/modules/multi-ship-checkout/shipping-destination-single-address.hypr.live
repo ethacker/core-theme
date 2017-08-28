@@ -1,8 +1,9 @@
 
 {% if not model.destinationContact.address.candidateValidatedAddresses %}
 
- {% include "modules/common/address-form" with model=model.destinationContact countries=pageContext.shippingCountries states=pageContext.shippingStates %}
-
+  <div data-mz-address-form>
+    {% include "modules/common/address-form" with model=model.destinationContact countries=pageContext.shippingCountries states=pageContext.shippingStates %}
+  </div>
 {% else %}
 
    {{ labels.selectValidAddress }}

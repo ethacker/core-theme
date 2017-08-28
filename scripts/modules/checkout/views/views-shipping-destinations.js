@@ -16,8 +16,8 @@ define(["modules/jquery-mozu",
             ]
         });
 
-        var ShippingDestinationSingleView = Backbone.MozuView.extend({
-            templateName: 'modules/multi-ship-checkout/shipping-destination-single-address',
+        var ShippingDestinationContactView = Backbone.MozuView.extend({
+            templateName: 'modules/common/address-form',
             autoUpdate: [
                 'firstName',
                 'lastNameOrSurname',
@@ -31,7 +31,11 @@ define(["modules/jquery-mozu",
                 'address.addressType',
                 'phoneNumbers.home',
                 'email'
-            ],
+            ]
+        });
+
+        var ShippingDestinationSingleView = Backbone.MozuView.extend({
+            templateName: 'modules/multi-ship-checkout/shipping-destination-single-address',
             initialize: function(){
                 var self = this;
                 this.listenTo(this.model, 'saveSingleDestination', function() {
@@ -228,7 +232,7 @@ define(["modules/jquery-mozu",
                 });
 
                 $.each(this.$el.find('[data-mz-shipping-destination-single]'), function(index, val) {
-                    var shippingDestination = self.model.getCheckout().get('destinations').at(0);
+                    var shippingDestination = self.model.getCheckout().get('destinations').singleShippingDestination();
                     if(!shippingDestination) {
                         shippingDestination = self.model.getCheckout().get('destinations').newDestination();
                     }
@@ -237,6 +241,15 @@ define(["modules/jquery-mozu",
                         model: shippingDestination
                     });
                     shippingDestinationSingleView.render();
+
+                     $.each($(this).find('[data-mz-address-form]'), function(index, val) {
+                        var shippingDestinationContactView = new ShippingDestinationContactView({
+                            el: $(this),
+                            model: shippingDestination.get('destinationContact')
+                        });
+                    shippingDestinationContactView.render();
+                    });
+
                 });
 
                 $.each(this.$el.find('[data-mz-gift-card-destination]'), function(index, val) {
