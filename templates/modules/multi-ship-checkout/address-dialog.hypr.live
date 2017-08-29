@@ -3,6 +3,9 @@
 		<div data-mz-contact-modal-form>
 			{% include "modules/multi-ship-checkout/address-form" %}
 		</div>
+    <div>
+      <input type="checkbox" data-mz-value="primaryShippingContact" value="true" {% if model.isPrimaryShippingContact %} checked="checked" disabled{% endif %}> {{ labels.primary }}
+    </div>
 {% else %}
 	<div>
         {{ labels.selectValidAddress }}

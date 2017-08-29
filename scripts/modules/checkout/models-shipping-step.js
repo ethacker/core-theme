@@ -173,6 +173,21 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
         getDestinations : function() {
             return this.parent.get("destinations");
         },
+        updateDigitalItemDestinations: function(destinationId){
+            var self = this;
+            var payload = [{
+                destinationId: destinationId,
+                itemIds: [] 
+            }];
+            var digitalItemIds = self.getCheckout().get('items').each(function(item){
+                if(item.get('fulfillmentMethod') === "Digital") {
+                    payload[0].itemIds.push(item.get('id'));
+                }
+            });
+            if(digitalItemIds.length) {
+                this.getCheckout().apiUpdateCheckoutItemDestinationBulk({id: self.getCheckout().get('id'), postdata: payload});
+            };
+        },
         toJSON: function() {
                 if (this.requiresFulfillmentInfo() || this.requiresDigitalFulfillmentContact()) {
                     return CheckoutStep.prototype.toJSON.apply(this, arguments);
@@ -217,9 +232,12 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                 if(giftCardDestination) {
                     if(!giftCardDestination.get('id')) {
                         self.getDestinations().apiSaveDestinationAsync(giftCardDestination).then(function(data){
+                            self.updateDigitalItemDestinations(data.data.id);
+                            //self.getCheckout.updateCheckoutItemDestinationBulk
                         });
                     } else {
                         self.getDestinations().updateShippingDestinationAsync(giftCardDestination).then(function(data){
+                            self.updateDigitalItemDestinations(data.data.id);
                         });
                     }
                 }
@@ -249,9 +267,11 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
             checkout = this.getCheckout();
             
             if(this.singleShippingAddressValid()){
-
-                self.validateAddresses();
-                
+                if(this.selectableDestinations().length < 2) {
+                    self.validateAddresses();
+                } else {
+                    self.completeStep();
+                } 
             }
         },
         validateAddresses : function(){

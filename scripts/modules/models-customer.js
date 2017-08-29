@@ -168,35 +168,43 @@
                 }
                 return false;
             };
-            var setAsShipping = function(isPrimary){
+            var togglePrimaryShipping = function(isPrimary){
                 var newShippingType = {
                     "name": "Shipping",
-                    "isPrimary": (primary) ? true : false 
+                    "isPrimary": (isPrimary) ? true : false 
                 }
-                if(this.types.length) {
-                    var shippingType = _.findWhere(this.types, {"name": "Shipping"});
+                if(self.get('types')) {
+                    var shippingType = _.findWhere(self.types, {"name": "Shipping"});
                     shippingType = newShippingType;
                 }
-                this.types = [newShippingType];
+                self.set('types', [newShippingType]);
             };
-            var setAsBilling = function(isPrimary){
+            var toggleAsBilling = function(selected, isPrimary){
                 var newBillingType = {
                     "name": "Billing",
-                    "isPrimary": (primary) ? true : false 
+                    "isPrimary": (isPrimary) ? true : false 
                 }
-                if(this.types.length) {
-                    var billingType = _.findWhere(this.types, {"name": "Billing"});
-                    billingType = newBillingType;
+                var billingType = _.findIndex(this.types, function(type){
+                    return type.name === "Billing"
+                });
+
+                if(this.get('types').length) {
+                    if(selected){
+                        this.get('types')[billingType] = newBillingType;
+                    } else {
+                        this.get('types').pop()
+                    }
                 }
-                this.types = [newBillingType];
+
+                this.set('types', [newBillingType]);
             };
             return {
                 isShipping: isShipping,
                 isBilling: isBilling,
                 isPrimaryShipping: isPrimaryShipping,
                 isPrimaryBilling: isPrimaryBilling,
-                setAsBilling: setAsBilling,
-                setAsShipping: setAsShipping
+                togglePrimaryShipping: togglePrimaryShipping,
+                toggleAsBilling: toggleAsBilling
             };
         },
         initialize: function () {

@@ -15,7 +15,8 @@ define(['modules/backbone-mozu','hyprlive', 'modules/jquery-mozu','underscore', 
                 'address.addressType',
                 'phoneNumbers.home',
                 'contactId',
-                'email'
+                'email',
+                'primaryShippingContact'
             ],
         choose: function(e) {
             var idx = parseInt($(e.currentTarget).val(), 10);
@@ -47,7 +48,6 @@ define(['modules/backbone-mozu','hyprlive', 'modules/jquery-mozu','underscore', 
 
             var addr = this.model.get('destinationContact').get('address');
 
-
             var promptValidatedAddress = function () {
                     checkout.syncApiModel();
                     //self.isLoading(false);
@@ -55,9 +55,16 @@ define(['modules/backbone-mozu','hyprlive', 'modules/jquery-mozu','underscore', 
                     //self.stepStatus('invalid');
                 };
 
+            
+            if(this.model.get('destinationContact').get('primaryShippingContact')){
+                checkout.get('destinations').setAsPrimaryShippingContact(this.model.get('destinationContact'), true);
+            }
+
             var saveAddress = function(){
                 if(self.model.get('id')) {
-                        self.model.parent.get('destinations').updateShippingDestinationAsync(self.model).ensure(function () {
+                        self.model.parent.get('destinations').updateShippingDestinationAsync(self.model).then(function(){
+                            checkout.get("destinations").setAsPrimaryShippingContact(checkout.get("destinations").get(data.data.id).get('destinationContact'), true);
+                        }).ensure(function () {
                              self.model.trigger('closeDialog');
                         });
                 } else {
@@ -72,6 +79,7 @@ define(['modules/backbone-mozu','hyprlive', 'modules/jquery-mozu','underscore', 
                             self.trigger('destinationsUpdate');
                             item.isLoading(false);
                         });
+                        checkout.get("destinations").setAsPrimaryShippingContact(checkout.get("destinations").get(data.data.id).get('destinationContact'), true);
                     }).ensure(function () {
                          self.model.trigger('closeDialog');    
                     });

@@ -88,6 +88,17 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
         getCheckout : function(){
             return this.parent;
         },
+        setAsPrimaryShippingContact : function(model){
+            var self = this;
+            var primaryDestination = self.find(function(destination){
+                return destination.get('destinationContact').contactTypeHelpers().isPrimaryShipping();
+            });
+
+            if(primaryDestination){
+                primaryDestination.get('destinationContact').contactTypeHelpers().togglePrimaryShipping(false);
+            }
+            model.contactTypeHelpers().togglePrimaryShipping(true);  
+        },
         newDestination : function(contact, isCustomerAddress){
             var destination = {destinationContact : contact || new CustomerModels.Contact()};
 
