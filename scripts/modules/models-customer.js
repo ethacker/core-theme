@@ -168,11 +168,35 @@
                 }
                 return false;
             };
+            var setAsShipping = function(isPrimary){
+                var newShippingType = {
+                    "name": "Shipping",
+                    "isPrimary": (primary) ? true : false 
+                }
+                if(this.types.length) {
+                    var shippingType = _.findWhere(this.types, {"name": "Shipping"});
+                    shippingType = newShippingType;
+                }
+                this.types = [newShippingType];
+            };
+            var setAsBilling = function(isPrimary){
+                var newBillingType = {
+                    "name": "Billing",
+                    "isPrimary": (primary) ? true : false 
+                }
+                if(this.types.length) {
+                    var billingType = _.findWhere(this.types, {"name": "Billing"});
+                    billingType = newBillingType;
+                }
+                this.types = [newBillingType];
+            };
             return {
                 isShipping: isShipping,
                 isBilling: isBilling,
                 isPrimaryShipping: isPrimaryShipping,
-                isPrimaryBilling: isPrimaryBilling
+                isPrimaryBilling: isPrimaryBilling,
+                setAsBilling: setAsBilling,
+                setAsShipping: setAsShipping
             };
         },
         initialize: function () {
@@ -226,7 +250,19 @@
                 model: CustomerAttribute
             }),
             contacts: Backbone.Collection.extend({
-                model: CustomerContact
+                model: CustomerContact,
+                getPrimaryShippingContact: function(){
+                    var primaryContacts = this.find(function(contact){
+                        return contact.contactTypeHelpers().isPrimaryShipping();
+                    });
+                    return (primaryContacts.length) ? primaryContacts[0] : null;
+                },
+                getPrimaryBillingContact: function(){
+                     var primaryContacts = this.find(function(contact){
+                        return contact.contactTypeHelpers().isPrimaryBilling();
+                    });
+                    return (primaryContacts.length) ? primaryContacts[0] : null;
+                }
             }),
             cards: Backbone.Collection.extend({
                 model: PaymentMethods.CreditCard
