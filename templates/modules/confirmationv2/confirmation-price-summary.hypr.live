@@ -3,7 +3,7 @@
     <tr class="mz-ordersummary-subtotal">
       <td colspan="4">
         <span class="mz-ordersummary-totalname">{{ labels.subtotal }}:</span>
-        <span class="mz-ordersummary-totalvalue">{{ model.subTotal|subtract(model.itemLevelProductDiscountTotal)|currency }}</span>
+        <span class="mz-ordersummary-totalvalue">{{ model.subtotal|subtract(model.itemLevelProductDiscountTotal)|currency }}</span>
       </td>
     </tr>
   {% for discount in model.orderDiscounts %}
