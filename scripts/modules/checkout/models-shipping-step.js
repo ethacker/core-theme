@@ -126,17 +126,8 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                 return this.getCheckout().get('destinations').get(selectedId).toJSON();
             }
         },
-        singleAddressDestination : function(){
-            var selectedId = this.getCheckout().get('items').at(0).get('destinationId');
-            if(selectedId){
-                return this.getCheckout().get('destinations').get(selectedId);
-            }
-        },
         getCheckout: function(){
             return this.parent;
-        },
-        isCustomerContactDestination: function(customerContactId){
-
         },
         updateSingleCheckoutDestination: function(destinationId, customerContactId){
             var self = this;
@@ -327,8 +318,6 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
 
             if (!this.requiresFulfillmentInfo() && !this.requiresDigitalFulfillmentContact()) return this.stepStatus('complete');
 
-            this.validation = this.multiShipValidation;
-
             if (this.requiresDigitalFulfillmentContact()) {
                 this.validation = this.digitalOnlyValidation;
                 if(this.validate()) return this.stepStatus('incomplete');
@@ -336,6 +325,8 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
 
             if (!this.isMultiShipMode() && this.getCheckout().get('destinations').nonGiftCardDestinations().length < 2) {
                 this.validation = this.singleShippingAddressValidation;
+            } else {
+                this.validation = this.multiShipValidation;
             }
             
             if(!this.validate()) return this.stepStatus('complete');
