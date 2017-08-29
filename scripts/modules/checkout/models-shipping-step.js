@@ -186,7 +186,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
             });
             if(digitalItemIds.length) {
                 this.getCheckout().apiUpdateCheckoutItemDestinationBulk({id: self.getCheckout().get('id'), postdata: payload});
-            };
+            }
         },
         toJSON: function() {
                 if (this.requiresFulfillmentInfo() || this.requiresDigitalFulfillmentContact()) {

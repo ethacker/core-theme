@@ -172,7 +172,7 @@
                 var newShippingType = {
                     "name": "Shipping",
                     "isPrimary": (isPrimary) ? true : false 
-                }
+                };
                 if(self.get('types')) {
                     var shippingType = _.findWhere(self.types, {"name": "Shipping"});
                     shippingType = newShippingType;
@@ -183,16 +183,16 @@
                 var newBillingType = {
                     "name": "Billing",
                     "isPrimary": (isPrimary) ? true : false 
-                }
+                };
                 var billingType = _.findIndex(this.types, function(type){
-                    return type.name === "Billing"
+                    return type.name === "Billing";
                 });
 
                 if(this.get('types').length) {
                     if(selected){
                         this.get('types')[billingType] = newBillingType;
                     } else {
-                        this.get('types').pop()
+                        //this.get('types').pop()
                     }
                 }
 

@@ -62,7 +62,7 @@ define(['modules/backbone-mozu','hyprlive', 'modules/jquery-mozu','underscore', 
 
             var saveAddress = function(){
                 if(self.model.get('id')) {
-                        self.model.parent.get('destinations').updateShippingDestinationAsync(self.model).then(function(){
+                        self.model.parent.get('destinations').updateShippingDestinationAsync(self.model).then(function(data){
                             checkout.get("destinations").setAsPrimaryShippingContact(checkout.get("destinations").get(data.data.id).get('destinationContact'), true);
                         }).ensure(function () {
                              self.model.trigger('closeDialog');
