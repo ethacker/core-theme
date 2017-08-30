@@ -24,14 +24,16 @@
               {% endfor %}
           </select>
 
-          <div>
-            <a href="javascript:;" data-mz-action="handleNewContact">{{labels.addAddress}}</a> | 
-
-            <a class="mz-shipping-destination-edit-address-link" {% if not model.destinationId %} style="visibility:hidden" {% endif %} data-mz-action="handleEditContact" data-mz-destination-id="{{ model.destinationId }}">{{ labels.shippingDestinationEditAddress}}</a>
-        </div>
+         
       </div>
     </div>
 
+    <div class="mz-shipping-row-item">
+      <a href="javascript:;" data-mz-action="handleNewContact">{{labels.addAddress}}</a> | 
+
+      <a class="mz-shipping-destination-edit-address-link" {% if not model.destinationId %} style="visibility:hidden" {% endif %} data-mz-action="handleEditContact" data-mz-destination-id="{{ model.destinationId }}">{{ labels.shippingDestinationEditAddress}}</a>
+    </div>
+    
     <div class="mz-shipping-row-item">
       <button class="mz-button mz-shipping-destination-add-address-link mz-checkout-button-link" {% if model.quantity < 2 %} style="visibility:hidden" {% endif %} data-mz-action="handleSplitOrderItem" {% if model.isLoading %} disabled {% endif %}> + {{ labels.shippingDestinationAddAddress }} </button>
   </div>

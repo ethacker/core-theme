@@ -345,10 +345,11 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
 
             if (!this.isMultiShipMode() && this.getCheckout().get('destinations').nonGiftCardDestinations().length < 2) {
                 this.validation = this.singleShippingAddressValidation;
-            } else {
-                this.validation = this.multiShipValidation;
-            }
-            
+                if(this.validate()) return this.stepStatus('incomplete');
+            } 
+
+            this.validation = this.multiShipValidation;
+
             if(!this.validate()) return this.stepStatus('complete');
 
             return CheckoutStep.prototype.calculateStepStatus.apply(this);
