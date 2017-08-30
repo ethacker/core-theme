@@ -236,13 +236,14 @@ require(["modules/jquery-mozu",
                     el: $('#step-review'),
                     model: checkoutModel
                 }),
-                messageView: messageViewFactory({
+                messageView: messageViewFactory({ 
                     el: $checkoutView.find('[data-mz-message-bar]'),
                     model: checkoutModel.messages
                 }),
                 contactDialog: new ContactDialogView({
                     el: $("[mz-modal-contact-dialog]"),
-                    model: checkoutModel.get('dialogContact')
+                    model: checkoutModel.get('dialogContact'),
+                    messagesEl: $("[mz-modal-contact-dialog]").find('[data-mz-message-bar]')
                 })
             };
 

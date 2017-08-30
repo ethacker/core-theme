@@ -16,7 +16,7 @@
         <a href="javascript:;" data-mz-action="handleNewContact">{{labels.addAddress}}</a>
     </div>
 
-
+    
    </div>
    <div class="mz-l-formfieldgroup-cell">
     {% if destinationId %}

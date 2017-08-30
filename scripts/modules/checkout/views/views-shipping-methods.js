@@ -46,10 +46,12 @@ define(["modules/jquery-mozu",
                                 self.model.getCheckout().get('shippingInfo').setDefaultShippingMethodsAsync(defaults).ensure(function(){
                                     self.model.calculateStepStatus();
                                     self.model.getCheckout().get('billingInfo').calculateStepStatus();
+                                    self.model.isLoading(false);
                                 });
                             } else {
                                  self.model.calculateStepStatus();
                                  self.model.getCheckout().get('billingInfo').calculateStepStatus();
+                                 self.model.isLoading(false);
                             }
                         }, function(){
                             self.model.isLoading(false);

@@ -87,11 +87,6 @@ define(["modules/jquery-mozu",
                 if($target.val() === "" && !customerContactId) {
                     return false;
                 }
-
-                if($target.val() === "new"){
-                    this.handleNewContact();
-                    return;
-                }
                 
                 self.model.updateOrderItemDestination($target.val(), customerContactId);
                 self.render();
@@ -168,10 +163,10 @@ define(["modules/jquery-mozu",
                 var self = this;
                 var $target = $(e.currentTarget);
 
-                if($target.val() === "new"){
-                    this.handleNewContact();
+                if(!$target.val()){
                     return;
                 }
+
                 var customerContactId = $target.find(":selected").data("mzCustomercontactid");
                 self.model.updateSingleCheckoutDestination($target.val(), customerContactId).ensure(function(){
                    //self.render(); 

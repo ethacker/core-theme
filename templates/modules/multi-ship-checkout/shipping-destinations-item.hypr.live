@@ -19,15 +19,16 @@
       <span class="mz-validationmessage" data-mz-validationmessage-for="shippingDestinationAddress"></span>
       <select id="mz-shipping-destination-address" name="shippingDestinationAddress" class="mz-shipping-destination-address-dd" data-mz-fulfillment-contact data-mz-value="fulfillmentContactId" {% if model.isLoading %} disabled {% endif %}>
          <option value="" class="mz-shipping-destination-address"> </option>
-           <option value="new" class="mz-shipping-destination-address-select-new-address">{{ labels.shippingDestinationNewAddress }}</option>
               {% for destination in model.selectableDestinations %}
                 <option class="mz-shipping-destination-address-select" value="{{ destination.id }}" data-mz-customerContactId="{{destination.customerContactId}}"" {% if model.destinationId == destination.id %} selected="selected" {% endif %}>{{ destination.destinationContact.address.address1 }}, {{ destination.destinationContact.address.cityOrTown }} {{ destination.destinationContact.address.stateOrProvince }}</option>
               {% endfor %}
           </select>
-      </div>
-      <div class="mz-shipping-row-item">
-        <a class="mz-shipping-destination-edit-address-link" {% if not model.destinationId %} style="visibility:hidden" {% endif %} data-mz-action="handleEditContact" data-mz-destination-id="{{ model.destinationId }}">{{ labels.shippingDestinationEditAddress}}</a>
 
+          <div>
+            <a href="javascript:;" data-mz-action="handleNewContact">{{labels.addAddress}}</a> | 
+
+            <a class="mz-shipping-destination-edit-address-link" {% if not model.destinationId %} style="visibility:hidden" {% endif %} data-mz-action="handleEditContact" data-mz-destination-id="{{ model.destinationId }}">{{ labels.shippingDestinationEditAddress}}</a>
+        </div>
       </div>
     </div>
 

@@ -2,9 +2,11 @@
 
 {% block modal-body %}
 
+{% include "modules/common/message-bar" with model=model.messages %}
+
 <div id="mzContactDialog" data-mz-contact-modal-content class="mz-contact-dialog">
 
 	{% include "modules/multi-ship-checkout/address-dialog" %}      
 
 </div>
-{% endblock modal-body %}
+{% endblock modal-body %} 

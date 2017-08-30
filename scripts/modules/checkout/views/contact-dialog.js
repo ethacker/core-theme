@@ -88,7 +88,7 @@ define(['modules/backbone-mozu','hyprlive', 'modules/jquery-mozu','underscore', 
 
 			if(!this.model.validate()) {
             	if (!isAddressValidationEnabled) {
-                    saveAddress();
+                    saveAddress(); 
                 } else {
                     if (!addr.get('candidateValidatedAddresses')) {
                         var methodToUse = allowInvalidAddresses ? 'validateAddressLenient' : 'validateAddress';
@@ -110,10 +110,10 @@ define(['modules/backbone-mozu','hyprlive', 'modules/jquery-mozu','underscore', 
                         }, function (e) {
                             if (allowInvalidAddresses) {
                                 // TODO: sink the exception.in a better way.
-                                checkout.messages.reset();
+                                self.model.messages.reset();
                                 saveAddress();
                             } else { 
-                                checkout.messages.reset({ message: Hypr.getLabel('addressValidationError') });
+                                self.model.messages.reset({ message: Hypr.getLabel('addressValidationError') });
                             }
                         });
                     } else {

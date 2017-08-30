@@ -1,9 +1,7 @@
-define(["backbone", 'hyprlive'], function(Backbone, Hypr) {
+define(["modules/backbone-mozu", 'hyprlive'], function(Backbone, Hypr) {
 
-    var modalDialog = Backbone.Model.extend({
-        defaults:{
-           
-        },
+    var modalDialog = Backbone.MozuModel.extend({
+        
         closeDialog: function(){
             this.trigger('closeDialog');
         },

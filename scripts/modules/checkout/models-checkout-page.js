@@ -196,7 +196,7 @@ var CheckoutPage = Backbone.MozuModel.extend({
                     model : CheckoutOrder
                 }),
                 groupings : Backbone.Collection.extend({
-                    model : CheckoutGrouping 
+                    model : CheckoutGrouping  
                 }),
                 billingInfo: BillingInfo,
                 shopperNotes: Backbone.MozuModel.extend(),
