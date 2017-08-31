@@ -532,7 +532,7 @@ define([
                 }
 
                 if (currentPaymentType && (currentPaymentType !== billingInfoPaymentType || currentPaymentWorkflow !== billingInfoPaymentWorkflow)) {
-                    this.set('paymentType', currentPaymentType, { silent: true });
+                    this.set('paymentType', currentPaymentType );
                     this.set('paymentWorkflow', currentPaymentWorkflow, { silent: true });
                     this.set('card', currentCard, { silent: true });
                     this.set('billingContact', currentBillingContact, { silent: true });
