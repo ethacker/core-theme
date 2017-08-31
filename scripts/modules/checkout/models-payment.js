@@ -863,8 +863,11 @@ define([
             submit: function () {
                 
                 var order = this.getOrder();
+                var self = this;
                 // just can't sync these emails right
                 order.syncBillingAndCustomerEmail();
+
+                //
 
                 // This needs to be ahead of validation so we can check if visa checkout is being used.
                 var currentPayment = order.apiModel.getCurrentPayment();
@@ -877,6 +880,11 @@ define([
                 }
 
                 var val = this.validate();
+
+                //If Single Address Save to Destination
+                if(selectableDestinations > 1) {
+                    order.get('destinations').saveShippingDestinationAsync(self.get('BillingContact'));
+                }
 
                 if (this.nonStoreCreditTotal() > 0 && val) {
                     // display errors:

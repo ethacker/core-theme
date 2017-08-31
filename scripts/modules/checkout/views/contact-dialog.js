@@ -42,8 +42,9 @@ define(['modules/backbone-mozu','hyprlive', 'modules/jquery-mozu','underscore', 
 
             if(this.model.get('destinationContact').validate()) return false;
             if(this.model.get('destinationContact').get('isBillingAddress')) {
-                checkout.get('billingInfo').updateBillingContact(this.model.get('destinationContact'));
-                checkout.get('destinations').newDestination(this.model.get('destinationContact'));
+                
+                //checkout.get('destinations').newDestination(this.model.get('destinationContact'));
+                this.saveBillingDestination();
                 return self.model.trigger('closeDialog');
             }
             
@@ -53,14 +54,24 @@ define(['modules/backbone-mozu','hyprlive', 'modules/jquery-mozu','underscore', 
 
             var addr = this.model.get('destinationContact').get('address');
 
-            var promptValidatedAddress = function () {
-                    checkout.syncApiModel();
-                    //self.isLoading(false);
-                    //parent.isLoading(false);
-                    //self.stepStatus('invalid');
-                };
 
-            var saveAddress = function(){
+             var saveBillingDestination = function(){
+                if(self.model.get('id')) {
+                        self.model.parent.get('destinations').updateShippingDestinationAsync(self.model).then(function(){
+                            checkout.get('billingInfo').updateBillingContact(this.model.get('destinationContact'));
+                        }).ensure(function () {
+                             self.model.trigger('closeDialog');
+                        });
+                } else {
+                    self.model.parent.get('destinations').saveShippingDestinationAsync(self.model).then(function(){
+                        checkout.get('billingInfo').updateBillingContact(this.model.get('destinationContact'));
+                    }).ensure(function () {
+                         self.model.trigger('closeDialog');    
+                    });
+                }
+            };   
+
+            var saveShippingDestination = function(){
                 if(self.model.get('id')) {
                         self.model.parent.get('destinations').updateShippingDestinationAsync(self.model).ensure(function () {
                              self.model.trigger('closeDialog');
@@ -85,7 +96,7 @@ define(['modules/backbone-mozu','hyprlive', 'modules/jquery-mozu','underscore', 
 
 			if(!this.model.validate()) {
             	if (!isAddressValidationEnabled) {
-                    saveAddress(); 
+                    saveShippingDestination(); 
                 } else {
                     if (!addr.get('candidateValidatedAddresses')) {
                         var methodToUse = allowInvalidAddresses ? 'validateAddressLenient' : 'validateAddress';
@@ -94,27 +105,26 @@ define(['modules/backbone-mozu','hyprlive', 'modules/jquery-mozu','underscore', 
                             if (resp.data && resp.data.addressCandidates && resp.data.addressCandidates.length) {
                                 if (_.find(resp.data.addressCandidates, addr.is, addr)) {
                                     addr.set('isValidated', true);
-                                        saveAddress();
+                                        saveShippingDestination();
                                         return;
                                     }
                                 addr.set('candidateValidatedAddresses', resp.data.addressCandidates);
                                 self.render();
-                                //promptValidatedAddress();
                             } else {
                                 //completeStep();
-                                saveAddress();
+                                saveShippingDestination();
                             }
                         }, function (e) {
                             if (allowInvalidAddresses) {
                                 // TODO: sink the exception.in a better way.
                                 self.model.messages.reset();
-                                saveAddress();
+                                saveShippingDestination();
                             } else { 
                                 self.model.messages.reset({ message: Hypr.getLabel('addressValidationError') });
                             }
                         });
                     } else {
-                        saveAddress();
+                        saveShippingDestination();
                     }
                 }
 			}
