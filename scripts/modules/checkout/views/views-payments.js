@@ -154,7 +154,7 @@ define(["modules/jquery-mozu",
 
                 var destination = this.model.getOrder().get('destinations').get(destinationId);
                 if(!destination) {
-                    destination = this.model.getOrder().get('destinations').findWhere({customerContactId: customerContactId })
+                    destination = this.model.getOrder().get('destinations').findWhere({customerContactId: customerContactId });
                 }
                 
                 if(destination){
