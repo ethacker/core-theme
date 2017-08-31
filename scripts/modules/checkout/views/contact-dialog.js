@@ -15,8 +15,7 @@ define(['modules/backbone-mozu','hyprlive', 'modules/jquery-mozu','underscore', 
                 'address.addressType',
                 'phoneNumbers.home',
                 'contactId',
-                'email',
-                'primaryShippingContact'
+                'email'
             ],
         choose: function(e) {
             var idx = parseInt($(e.currentTarget).val(), 10);
@@ -38,10 +37,16 @@ define(['modules/backbone-mozu','hyprlive', 'modules/jquery-mozu','underscore', 
             this.bootstrapInstance.show();
         },
 		handleDialogSave : function(){
-
-            if(this.model.get('destinationContact').validate()) return false;
             var self = this;
             var checkout = this.model.parent;
+
+            if(this.model.get('destinationContact').validate()) return false;
+            if(this.model.get('destinationContact').get('isBillingAddress')) {
+                checkout.get('billingInfo').updateBillingContact(this.model.get('destinationContact'));
+                checkout.get('destinations').newDestination(this.model.get('destinationContact'));
+                return self.model.trigger('closeDialog');
+            }
+            
 
 			var isAddressValidationEnabled = HyprLiveContext.locals.siteContext.generalSettings.isAddressValidationEnabled,
                     allowInvalidAddresses = HyprLiveContext.locals.siteContext.generalSettings.allowInvalidAddresses;
@@ -55,16 +60,9 @@ define(['modules/backbone-mozu','hyprlive', 'modules/jquery-mozu','underscore', 
                     //self.stepStatus('invalid');
                 };
 
-            
-            if(this.model.get('destinationContact').get('primaryShippingContact')){
-                checkout.get('destinations').setAsPrimaryShippingContact(this.model.get('destinationContact'), true);
-            }
-
             var saveAddress = function(){
                 if(self.model.get('id')) {
-                        self.model.parent.get('destinations').updateShippingDestinationAsync(self.model).then(function(data){
-                            checkout.get("destinations").setAsPrimaryShippingContact(checkout.get("destinations").get(data.data.id).get('destinationContact'), true);
-                        }).ensure(function () {
+                        self.model.parent.get('destinations').updateShippingDestinationAsync(self.model).ensure(function () {
                              self.model.trigger('closeDialog');
                         });
                 } else {
@@ -79,7 +77,6 @@ define(['modules/backbone-mozu','hyprlive', 'modules/jquery-mozu','underscore', 
                             self.trigger('destinationsUpdate');
                             item.isLoading(false);
                         });
-                        checkout.get("destinations").setAsPrimaryShippingContact(checkout.get("destinations").get(data.data.id).get('destinationContact'), true);
                     }).ensure(function () {
                          self.model.trigger('closeDialog');    
                     });

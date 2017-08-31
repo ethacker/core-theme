@@ -88,17 +88,6 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
         getCheckout : function(){
             return this.parent;
         },
-        setAsPrimaryShippingContact : function(model){
-            var self = this;
-            var primaryDestination = self.find(function(destination){
-                return destination.get('destinationContact').contactTypeHelpers().isPrimaryShipping();
-            });
-
-            if(primaryDestination){
-                primaryDestination.get('destinationContact').contactTypeHelpers().togglePrimaryShipping(false);
-            }
-            model.contactTypeHelpers().togglePrimaryShipping(true);  
-        },
         newDestination : function(contact, isCustomerAddress){
             var destination = {destinationContact : contact || new CustomerModels.Contact()};
 
@@ -136,7 +125,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
                 destination = this.newDestination();
                 destination.set('isSingleShipDestination', true);
             }
-
+ 
             if(!destination) {
                 destination = this.find(function(destination, idx){
                     return (destination.get('isSingleShipDestination'));
@@ -152,10 +141,10 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
         },
         hasDestination: function(destinationContact){
             var self = this;
-            var foundDestinations = self.filter(function(destination){
+            var foundDestination = self.find(function(destination){
                 return self.compareObjects(destination.get('destinationContact').get('address').toJSON(), destinationContact.get('address').toJSON());
             });
-            return (foundDestinations.length) ? true : false;
+            return (foundDestination) ? foundDestination : false;
         },
         compareObjects: function(obj1, obj2) {
             var areEqual = _.isEqual(obj1, obj2);

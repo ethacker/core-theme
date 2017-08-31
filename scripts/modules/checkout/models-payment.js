@@ -54,7 +54,9 @@ define([
 
             },
             helpers: ['acceptsMarketing', 'savedPaymentMethods', 'availableStoreCredits', 'applyingCredit', 'maxCreditAmountToApply',
-              'activeStoreCredits', 'nonStoreCreditTotal', 'activePayments', 'hasSavedCardPayment', 'availableDigitalCredits', 'digitalCreditPaymentTotal', 'isAnonymousShopper', 'visaCheckoutFlowComplete','isExternalCheckoutFlowComplete'],
+              'activeStoreCredits', 'nonStoreCreditTotal', 'activePayments', 'hasSavedCardPayment', 'availableDigitalCredits', 
+              'digitalCreditPaymentTotal', 'isAnonymousShopper', 'visaCheckoutFlowComplete','isExternalCheckoutFlowComplete', 'selectedBillingDestination',
+              'selectableDestinations'],
             acceptsMarketing: function () {
                 return this.getOrder().get('acceptsMarketing');
             },
@@ -129,7 +131,9 @@ define([
                     }));
                 return availableCredits && availableCredits.length > 0 && availableCredits;
             },
-
+            selectableDestinations : function() {
+                return this.getOrder().selectableDestinations();
+            },
             applyingCredit: function () {
                 return this._applyingCredit;
             },
@@ -430,7 +434,7 @@ define([
                     me.isLoading(false);
                     return me;
                 });
-            },
+            }, 
 
             getMaxCreditToApply: function(creditModel, scope, toBeVoidedPayment) {
                 var remainingTotal = scope.nonStoreCreditTotal();
@@ -681,6 +685,23 @@ define([
                         return term.get('code') === termCode;
                     });
                     currentPurchaseOrder.set('paymentTerm', foundTerm, {silent: true});
+            },
+            updateBillingContact : function(contact) {
+                if(contact) {
+                    this.set('billingContact', contact.toJSON());
+                }
+            },
+            addNewContact: function(){
+        
+                this.getOrder().get('dialogContact').resetDestinationContact();
+                this.getOrder().get('dialogContact').unset('id');
+                this.getOrder().get('dialogContact').get('destinationContact').set('isBillingAddress', true);
+
+                this.getOrder().get('dialogContact').trigger('openDialog');
+            },
+            selectedBillingDestination : function(){
+                var self = this;
+                return self.getOrder().get('destinations').hasDestination(this.get('billingContact'));
             },
             initialize: function () {
                 var me = this;

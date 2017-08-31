@@ -74,7 +74,7 @@ define(["modules/jquery-mozu",
                 });
                 this.listenTo(this.model, 'changeDestination', function() {
                     self.render();
-                });
+                }); 
                 this.listenTo(this.model, 'destinationsUpdate', function() {
                     self.render();
                 });

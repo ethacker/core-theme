@@ -329,6 +329,15 @@ var CheckoutPage = Backbone.MozuModel.extend({
             getCustomerInfo : function(){
                 return this.get('customer');
             },
+            selectableDestinations : function(){
+                var selectable = [];
+               this.getCheckout().get('destinations').each(function(destination){
+                    if(!destination.get('isGiftCardDestination')){
+                        selectable.push(destination.toJSON());
+                    }
+                });
+                return selectable;   
+            },
             applyAttributes: function() {
                 var storefrontOrderAttributes = require.mozuData('pagecontext').storefrontOrderAttributes;
                 if(storefrontOrderAttributes && storefrontOrderAttributes.length > 0) {

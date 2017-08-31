@@ -10,7 +10,7 @@ define(["modules/jquery-mozu",
         var visaCheckoutSettings = HyprLiveContext.locals.siteContext.checkoutSettings.visaCheckout;
         var pageContext = require.mozuData('pagecontext');
         var BillingInfoView = CheckoutStepView.extend({
-            templateName: 'modules/checkout/step-payment-info',
+            templateName: 'modules/multi-ship-checkout/step-payment-info',
             autoUpdate: [
                 'savedPaymentMethodId',
                 'paymentType',
@@ -53,7 +53,8 @@ define(["modules/jquery-mozu",
                 "change [data-mz-digital-credit-amount]": "applyDigitalCredit",
                 "change [data-mz-digital-add-remainder-to-customer]": "addRemainderToCustomer",
                 "change [name='paymentType']": "resetPaymentData",
-                "change [data-mz-purchase-order-payment-term]": "updatePurchaseOrderPaymentTerm"
+                "change [data-mz-purchase-order-payment-term]": "updatePurchaseOrderPaymentTerm",
+                "change [data-mz-single-fulfillment-contact]": "handleBillingAddressSelectorChange"
             },
 
             initialize: function () {
@@ -129,7 +130,7 @@ define(["modules/jquery-mozu",
             },
             beginApplyCredit: function () {
                 this.model.beginApplyCredit();
-                this.render();
+                this.render(); 
             },
             cancelApplyCredit: function () {
                 this.model.closeApplyCredit();
@@ -140,6 +141,33 @@ define(["modules/jquery-mozu",
                 this.model.finishApplyCredit().then(function() {
                     self.render();
                 });
+            },
+            handleBillingAddressSelectorChange : function(e){
+                var self = this;
+                var $target = $(e.currentTarget);
+                var destinationId = $target.val();
+                var customerContactId = $target.find(":selected").data("mzCustomercontactid");
+                
+                if($target.val() === "" && !customerContactId) {
+                    return false;
+                }
+
+                var destination = this.model.getOrder().get('destinations').get(destinationId);
+                if(!destination) {
+                    destination = this.model.getOrder().get('destinations').findWhere({customerContactId: customerContactId })
+                }
+                
+                if(destination){
+                    self.model.updateBillingContact(destination.get('destinationContact'));
+                }
+                //self.render();
+            },
+            handleNewContact : function(){
+                var self = this;
+                this.listenToOnce(this.model.getOrder().get('dialogContact'), 'dialogClose', function () {
+                       self.render();
+                }, this);
+                this.model.addNewContact();
             },
             removeCredit: function (e) {
                 var self = this,

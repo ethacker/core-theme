@@ -37,7 +37,6 @@ define(['modules/jquery-mozu','underscore',"modules/backbone-mozu",'hyprlive', '
             handleDialogOpen: function(){
                 this.model.trigger('dialogOpen');
                 this.bootstrapInstance.show();
-                
             },
             handleDialogCancel: function(){
                 this.model.trigger('dialogCancel');

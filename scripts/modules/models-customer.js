@@ -168,43 +168,11 @@
                 }
                 return false;
             };
-            var togglePrimaryShipping = function(isPrimary){
-                var newShippingType = {
-                    "name": "Shipping",
-                    "isPrimary": (isPrimary) ? true : false 
-                };
-                if(self.get('types')) {
-                    var shippingType = _.findWhere(self.types, {"name": "Shipping"});
-                    shippingType = newShippingType;
-                }
-                self.set('types', [newShippingType]);
-            };
-            var toggleAsBilling = function(selected, isPrimary){
-                var newBillingType = {
-                    "name": "Billing",
-                    "isPrimary": (isPrimary) ? true : false 
-                };
-                var billingType = _.findIndex(this.types, function(type){
-                    return type.name === "Billing";
-                });
-
-                if(this.get('types').length) {
-                    if(selected){
-                        this.get('types')[billingType] = newBillingType;
-                    } else {
-                        //this.get('types').pop()
-                    }
-                }
-
-                this.set('types', [newBillingType]);
-            };
             return {
                 isShipping: isShipping,
                 isBilling: isBilling,
                 isPrimaryShipping: isPrimaryShipping,
-                isPrimaryBilling: isPrimaryBilling,
-                togglePrimaryShipping: togglePrimaryShipping,
-                toggleAsBilling: toggleAsBilling
+                isPrimaryBilling: isPrimaryBilling
             };
         },
         initialize: function () {
