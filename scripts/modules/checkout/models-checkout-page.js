@@ -395,7 +395,7 @@ var CheckoutPage = Backbone.MozuModel.extend({
                     return deferred.promise;
                 }
                 this.isLoading(true);
-                return this.apiAddCoupon(this.get('couponCode')).then(function () {
+                return this.apiAddCoupon(this.get('couponCode')).then(function (response) {
 
                     me.get('billingInfo').trigger('sync');
                     me.set('couponCode', '');
@@ -416,8 +416,14 @@ var CheckoutPage = Backbone.MozuModel.extend({
                         // there are discounts that have no coupon code that we should not blow up on.
                         return (d.couponCode || "").toLowerCase() === lowerCode;
                     };
-                      console.log(me);
-                    if (!allDiscounts || !_.find(allDiscounts, matchesCode))
+
+                    var invalidCoupons = _.pluck(response.invalidCoupons, "couponCode");
+                    if (_.contains(invalidCoupons, code)){
+                      me.trigger('error', {
+                        message: Hypr.getLabel('promoCodeInvalid', code)
+                      });
+
+                    } else if (!allDiscounts || !_.find(allDiscounts, matchesCode))
                     {
                         me.trigger('error', {
                             message: Hypr.getLabel('promoCodeError', code)
