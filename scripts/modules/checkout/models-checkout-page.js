@@ -399,12 +399,15 @@ var CheckoutPage = Backbone.MozuModel.extend({
 
                     me.get('billingInfo').trigger('sync');
                     me.set('couponCode', '');
+                    var groupingShippingDiscounts = [];
+                    me.get("groupings").forEach(function(grouping){
+                      groupingShippingDiscounts.concat(grouping.shippingDiscounts);
+                    });
+
+
                     var productDiscounts = _.flatten(me.get('items').pluck('productDiscounts'));
-                    // var productDiscounts = _.flatten(_.pluck(me.get('items'), 'productDiscounts'));
-                    // var shippingDiscounts = _.flatten(_.pluck(_.flatten(_.pluck(me.get('items'), 'shippingDiscounts')), 'discount'));
                     var shippingDiscounts = _.flatten(_.pluck(_.flatten(me.get('items').pluck('shippingDiscounts')), 'discount'));
-                    // var orderShippingDiscounts = _.flatten(_.pluck(me.get('shippingDiscounts'), 'discount'));
-                    var orderShippingDiscounts = _.flatten(me.get('shippingDiscounts').pluck('discount'));
+                    var orderShippingDiscounts = _.flatten(_.pluck(groupingShippingDiscounts, 'discount'));
 
                     var allDiscounts = me.get('orderDiscounts').concat(productDiscounts).concat(shippingDiscounts).concat(orderShippingDiscounts);
                     var lowerCode = code.toLowerCase();
