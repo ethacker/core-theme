@@ -3,7 +3,9 @@
   {% if model.selectableDestinations.length > 1 %}
       {% include "modules/checkout/checkout-shipping-contact-selector" with model=model.selectableDestinations destinationId=model.selectedBillingDestination.id isLoading=model.isLoading%}
   {% else %}
-      {% include "modules/multi-ship-checkout/address-form" with model=model.billingContact %}
+  <div class="mz-l-formfieldgroup mz-l-formfieldgroup-address">
+      {% include "modules/checkout/billing-address-form" with model=model.billingContact countries=pageContext.billingCountries states=pageContext.billingStates %}
+  </div>
   {% endif %}
 </div>
 

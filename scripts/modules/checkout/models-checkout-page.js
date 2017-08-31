@@ -326,6 +326,9 @@ var CheckoutPage = Backbone.MozuModel.extend({
             getCustomerInfo : function(){
                 return this.get('customer');
             },
+            getCheckout : function(){
+                return this;
+            },
             selectableDestinations : function(){
                 var selectable = [];
                this.getCheckout().get('destinations').each(function(destination){

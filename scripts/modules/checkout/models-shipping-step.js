@@ -57,6 +57,9 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                 }
             }
         },
+        getCheckout: function(){
+            return this.parent;
+        },
         initStep: function () {
             var self = this;
             if (self.requiresDigitalFulfillmentContact()) {
@@ -92,6 +95,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                 self.isLoading(false);
             });
         },
+
         selectableDestinations : function(){
            var selectable = [];
            this.getCheckout().get('destinations').each(function(destination){
@@ -125,9 +129,6 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
             if(selectedId){
                 return this.getCheckout().get('destinations').get(selectedId).toJSON();
             }
-        },
-        getCheckout: function(){
-            return this.parent;
         },
         updateSingleCheckoutDestination: function(destinationId, customerContactId){
             var self = this;

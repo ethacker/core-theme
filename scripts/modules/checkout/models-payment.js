@@ -881,11 +881,6 @@ define([
 
                 var val = this.validate();
 
-                //If Single Address Save to Destination
-                if(selectableDestinations > 1) {
-                    order.get('destinations').saveShippingDestinationAsync(self.get('BillingContact'));
-                }
-
                 if (this.nonStoreCreditTotal() > 0 && val) {
                     // display errors:
                     var error = {"items":[]};
@@ -901,6 +896,11 @@ define([
                         order.onCheckoutError(error);
                     }
                     return false;
+                }
+
+                //If Single Address Save to Destination
+                if(this.selectableDestinations() < 2) {
+                    order.get('destinations').saveShippingDestinationAsync(self.get('billingContact'));
                 }
 
                 var card = this.get('card');
