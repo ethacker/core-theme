@@ -27,10 +27,10 @@ define([
             helpers: ['contacts'],
             /**
              * [getOrder] Gets the Parent Checkout Model. Fulfillment Contact is child of Fulfillment Info and must go 1 more level up.
-             * @return {CheckoutStep} 
-             * 
+             * @return {CheckoutStep}
+             *
              */
-            
+
             contacts: function() {
                 var contacts = this.getOrder().get('customer').get('contacts').toJSON();
                 return contacts && contacts.length > 0 && contacts;
@@ -105,7 +105,7 @@ define([
             //     // since this is one step further away from the order, it has to be accessed differently
             //     return this.parent.parent;
             // },
-            
+
             toJSON: function() {
                 if (this.requiresFulfillmentInfo() || this.requiresDigitalFulfillmentContact()) {
                     return CheckoutStep.prototype.toJSON.apply(this, arguments);
@@ -158,6 +158,7 @@ define([
                     if (!addr.get('candidateValidatedAddresses')) {
                         var methodToUse = allowInvalidAddresses ? 'validateAddressLenient' : 'validateAddress';
                         addr.syncApiModel();
+                        order.messages.reset();
                         addr.apiModel[methodToUse]().then(function(resp) {
                             if (resp.data && resp.data.addressCandidates && resp.data.addressCandidates.length) {
                                 if (_.find(resp.data.addressCandidates, addr.is, addr)) {
@@ -198,7 +199,7 @@ define([
                 //Moved to Validate Model
                 // var validationObj = this.validate();
 
-                // if (validationObj) { 
+                // if (validationObj) {
                 //     Object.keys(validationObj).forEach(function(key){
                 //         this.trigger('error', {message: validationObj[key]});
                 //     }, this);
@@ -219,7 +220,7 @@ define([
                     self.calculateStepStatus();
                     //
                     // Remove getShippingMethodsFromContact, move to shipping Fulfillment as call to refresh
-                    // Saves Fulfillment Info and Returns Shipping Methods 
+                    // Saves Fulfillment Info and Returns Shipping Methods
                     //
                     // order.apiModel.getShippingMethodsFromContact().then(function (methods) {
                     //     return parent.refreshShippingMethods(methods);
@@ -231,7 +232,7 @@ define([
                     //     self.calculateStepStatus();
                     //     //Redundent
                     //     //parent.calculateStepStatus();
-                    // });                  
+                    // });
                 };
                 self.validateAddresses().then(function() {
                     completeStep();
