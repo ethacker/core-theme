@@ -67,6 +67,13 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                 if(!giftCardDestination) {
                     giftCardDestination = self.getCheckout().get('destinations').newGiftCardDestination();
                 }
+                self.getCheckout().get('destinations').reset = function(models, options) {
+                    var giftCardDestination = self.getCheckout().get('destinations').findWhere({'isGiftCardDestination': true}); 
+                    if(giftCardDestination && !_.findWhere(models, {'isGiftCardDestination': true})) {
+                        models.push(giftCardDestination);
+                    }
+                    Backbone.Collection.prototype.reset.apply(this, arguments);
+                }
             }
             CheckoutStep.prototype.initStep.apply(this, arguments);
         },
@@ -365,7 +372,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                      if(!digitalValid) { return false; }
                 }
 
-                if (this.getCheckout().requiresFulfillmentInfo && validationObj) {
+                if (this.requiresFulfillmentInfo() && validationObj) {
                     if (!this.isMultiShipMode() && this.getCheckout().get('destinations').nonGiftCardDestinations().length < 2) {
                         this.singleShippingAddressValid();
                         return false;
@@ -439,7 +446,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                 }
 
                 if(self.requiresFulfillmentInfo()){
-                    if (!this.isMultiShipMode()) {
+                    if (!this.isMultiShipMode() && this.getCheckout().get('destinations').nonGiftCardDestinations().length < 2) {
                         return self.nextSingleShippingAddress();
                     }
 
