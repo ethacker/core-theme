@@ -899,9 +899,11 @@ define([
                 }
 
                 //If Single Address Save to Destination
-                if(this.selectableDestinations() < 2) {
-                    order.get('destinations').saveShippingDestinationAsync(self.get('billingContact'));
-                }
+                //Do I need this Line? Why Did I orginally Do this?
+                //
+                // if(this.selectableDestinations() < 2) {
+                //     order.get('destinations').saveShippingDestinationAsync(self.get('billingContact'));
+                // }
 
                 var card = this.get('card');
                 if(this.get('paymentType').toLowerCase() === "purchaseorder") {

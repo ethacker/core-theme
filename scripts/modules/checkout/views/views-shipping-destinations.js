@@ -31,6 +31,9 @@ define(["modules/jquery-mozu",
                 'address.addressType',
                 'phoneNumbers.home',
                 'email'
+            ],
+            renderOnChange: [
+                'address.countryCode'
             ]
         });
 
@@ -162,12 +165,12 @@ define(["modules/jquery-mozu",
             handleChangeSingleAddress: function(e){
                 var self = this;
                 var $target = $(e.currentTarget);
-
-                if(!$target.val()){
-                    return;
+                var customerContactId = $target.find(":selected").data("mzCustomercontactid");
+                
+                if($target.val() === "" && !customerContactId) {
+                    return false;
                 }
 
-                var customerContactId = $target.find(":selected").data("mzCustomercontactid");
                 self.model.updateSingleCheckoutDestination($target.val(), customerContactId).ensure(function(){
                    //self.render(); 
                 });
