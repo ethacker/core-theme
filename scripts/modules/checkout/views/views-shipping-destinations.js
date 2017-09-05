@@ -171,7 +171,6 @@ define(["modules/jquery-mozu",
                     return false;
                 }
 
-                var customerContactId = $target.find(":selected").data("mzCustomercontactid");
                 self.model.updateSingleCheckoutDestination($target.val(), customerContactId).ensure(function(){
                    //self.render(); 
                 });
