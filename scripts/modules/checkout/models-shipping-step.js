@@ -19,7 +19,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                 var destinationErrors = [];
 
                 var giftCardDestination = this.parent.get('destinations').find(function(destination, idx){
-                    return (destination.get('isGiftCardDestination'));   
+                    return (destination.get('isGiftCardDestination'));
                 });
 
                 destinationErrors = giftCardDestination.validate();
@@ -160,7 +160,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
         },
         editContact: function(destinationId){
             var destination = this.getDestinations().findWhere({'id': destinationId});
-        
+
             if(destination){
                 var destCopy = destination.toJSON();
                 destCopy = new ShippingDestinationModels.ShippingDestination(destCopy);
@@ -178,7 +178,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
             var self = this;
             var payload = [{
                 destinationId: destinationId,
-                itemIds: [] 
+                itemIds: []
             }];
             var digitalItemIds = self.getCheckout().get('items').each(function(item){
                 if(item.get('fulfillmentMethod') === "Digital") {
@@ -202,7 +202,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
         },
         //Rename for clear
         // Breakup into seperate api update for fulfillment
-        
+
         digitalGiftCardValid :function(){
             var self = this;
             self.validation = self.digitalOnlyValidation;
@@ -224,10 +224,10 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
         saveDigitalGiftCard: function() {
             var self = this,
             checkout = self.getCheckout();
-            
+
             if(self.digitalGiftCardValid()){
                 var giftCardDestination = this.parent.get('destinations').find(function(destination, idx){
-                    return (destination.get('isGiftCardDestination'));   
+                    return (destination.get('isGiftCardDestination'));
                 });
 
                 if(giftCardDestination) {
@@ -266,13 +266,13 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
         nextSingleShippingAddress: function() {
             var self = this,
             checkout = this.getCheckout();
-            
+
             if(this.singleShippingAddressValid()){
                 if(this.selectableDestinations().length < 2) {
                     self.validateAddresses();
                 } else {
                     self.completeStep();
-                } 
+                }
             }
         },
         validateAddresses : function(){
@@ -309,6 +309,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                 if (!addr.get('candidateValidatedAddresses')) {
                     var methodToUse = allowInvalidAddresses ? 'validateAddressLenient' : 'validateAddress';
                     addr.syncApiModel();
+                    checkout.messages.reset();
                     addr.apiModel[methodToUse]().then(function (resp) {
                         if (resp.data && resp.data.addressCandidates && resp.data.addressCandidates.length) {
                             if (_.find(resp.data.addressCandidates, addr.is, addr)) {
@@ -326,7 +327,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                             // TODO: sink the exception.in a better way.
                             checkout.messages.reset();
                             saveAddress();
-                        } else { 
+                        } else {
                             checkout.messages.reset({ message: Hypr.getLabel('addressValidationError') });
                         }
                     });
@@ -347,14 +348,14 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
             if (!this.isMultiShipMode() && this.getCheckout().get('destinations').nonGiftCardDestinations().length < 2) {
                 this.validation = this.singleShippingAddressValidation;
                 if(this.validate()) return this.stepStatus('incomplete');
-            } 
+            }
 
             this.validation = this.multiShipValidation;
 
             if(!this.validate()) return this.stepStatus('complete');
 
             return CheckoutStep.prototype.calculateStepStatus.apply(this);
-        }, 
+        },
         validateModel: function() {
                 this.validation = this.multiShipValidation;
                 var validationObj = this.validate();
@@ -365,7 +366,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                 }
 
                 if (this.getCheckout().requiresFulfillmentInfo && validationObj) {
-                    if (!this.isMultiShipMode() && this.getCheckout().get('destinations').nonGiftCardDestinations().length < 2) { 
+                    if (!this.isMultiShipMode() && this.getCheckout().get('destinations').nonGiftCardDestinations().length < 2) {
                         this.singleShippingAddressValid();
                         return false;
                     }
@@ -415,14 +416,14 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                             } else {
                                  self.getCheckout().get('shippingInfo').calculateStepStatus();
                             }
-                        } 
+                        }
                     }).ensure(function(){
                         self.isLoading(false);
                         self.stepStatus('complete');
                         checkout.get('shippingInfo').calculateStepStatus();
                     });
                 } else {
-                   self.stepStatus('complete'); 
+                   self.stepStatus('complete');
                    checkout.get('billingInfo').calculateStepStatus();
                 }
             },
@@ -432,7 +433,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                 var self = this;
 
                 if (self.requiresDigitalFulfillmentContact()) {
-                    if(!self.saveDigitalGiftCard()) { 
+                    if(!self.saveDigitalGiftCard()) {
                         return false;
                     }
                 }

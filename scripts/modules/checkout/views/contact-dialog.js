@@ -45,12 +45,12 @@ define(['modules/backbone-mozu','hyprlive', 'modules/jquery-mozu','underscore', 
 
             if(this.model.get('destinationContact').validate()) return false;
             if(this.model.get('destinationContact').get('isBillingAddress')) {
-                
+
                 //checkout.get('destinations').newDestination(this.model.get('destinationContact'));
                 this.saveBillingDestination();
                 return self.model.trigger('closeDialog');
             }
-            
+
 
 			var isAddressValidationEnabled = HyprLiveContext.locals.siteContext.generalSettings.isAddressValidationEnabled,
                     allowInvalidAddresses = HyprLiveContext.locals.siteContext.generalSettings.allowInvalidAddresses;
@@ -59,6 +59,7 @@ define(['modules/backbone-mozu','hyprlive', 'modules/jquery-mozu','underscore', 
 
 
              var saveBillingDestination = function(){
+               self.model.messages.reset();
                 if(self.model.get('id')) {
                         self.model.parent.get('destinations').updateShippingDestinationAsync(self.model).then(function(){
                             checkout.get('billingInfo').updateBillingContact(this.model.get('destinationContact'));
@@ -69,12 +70,13 @@ define(['modules/backbone-mozu','hyprlive', 'modules/jquery-mozu','underscore', 
                     self.model.parent.get('destinations').saveShippingDestinationAsync(self.model).then(function(){
                         checkout.get('billingInfo').updateBillingContact(this.model.get('destinationContact'));
                     }).ensure(function () {
-                         self.model.trigger('closeDialog');    
+                         self.model.trigger('closeDialog');
                     });
                 }
-            };   
+            };
 
             var saveShippingDestination = function(){
+              self.model.messages.reset();
                 if(self.model.get('id')) {
                         self.model.parent.get('destinations').updateShippingDestinationAsync(self.model).ensure(function () {
                              self.model.trigger('closeDialog');
@@ -92,18 +94,19 @@ define(['modules/backbone-mozu','hyprlive', 'modules/jquery-mozu','underscore', 
                             item.isLoading(false);
                         });
                     }).ensure(function () {
-                         self.model.trigger('closeDialog');    
+                         self.model.trigger('closeDialog');
                     });
                 }
             };
 
 			if(!this.model.validate()) {
             	if (!isAddressValidationEnabled) {
-                    saveShippingDestination(); 
+                    saveShippingDestination();
                 } else {
                     if (!addr.get('candidateValidatedAddresses')) {
                         var methodToUse = allowInvalidAddresses ? 'validateAddressLenient' : 'validateAddress';
                         addr.syncApiModel();
+                        self.model.messages.reset();
                         addr.apiModel[methodToUse]().then(function (resp) {
                             if (resp.data && resp.data.addressCandidates && resp.data.addressCandidates.length) {
                                 if (_.find(resp.data.addressCandidates, addr.is, addr)) {
@@ -115,6 +118,7 @@ define(['modules/backbone-mozu','hyprlive', 'modules/jquery-mozu','underscore', 
                                 self.render();
                             } else {
                                 //completeStep();
+
                                 saveShippingDestination();
                             }
                         }, function (e) {
@@ -122,7 +126,7 @@ define(['modules/backbone-mozu','hyprlive', 'modules/jquery-mozu','underscore', 
                                 // TODO: sink the exception.in a better way.
                                 self.model.messages.reset();
                                 saveShippingDestination();
-                            } else { 
+                            } else {
                                 self.model.messages.reset({ message: Hypr.getLabel('addressValidationError') });
                             }
                         });
@@ -141,7 +145,7 @@ define(['modules/backbone-mozu','hyprlive', 'modules/jquery-mozu','underscore', 
                     model: self.model.get('destinationContact')
                 });
                 contactModalContactView.render();
-            });  
+            });
         },
 
         render : function() {
@@ -156,10 +160,9 @@ define(['modules/backbone-mozu','hyprlive', 'modules/jquery-mozu','underscore', 
             //         model: self.model.get('contact')
             //     });
             //     contactModalContactView.render();
-            // });  
+            // });
         }
 	});
 
 	return ContactModalView;
 });
-
