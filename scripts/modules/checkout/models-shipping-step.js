@@ -73,7 +73,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                         models.push(giftCardDestination);
                     }
                     Backbone.Collection.prototype.reset.apply(this, arguments);
-                }
+                };
             }
             CheckoutStep.prototype.initStep.apply(this, arguments);
         },

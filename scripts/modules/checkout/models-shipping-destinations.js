@@ -143,12 +143,19 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
         hasDestination: function(destinationContact){
             var self = this;
             var foundDestination = self.find(function(destination){
-                return self.compareObjects(destination.get('destinationContact').get('address').toJSON(), destinationContact.get('address').toJSON());
+                return self.compareAddressObjects(destination.get('destinationContact').get('address').toJSON(), destinationContact.get('address').toJSON());
             });
             return (foundDestination) ? foundDestination : false;
         },
-        compareObjects: function(obj1, obj2) {
-            var areEqual = _.isEqual(obj1, obj2);
+        compareAddressObjects: function(obj1, obj2) {
+            var areEqual = _.isMatch(obj1, {
+                address1 : obj2.address1,
+                addressType : obj2.addressType,
+                cityOrTown : obj2.cityOrTown,
+                countryCode : obj2.countryCode,
+                postalOrZipCode : obj2.postalOrZipCode,
+                stateOrProvince : obj2.stateOrProvince
+            });
             return areEqual;
         },
         apiSaveDestinationAsync : function(destination){

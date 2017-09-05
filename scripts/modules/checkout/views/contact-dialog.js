@@ -43,12 +43,31 @@ define(['modules/backbone-mozu','hyprlive', 'modules/jquery-mozu','underscore', 
             var self = this;
             var checkout = this.model.parent;
 
+
+            var saveBillingDestination = function(){
+               self.model.messages.reset();
+                if(self.model.get('id')) {
+                        self.model.parent.get('destinations').updateShippingDestinationAsync(self.model).then(function(){
+                            checkout.get('billingInfo').updateBillingContact(self.model.get('destinationContact'));
+                        }).ensure(function () {
+                             self.model.trigger('closeDialog');
+                        });
+                } else {
+                    self.model.parent.get('destinations').saveShippingDestinationAsync(self.model).then(function(){
+                        checkout.get('billingInfo').updateBillingContact(self.model.get('destinationContact'));
+                    }).ensure(function () {
+                         self.model.trigger('closeDialog');
+                    });
+                }
+            };
+
+
             if(this.model.get('destinationContact').validate()) return false;
             if(this.model.get('destinationContact').get('isBillingAddress')) {
 
                 //checkout.get('destinations').newDestination(this.model.get('destinationContact'));
-                this.saveBillingDestination();
-                return self.model.trigger('closeDialog');
+                saveBillingDestination();
+                return;
             }
 
 
@@ -58,22 +77,7 @@ define(['modules/backbone-mozu','hyprlive', 'modules/jquery-mozu','underscore', 
             var addr = this.model.get('destinationContact').get('address');
 
 
-             var saveBillingDestination = function(){
-               self.model.messages.reset();
-                if(self.model.get('id')) {
-                        self.model.parent.get('destinations').updateShippingDestinationAsync(self.model).then(function(){
-                            checkout.get('billingInfo').updateBillingContact(this.model.get('destinationContact'));
-                        }).ensure(function () {
-                             self.model.trigger('closeDialog');
-                        });
-                } else {
-                    self.model.parent.get('destinations').saveShippingDestinationAsync(self.model).then(function(){
-                        checkout.get('billingInfo').updateBillingContact(this.model.get('destinationContact'));
-                    }).ensure(function () {
-                         self.model.trigger('closeDialog');
-                    });
-                }
-            };
+             
 
             var saveShippingDestination = function(){
               self.model.messages.reset();

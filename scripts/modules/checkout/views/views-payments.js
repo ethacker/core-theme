@@ -164,7 +164,7 @@ define(["modules/jquery-mozu",
             },
             handleNewContact : function(){
                 var self = this;
-                this.listenToOnce(this.model.getOrder().get('dialogContact'), 'dialogClose', function () {
+                this.listenTo(this.model.getOrder().get('dialogContact'), 'dialogClose', function () {
                        self.render();
                 }, this);
                 this.model.addNewContact();
