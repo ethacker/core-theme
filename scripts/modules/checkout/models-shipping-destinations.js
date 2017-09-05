@@ -35,7 +35,8 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
         },
         initialize : function(){
             var self = this;
-            //Set Validation and Flag for Gift Card Destination
+            //We do not persit a Gift Card Destination Flag
+            //Instead we determine from the bloew checks and set Validation and Flag for a Gift Card Destination here
             if(self.get('destinationContact').get('email') && !self.get('destinationContact').get('address').get('address1')){
                 self.validation = self.validationDigitalDestination;
                 self.set('isGiftCardDestination', true);
