@@ -145,7 +145,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
             if(destination){
                 return destination.saveDestinationAsync().then(function(data){
                     return self.getCheckout().apiSetAllShippingDestinations({
-                        destinationId: destinationId
+                        destinationId: data.data.id
                     }).ensure(function(){
                         self.isLoading(false);
                     });

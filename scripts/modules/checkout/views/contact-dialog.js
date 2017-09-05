@@ -17,6 +17,9 @@ define(['modules/backbone-mozu','hyprlive', 'modules/jquery-mozu','underscore', 
                 'contactId',
                 'email'
             ],
+            renderOnChange: [
+                'address.countryCode'
+            ],
         choose: function(e) {
             var idx = parseInt($(e.currentTarget).val(), 10);
             if (idx !== -1) {
