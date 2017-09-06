@@ -540,7 +540,7 @@ var CheckoutPage = Backbone.MozuModel.extend({
                     throw error;
                 });
             },
-            addApiCustomerContacts: function (){
+            addApiCustomerContacts: function () {
                 var self = this;
                 var destinations = self.get('destinations');
                 if(self.get('destinations').length) {
@@ -548,73 +548,80 @@ var CheckoutPage = Backbone.MozuModel.extend({
 
                 }
             },
-            saveCustomerContacts: function(){
+            saveCustomerContacts: function() {
                 var customer = this.get('customer');
                 var destinations = this.get('destinations');
                 var contacts = [];
                 var self = this;
 
-                destinations.each(function(destination){
+                destinations.each(function(destination) {
                     var contact = destination.get('destinationContact').toJSON();
+
                     contact.types =  [{
                         "name": "Shipping",
                         "isPrimary": (destination.get('destinationContact').contactTypeHelpers().isPrimaryShipping()) ? true : false
                     }];
+
                     contacts.push(contact);
                 });
 
-                var billingContact = customer.get('contacts').filter(function(contact){
+                var billingContact = customer.get('contacts').filter(function(contact) {
                     return contact.contactTypeHelpers().isPrimaryBilling();
                 });
 
-                if(!billingContact.length){
+                if (!billingContact.length) {
                     var contact = this.get('billingInfo').get('billingContact').toJSON();
 
                     contact.types =  [{
                         "name": "Billing",
                         "isPrimary": true
                     }];
+
                     contacts.push(contact);
                 }
 
                 return customer.apiModel.updateCustomerContacts({id: customer.id, postdata:contacts}).then(function(contactResult) {
-                      _.each(contactResult, function(contact){
-                        var isPrimaryBilling = _.findWhere(contact, {contact: {types : { name: "Billing", "isPrimary": true }}});
-                        if(isPrimaryBilling){
-                            self.get('billingInfo').set('billingContact', contact);
-                        }
-                      });
-                     return contactResult;
-                });
+                    _.each(contactResult, function(contact) {
+                        if (contact.data && contact.data.types && contact.data.types[0]) {
+                            var contactType = contact.data.types[0];
 
+                            if (contactType.name === 'Billing' && contactType.isPrimary === true) {
+                                self.get('billingInfo').set('billingContact', contact.data);
+                            }
+                        }
+                    });
+
+                    return contactResult;
+                });
             },
             saveCustomerCard: function () {
                 var order = this,
-                    customer = this.get('customer'), //new CustomerModels.EditableCustomer(this.get('customer').toJSON()),
-                    billingInfo = this.get('billingInfo'),
-                    isSameBillingShippingAddress = billingInfo.get('isSameBillingShippingAddress'),
-                    isPrimaryAddress = this.isSavingNewCustomer(),
-                    billingContact = billingInfo.get('billingContact').toJSON(),
-                    card = billingInfo.get('card'),
-                    doSaveCard = function() {
-                        order.cardsSaved = order.cardsSaved || customer.get('cards').reduce(function(saved, card) {
-                            saved[card.id] = true;
-                            return saved;
-                        }, {});
-                        var method = order.cardsSaved[card.get('id') || card.get('paymentServiceCardId')] ? 'updateCard' : 'addCard';
-                        card.set('contactId', billingContact.id);
-                        return customer.apiModel[method](card.toJSON()).then(function(card) {
-                            order.cardsSaved[card.data.id] = true;
-                            return card;
-                        });
-                    };
+                customer = this.get('customer'), //new CustomerModels.EditableCustomer(this.get('customer').toJSON()),
+                billingInfo = this.get('billingInfo'),
+                isSameBillingShippingAddress = billingInfo.get('isSameBillingShippingAddress'),
+                isPrimaryAddress = this.isSavingNewCustomer(),
+                billingContact = billingInfo.get('billingContact').toJSON(),
+                card = billingInfo.get('card'),
 
-                if(billingContact.id) {
+                doSaveCard = function() {
+                    order.cardsSaved = order.cardsSaved || customer.get('cards').reduce(function(saved, card) {
+                        saved[card.id] = true;
+                        return saved;
+                    }, {});
+                    var method = order.cardsSaved[card.get('id') || card.get('paymentServiceCardId')] ? 'updateCard' : 'addCard';
+                    card.set('contactId', billingContact.id);
+                    return customer.apiModel[method](card.toJSON()).then(function(card) {
+                        order.cardsSaved[card.data.id] = true;
+                        return card;
+                    });
+                };
+
+                if (billingContact.id) {
                     return doSaveCard();
                 }
             },
             getBillingContact: function () {
-                return ;
+                return;
             },
             // addShippingContact: function () {
             //     return this.addCustomerContact('fulfillmentInfo', 'fulfillmentContact', [{ name: 'Shipping' }]);
@@ -822,6 +829,7 @@ var CheckoutPage = Backbone.MozuModel.extend({
 
                 var activePayments = this.apiModel.getActivePayments();
                 var saveCreditCard = false;
+
                 if (activePayments !== null && activePayments.length > 0) {
                      var creditCard = _.findWhere(activePayments, { paymentType: 'CreditCard' });
                      if (creditCard && creditCard.billingInfo && creditCard.billingInfo.card) {
@@ -829,17 +837,15 @@ var CheckoutPage = Backbone.MozuModel.extend({
                          billingInfo.set('card', creditCard.billingInfo.card);
                      }
                  }
+
                  if (saveCreditCard && (this.get('createAccount') || isAuthenticated)) {
                     isSavingCreditCard = true;
                     process.push(this.saveCustomerCard);
-                    }
+                }
 
                 if ((this.get('createAccount') || isAuthenticated) && billingInfo.getDigitalCreditsToAddToCustomerAccount().length > 0) {
                     process.push(this.addDigitalCreditToCustomerAccount);
                 }
-
-
-
 
                 process.push(/*this.finalPaymentReconcile, */this.apiCheckout);
 
