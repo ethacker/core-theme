@@ -82,7 +82,7 @@ var CheckoutOrder = OrderModels.Order.extend({
     selectableDestinations : function(){
         var selectable = [];
        this.getCheckout().get('destinations').each(function(destination){
-            if(!destination.get('isGiftCardDestination')){
+            if(!destination.get('isGiftCardDestination') && !destination.get('isSingleShipDestination')){
                 selectable.push(destination.toJSON());
             }
         });
@@ -246,7 +246,7 @@ var CheckoutPage = Backbone.MozuModel.extend({
                     user = require.mozuData('user');
                     //self.get('shippingStep').initSet();
 
-                
+                self.addCustomerContacts();
                 _.defer(function() {
                     self.setMultiShipMode();
 
@@ -555,27 +555,29 @@ var CheckoutPage = Backbone.MozuModel.extend({
                 var self = this;
 
                 destinations.each(function(destination){
-                    var contact = destination.get('destinationContact').toJSON();
-                    contact.types =  [{
-                        "name": "Shipping",
-                        "isPrimary": (destination.get('destinationContact').contactTypeHelpers().isPrimaryShipping()) ? true : false
-                    }];
-                    contacts.push(contact);
+                    if(!destination.get("isGiftCardDestination")) {
+                        var contact = destination.get('destinationContact').toJSON();
+                        contact.types =  [{
+                            "name": "Shipping",
+                            "isPrimary": (destination.get('destinationContact').contactTypeHelpers().isPrimaryShipping()) ? true : false
+                        }];
+                        contacts.push(contact);
+                    }
                 });
 
                 var billingContact = customer.get('contacts').filter(function(contact){
                     return contact.contactTypeHelpers().isPrimaryBilling();
                 });
 
-                if(!billingContact.length){
-                    var contact = this.get('billingInfo').get('billingContact').toJSON();
+               
+                var contact = this.get('billingInfo').get('billingContact').toJSON();
 
-                    contact.types =  [{
-                        "name": "Billing",
-                        "isPrimary": true
-                    }];
-                    contacts.push(contact);
-                }
+                contact.types =  [{
+                    "name": "Billing",
+                    "isPrimary": true
+                }];
+                contacts.push(contact);
+                
 
                 return customer.apiModel.updateCustomerContacts({id: customer.id, postdata:contacts}).then(function(contactResult) {
                       _.each(contactResult, function(contact){

@@ -89,11 +89,16 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
         getCheckout : function(){
             return this.parent;
         },
-        newDestination : function(contact, isCustomerAddress){
+        newDestination : function(contact, isCustomerAddress, isBillingAddress){
             var destination = {destinationContact : contact || new CustomerModels.Contact()};
 
             if(isCustomerAddress && contact.get('id')){
                destination.customerContactId = contact.get('id');
+            }
+
+            if(isBillingAddress){
+                destination.id = _.uniqueId("billing_");
+                destination.isBilling = true;
             }
 
             var shippingDestination = new ShippingDestination(destination);

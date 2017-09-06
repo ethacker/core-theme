@@ -45,20 +45,14 @@ define(['modules/backbone-mozu','hyprlive', 'modules/jquery-mozu','underscore', 
 
 
             var saveBillingDestination = function(){
-               self.model.messages.reset();
+                self.model.messages.reset();
                 if(self.model.get('id')) {
-                        self.model.parent.get('destinations').updateShippingDestinationAsync(self.model).then(function(){
-                            checkout.get('billingInfo').updateBillingContact(self.model.get('destinationContact'));
-                        }).ensure(function () {
-                             self.model.trigger('closeDialog');
-                        });
+                    checkout.get('destinations').get(self.model.get('id')).set('destinationContact',self.model.get('destinationContact'));
                 } else {
-                    self.model.parent.get('destinations').saveShippingDestinationAsync(self.model).then(function(){
-                        checkout.get('billingInfo').updateBillingContact(self.model.get('destinationContact'));
-                    }).ensure(function () {
-                         self.model.trigger('closeDialog');
-                    });
+                    checkout.get('destinations').newDestination(self.model.get('destinationContact'), false, true);
                 }
+                checkout.get('billingInfo').updateBillingContact(self.model.get('destinationContact'));
+                self.model.trigger('closeDialog');
             };
 
 

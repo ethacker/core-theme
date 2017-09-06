@@ -736,24 +736,11 @@ define([
                 this.selectPaymentType(this, this.get('paymentType'));
                 this.on('change:isSameBillingShippingAddress', function (model, wellIsIt) {
                     if (wellIsIt) {
-                         var myBillingContact = null;   
-                         var contacts = this.parent.get('customer').get('contacts');
-                         if(contacts.length){
-                            contacts.each(function(contact){
-                                if(contact.contactTypeHelpers().isPrimaryBilling()) {
-                                    myBillingContact = contact;
-                                    return false;
-                                }else if(contact.contactTypeHelpers().isBilling()) {
-                                    myBillingContact = contact;
-                                }  
-                            });
+                         var destinations = this.selectableDestinations();
+                         if(destinations.length) {
+                            this.set('billingContact', destinations[0].destinationContact, { silent: true });
                          }
-
-                         if(!myBillingContact) {
-                             myBillingContact = this.parent.get('destinations').at(0).get('destinationContact');  
-                         }
-
-                         this.set('billingContact',myBillingContact, { silent: true });
+                         
                     } else if (billingContact) {
                         // if they initially checked the checkbox, then later they decided to uncheck it... remove the id so that updates don't update
                         // the original address, instead create a new contact address.

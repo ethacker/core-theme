@@ -1,6 +1,6 @@
 <h3 class="mz-formstep-header mz-checkoutform-header">
     {{ labels.paymentInformation }}
-    {%if not model.isExternalCheckoutFlowComplete%}
+    {%if not model.isExternalCheckoutFlowComplete || model.visaCheckoutFlowComplete %}
         <a href="javascript:;" class="mz-formstep-edit" data-mz-action="edit">{{ labels.change }}</a>
     {%endif%}
 </h3>
