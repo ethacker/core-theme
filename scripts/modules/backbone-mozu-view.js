@@ -38,6 +38,7 @@
             Backbone.View.apply(this, arguments);
             this.template = Hypr.getTemplate(conf.templateName || this.templateName);
             this.listenTo(this.model, "sync", this.render);
+            this.listenTo(this.model, "render", this.render);
             this.listenTo(this.model, "loadingchange", this.handleLoadingChange);
             if (this.model.handlesMessages && conf.messagesEl) {
                 this.messageView = messageViewFactory({

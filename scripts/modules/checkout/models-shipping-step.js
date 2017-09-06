@@ -193,7 +193,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                 }
             });
             if(digitalItemIds.length) {
-                this.getCheckout().apiUpdateCheckoutItemDestinationBulk({id: self.getCheckout().get('id'), postdata: payload});
+                this.getCheckout().apiModel.updateCheckoutItemDestinationBulk({id: self.getCheckout().get('id'), postdata: payload});
             }
         },
         toJSON: function() {
@@ -244,7 +244,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                             //self.getCheckout.updateCheckoutItemDestinationBulk
                         });
                     } else {
-                        self.getDestinations().updateShippingDestinationAsync(giftCardDestination).then(function(data){
+                        self.getDestinations().apiUpdateShippingDestinationAsync(giftCardDestination).then(function(data){
                             self.updateDigitalItemDestinations(data.data.id);
                         });
                     }
@@ -325,7 +325,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                                     return;
                                 }
                             addr.set('candidateValidatedAddresses', resp.data.addressCandidates);
-                            self.trigger('sync');
+                            self.trigger('render');
                         } else {
                             saveAddress();
                         }
@@ -410,6 +410,13 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                 //     checkout.get('shippingInfo').isLoading(false);
                 // });
                 //
+                //
+                
+                if (self.requiresDigitalFulfillmentContact()) {
+                    if(!self.saveDigitalGiftCard()) {
+                        return false;
+                    }
+                }
 
                 if(self.requiresFulfillmentInfo()){
                     self.isLoading(true);
@@ -421,6 +428,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
                                      self.getCheckout().get('shippingInfo').stepStatus('incomplete');
                                 });
                             } else {
+                                 self.getCheckout().get('shippingInfo').isLoading(false);
                                  self.getCheckout().get('shippingInfo').calculateStepStatus();
                             }
                         }
@@ -439,11 +447,6 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
             next: function() {
                 var self = this;
 
-                if (self.requiresDigitalFulfillmentContact()) {
-                    if(!self.saveDigitalGiftCard()) {
-                        return false;
-                    }
-                }
 
                 if(self.requiresFulfillmentInfo()){
                     if (!this.isMultiShipMode() && this.getCheckout().get('destinations').nonGiftCardDestinations().length < 2) {

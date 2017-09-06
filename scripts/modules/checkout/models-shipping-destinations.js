@@ -174,24 +174,28 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CustomerModels, CheckoutSt
                 return data;
             });
         },
-        updateShippingDestinationAsync: function(destination){
+        updateShippingDestinationAsync : function(destination){
+            var self = this;
+            return self.apiUpdateShippingDestinationAsync(destination).then(function(data){
+                var entry = self.findWhere({id: data.data.id});
+                    if(entry) {
+                        //var mergedDestinationContact = _.extend(entry.get('destinationContact'),  data.data.destinationContact);
+                        entry.set('destinationContact', data.data.destinationContact); 
+                        self.trigger('sync');
+                        self.trigger('destinationsUpdate');
+                    }
+                return data;
+            });
+        },
+        apiUpdateShippingDestinationAsync: function(destination){
             var self = this;
             var dest = destination.toJSON();
             dest.destinationId = dest.id;
             dest.checkoutId = this.getCheckout().get('id');
-
-            return self.getCheckout().apiUpdateShippingDestination(dest).then(function(data){
-                var entry = self.findWhere({id: data.data.id});
-                if(entry) {
-                    //var mergedDestinationContact = _.extend(entry.get('destinationContact'),  data.data.destinationContact);
-                    
-                    entry.set('destinationContact', data.data.destinationContact); 
-                    self.trigger('sync');
-                    self.trigger('destinationsUpdate');
-                }
+            return self.getCheckout().apiModel.updateShippingDestination(dest).then(function(data){
                 return data;
             });
-        }
+        }        
     });
    
     return {
