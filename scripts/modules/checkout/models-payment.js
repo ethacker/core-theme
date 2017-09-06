@@ -54,7 +54,7 @@ define([
 
             },
             helpers: ['acceptsMarketing', 'savedPaymentMethods', 'availableStoreCredits', 'applyingCredit', 'maxCreditAmountToApply',
-              'activeStoreCredits', 'nonStoreCreditTotal', 'activePayments', 'hasSavedCardPayment', 'availableDigitalCredits', 
+              'activeStoreCredits', 'nonStoreCreditTotal', 'activePayments', 'hasSavedCardPayment', 'availableDigitalCredits',
               'digitalCreditPaymentTotal', 'isAnonymousShopper', 'visaCheckoutFlowComplete','isExternalCheckoutFlowComplete', 'selectedBillingDestination',
               'selectableDestinations'],
             acceptsMarketing: function () {
@@ -153,7 +153,7 @@ define([
                         this.set('creditAmountToApply', this.maxCreditAmountToApply());
                     }
                 }
-            },            
+            },
             closeApplyCredit: function () {
                 delete this._applyingCredit;
                 this.unset('selectedCredit');
@@ -188,7 +188,7 @@ define([
                     var currentDate = new Date(),
                         unexpiredDate = new Date(2076, 6, 4);
 
-                    // todo: refactor so conversion & get can re-use - Greg Murray on 2014-07-01 
+                    // todo: refactor so conversion & get can re-use - Greg Murray on 2014-07-01
                     var invalidCredits = customerCredits.filter(function(cred) {
                         var credBalance = cred.get('currentBalance'),
                             credExpDate = cred.get('expirationDate');
@@ -234,7 +234,7 @@ define([
             },
 
             availableDigitalCredits: function () {
-                if (! this._cachedDigitalCredits) { 
+                if (! this._cachedDigitalCredits) {
                     this.loadCustomerDigitalCredits();
                 }
                 return this._cachedDigitalCredits && this._cachedDigitalCredits.length > 0 && this._cachedDigitalCredits;
@@ -253,6 +253,7 @@ define([
                     order.get('billingInfo').clear();
                     order.set(updatedOrder, { silent: true });
                 }
+                self.getPaymentTypeFromCurrentPayment();
                 self.setPurchaseOrderInfo();
                 self.setDefaultPaymentType(self);
                 self.trigger('orderPayment', updatedOrder, self);
@@ -279,7 +280,7 @@ define([
                 if (!creditAmountToApply && creditAmountToApply !== 0) {
                     creditAmountToApply = self.getMaxCreditToApply(digitalCredit, self);
                 }
-                
+
                 digitalCredit.set('creditAmountApplied', creditAmountToApply);
                 digitalCredit.set('remainingBalance',  digitalCredit.calculateRemainingBalance());
                 digitalCredit.set('isEnabled', isEnabled);
@@ -320,7 +321,7 @@ define([
                             }
                             return order.apiVoidPayment(sameCreditPayment.id).then(function (o) {
                                 order.set(o.data);
-                                
+
                                 return order.apiAddStoreCredit({
                                     storeCreditCode: creditCode,
                                     amount: creditAmountToApply
@@ -365,8 +366,8 @@ define([
             },
 
             areNumbersEqual: function(f1, f2) {
-                var epsilon = 0.01; 
-                return (Math.abs(f1 - f2)) < epsilon; 
+                var epsilon = 0.01;
+                return (Math.abs(f1 - f2)) < epsilon;
             },
 
             retrieveDigitalCredit: function (customer, creditCode, me, amountRequested) {
@@ -395,7 +396,7 @@ define([
                     if (validate !== null) {
                         return null;
                     }
-                    
+
                     var maxAmt = me.getMaxCreditToApply(creditModel, me, amountRequested);
                     if (!!amountRequested && amountRequested < maxAmt) {
                         maxAmt = amountRequested;
@@ -434,7 +435,7 @@ define([
                     me.isLoading(false);
                     return me;
                 });
-            }, 
+            },
 
             getMaxCreditToApply: function(creditModel, scope, toBeVoidedPayment) {
                 var remainingTotal = scope.nonStoreCreditTotal();
@@ -528,7 +529,7 @@ define([
                     currentPurchaseOrder = currentPayment && currentPayment.billingInfo.purchaseorder,
                     purchaseOrderSiteSettings = HyprLiveContext.locals.siteContext.checkoutSettings.purchaseOrder ?
                         HyprLiveContext.locals.siteContext.checkoutSettings.purchaseOrder.isEnabled : false,
-                    purchaseOrderCustomerSettings = this.getOrder().get('customer').get('purchaseOrder') ? 
+                    purchaseOrderCustomerSettings = this.getOrder().get('customer').get('purchaseOrder') ?
                         this.getOrder().get('customer').get('purchaseOrder').isEnabled : false;
 
                 if(purchaseOrderSiteSettings && purchaseOrderCustomerSettings && !currentPayment) {
@@ -636,7 +637,7 @@ define([
                 if(purchaseOrderInfo.totalAvailableBalance < order.get('amountRemainingForPayment')) {
                     currentPurchaseOrder.set('splitPayment', true);
                 }
-                
+
                 var paymentTerms = [];
                 purchaseOrderInfo.paymentTerms.forEach(function(term) {
                     if(term.siteId === siteId) {
@@ -668,7 +669,7 @@ define([
                     if(currentPurchaseOrder.selected && contacts.length > 0) {
                         var foundBillingContact = contacts.models.find(function(item){
                             return item.get('isPrimaryBillingContact');
-                                
+
                         });
 
                         if(foundBillingContact) {
@@ -692,7 +693,7 @@ define([
                 }
             },
             addNewContact: function(){
-        
+
                 this.getOrder().get('dialogContact').resetDestinationContact();
                 this.getOrder().get('dialogContact').unset('id');
                 this.getOrder().get('dialogContact').get('destinationContact').set('isBillingAddress', true);
@@ -736,7 +737,7 @@ define([
                 this.selectPaymentType(this, this.get('paymentType'));
                 this.on('change:isSameBillingShippingAddress', function (model, wellIsIt) {
                     if (wellIsIt) {
-                         var myBillingContact = null;   
+                         var myBillingContact = null;
                          var contacts = this.parent.get('customer').get('contacts');
                          if(contacts.length){
                             contacts.each(function(contact){
@@ -745,12 +746,12 @@ define([
                                     return false;
                                 }else if(contact.contactTypeHelpers().isBilling()) {
                                     myBillingContact = contact;
-                                }  
+                                }
                             });
                          }
 
                          if(!myBillingContact) {
-                             myBillingContact = this.parent.get('destinations').at(0).get('destinationContact');  
+                             myBillingContact = this.parent.get('destinations').at(0).get('destinationContact');
                          }
 
                          this.set('billingContact',myBillingContact, { silent: true });
@@ -826,7 +827,7 @@ define([
                             'lastNameOrSurname',
                             'phoneNumbers'),
                         {
-                            address: obj.billingContact.address ? _.pick(obj.billingContact.address, 
+                            address: obj.billingContact.address ? _.pick(obj.billingContact.address,
                                 'address1',
                                 'address2',
                                 'addressType',
@@ -857,11 +858,11 @@ define([
                 if (payment.paymentWorkflow === 'VisaCheckout') {
                     normalizedLiveBillingInfo.billingContact.address.addressType = normalizedSavedPaymentInfo.billingContact.address.addressType;
                 }
-                
+
                 return !_.isEqual(normalizedSavedPaymentInfo, normalizedLiveBillingInfo);
             },
             submit: function () {
-                
+
                 var order = this.getOrder();
                 var self = this;
                 // just can't sync these emails right
@@ -961,8 +962,8 @@ define([
                 this.stepStatus('complete');
                 this.isLoading(false);
                 var order = this.getOrder();
-                _.defer(function() { 
-                    order.isReady(true);   
+                _.defer(function() {
+                    order.isReady(true);
                 });
             },
             toJSON: function(options) {
