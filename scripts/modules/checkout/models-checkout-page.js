@@ -21,7 +21,7 @@ define([
         ShippingDestinationModels, ShippingInfo, BillingInfo, ContactDialogModels) {
 
     var checkoutPageValidation = {
-            'emailAddress': {
+            'email': {
                 fn: function (value) {
                     if (this.attributes.createAccount && (!value || !value.match(Backbone.Validation.patterns.email))) return Hypr.getLabel('emailMissing');
                 }
@@ -719,9 +719,9 @@ var CheckoutPage = Backbone.MozuModel.extend({
             // },
             syncBillingAndCustomerEmail: function () {
                 var billingEmail = this.get('billingInfo.billingContact.email'),
-                    customerEmail = this.get('emailAddress') || require.mozuData('user').email;
+                    customerEmail = this.get('email') || require.mozuData('user').email;
                 if (!customerEmail) {
-                    this.set('emailAddress', billingEmail);
+                    this.set('email', billingEmail);
                 }
                 if (!billingEmail) {
                     this.set('billingInfo.billingContact.email', customerEmail);
@@ -744,16 +744,20 @@ var CheckoutPage = Backbone.MozuModel.extend({
 
             validateReviewCheckoutFields: function(){
                 var validationResults = [];
+                var isValid = true
                 for (var field in checkoutPageValidation) {
                     if(checkoutPageValidation.hasOwnProperty(field)) {
-                        var result = this.validate(field);
+                        var result = this.preValidate(field, this.get(field));
                         if(result) {
-                            validationResults.push(result);
+                            this.trigger('error', {
+                                message: result
+                            });
+                            return isValid = false;
                         }
                     }
                 }
 
-                return validationResults.length > 0;
+                return isValid;
             },
 
             submit: function () {
@@ -811,10 +815,12 @@ var CheckoutPage = Backbone.MozuModel.extend({
                 //this.setFulfillmentContactEmail();
 
                 // skip payment validation, if there are no payments, but run the attributes and accept terms validation.
-                // if ((nonStoreCreditTotal > 0 && this.validate()) || this.validateReviewCheckoutFields()) {
-                //     this.isSubmitting = false;
-                //     return false;
-                // }
+                if (!this.validateReviewCheckoutFields()) {
+                    this.isSubmitting = false;
+                    return false;
+                }
+                
+                
 
                 this.isLoading(true);
 
