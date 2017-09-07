@@ -745,7 +745,7 @@ var CheckoutPage = Backbone.MozuModel.extend({
 
             validateReviewCheckoutFields: function(){
                 var validationResults = [];
-                var isValid = true
+                var isValid = true;
                 for (var field in checkoutPageValidation) {
                     if(checkoutPageValidation.hasOwnProperty(field)) {
                         var result = this.preValidate(field, this.get(field));
@@ -753,7 +753,8 @@ var CheckoutPage = Backbone.MozuModel.extend({
                             this.trigger('error', {
                                 message: result
                             });
-                            return isValid = false;
+                            isValid = false;
+                            return false;
                         }
                     }
                 }
