@@ -336,7 +336,7 @@ var CheckoutPage = Backbone.MozuModel.extend({
                         selectable.push(destination.toJSON());
                     }
                 });
-                return selectable;   
+                return selectable;
             },
             applyAttributes: function() {
                 var storefrontOrderAttributes = require.mozuData('pagecontext').storefrontOrderAttributes;
