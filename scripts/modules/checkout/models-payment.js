@@ -519,7 +519,8 @@ define([
                 }
             },
             getPaymentTypeFromCurrentPayment: function () {
-                var billingInfoPaymentType = this.get('paymentType'),
+                var activeStoreCredits = this.getOrder().apiModel.getActiveStoreCredits(),
+                    billingInfoPaymentType = this.get('paymentType'),
                     billingInfoPaymentWorkflow = this.get('paymentWorkflow'),
                     currentPayment = this.getOrder().apiModel.getCurrentPayment(),
                     currentPaymentType = currentPayment && currentPayment.billingInfo.paymentType,
@@ -704,6 +705,7 @@ define([
                 var self = this;
                 return self.getOrder().get('destinations').hasDestination(this.get('billingContact'));
             },
+
             initialize: function () {
                 var me = this;
 
@@ -711,6 +713,8 @@ define([
                     //set purchaseOrder defaults here.
                     me.setPurchaseOrderInfo();
                     me.getPaymentTypeFromCurrentPayment();
+
+                    
 
                     var savedCardId = me.get('card.paymentServiceCardId');
                     me.set('savedPaymentMethodId', savedCardId, { silent: true });
@@ -791,6 +795,7 @@ define([
                     activePayments = this.activePayments(),
                     thereAreActivePayments = activePayments.length > 0,
                     paymentTypeIsCard = activePayments && !!_.findWhere(activePayments, { paymentType: 'CreditCard' }),
+                    billingContactEmail = this.get('billingContact.email'),
                     balanceNotPositive = this.parent.get('amountRemainingForPayment') <= 0;
 
                 if (!shippingStepComplete || !shippingInfoComplete) return this.stepStatus('new');
@@ -798,6 +803,8 @@ define([
                 if (this.isNonMozuCheckout()) return this.stepStatus("complete");
                 
                 if (paymentTypeIsCard && !Hypr.getThemeSetting('isCvvSuppressed')) return this.stepStatus('incomplete'); // initial state for CVV entry
+                
+                if(!billingContactEmail) return this.stepStatus("incomplete");
 
                 if (thereAreActivePayments && (balanceNotPositive || (this.get('paymentType') === 'PaypalExpress' && window.location.href.indexOf('PaypalExpress=complete') !== -1))) return this.stepStatus('complete');
                 return this.stepStatus('incomplete');
@@ -854,7 +861,7 @@ define([
                 var order = this.getOrder();
                 var self = this;
                 // just can't sync these emails right
-                order.syncBillingAndCustomerEmail();
+                
 
                 //
 
@@ -885,6 +892,10 @@ define([
                         order.onCheckoutError(error);
                     }
                     return false;
+                }
+
+                if(val && val['billingContact.email']) {
+                    order.onCheckoutError(val['billingContact.email']);
                 }
 
                 //If Single Address Save to Destination

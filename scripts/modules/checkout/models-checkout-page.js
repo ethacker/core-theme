@@ -21,7 +21,7 @@ define([
         ShippingDestinationModels, ShippingInfo, BillingInfo, ContactDialogModels) {
 
     var checkoutPageValidation = {
-            'email': {
+            'emailAddress': {
                 fn: function (value) {
                     if (this.attributes.createAccount && (!value || !value.match(Backbone.Validation.patterns.email))) return Hypr.getLabel('emailMissing');
                 }
@@ -301,9 +301,7 @@ var CheckoutPage = Backbone.MozuModel.extend({
                         self.validation = _.pick(self.constructor.prototype.validation, _.filter(_.keys(self.constructor.prototype.validation), function(k) { return k.indexOf('fulfillment') === -1; }));
                     }
 
-                    self.get('billingInfo.billingContact').on('change:email', function(model, newVal) {
-                        self.set('email', newVal);
-                    });
+                    
 
                     var billingEmail = billingInfo.get('billingContact.email');
                     if (!billingEmail && user.email) billingInfo.set('billingContact.email', user.email);
@@ -718,13 +716,15 @@ var CheckoutPage = Backbone.MozuModel.extend({
             //     }
             // },
             syncBillingAndCustomerEmail: function () {
+                var self = this;
                 var billingEmail = this.get('billingInfo.billingContact.email'),
-                    customerEmail = this.get('email') || require.mozuData('user').email;
-                if (!customerEmail) {
+                    customerEmail = require.mozuData('user').email;
+
+                if (customerEmail) {
+                    this.set('email', customerEmail);
+                    
+                } else {
                     this.set('email', billingEmail);
-                }
-                if (!billingEmail) {
-                    this.set('billingInfo.billingContact.email', customerEmail);
                 }
             },
             addDigitalCreditToCustomerAccount: function () {
@@ -774,7 +774,8 @@ var CheckoutPage = Backbone.MozuModel.extend({
                     process = [function() {
                         return checkout.apiUpdateCheckout({
                             ipAddress: checkout.get('ipAddress'),
-                            shopperNotes: checkout.get('shopperNotes').toJSON()
+                            shopperNotes: checkout.get('shopperNotes').toJSON(),
+                            email: checkout.get('email')
                         });
                     }];
 
