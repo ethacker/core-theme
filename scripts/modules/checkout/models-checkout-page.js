@@ -336,7 +336,7 @@ var CheckoutPage = Backbone.MozuModel.extend({
                         selectable.push(destination.toJSON());
                     }
                 });
-                return selectable;   
+                return selectable;
             },
             applyAttributes: function() {
                 var storefrontOrderAttributes = require.mozuData('pagecontext').storefrontOrderAttributes;
@@ -413,9 +413,10 @@ var CheckoutPage = Backbone.MozuModel.extend({
                     me.set('couponCode', '');
                     var groupingShippingDiscounts = [];
                     me.get("groupings").forEach(function(grouping){
-                      groupingShippingDiscounts.concat(grouping.shippingDiscounts);
+                      grouping.get('shippingDiscounts').forEach(function(discount){
+                        groupingShippingDiscounts.push(discount);
+                      });
                     });
-
 
                     var productDiscounts = _.flatten(me.get('items').pluck('productDiscounts'));
                     var shippingDiscounts = _.flatten(_.pluck(_.flatten(me.get('items').pluck('shippingDiscounts')), 'discount'));
@@ -578,7 +579,7 @@ var CheckoutPage = Backbone.MozuModel.extend({
                     "isPrimary": true
                 }];
                 contacts.push(contact);
-                
+
 
                 return customer.apiModel.updateCustomerContacts({id: customer.id, postdata:contacts}).then(function(contactResult) {
                     _.each(contactResult, function(contact) {
