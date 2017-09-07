@@ -14,7 +14,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext) {
         // a method that only the CheckoutStepView knows to
         // run, so it can run late enough for the parent
         // reference in .getOrder to exist;
-        
+
         initStep: function () {
             var me = this;
             this.next = (function(next) {
@@ -79,10 +79,11 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext) {
                     self.parent.set('isMultiShipMode', false);
                     self.trigger('sync');
                 });
-                
+
                 return;
             }
 
+            this.parent.addCustomerContacts();
             this.parent.set('isMultiShipMode', true);
         }
     });
