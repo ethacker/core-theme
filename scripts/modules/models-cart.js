@@ -88,7 +88,7 @@ define(['underscore', 'modules/backbone-mozu', 'hyprlive', "modules/api", "modul
             }),
             storeLocationsCache : StoreLocationsCache
         },
-        
+
         initialize: function() {
             var self = this;
             this.get("items").on('sync remove', this.fetch, this)
@@ -160,7 +160,7 @@ define(['underscore', 'modules/backbone-mozu', 'hyprlive', "modules/api", "modul
                 }
 
                 var couponIsNotApplied = (!allDiscounts || !_.find(allDiscounts, function(d) {
-                    return d.couponCode.toLowerCase() === lowerCode;
+                    return d.couponCode && d.couponCode.toLowerCase() === lowerCode;
                 }));
                 me.set('tentativeCoupon', couponExists && couponIsNotApplied ? code : undefined);
 
