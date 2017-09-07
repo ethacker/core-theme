@@ -670,7 +670,6 @@ define([
                     if(currentPurchaseOrder.selected && contacts.length > 0) {
                         var foundBillingContact = contacts.models.find(function(item){
                             return item.get('isPrimaryBillingContact');
-
                         });
 
                         if(foundBillingContact) {
@@ -694,7 +693,6 @@ define([
                 }
             },
             addNewContact: function(){
-
                 this.getOrder().get('dialogContact').resetDestinationContact();
                 this.getOrder().get('dialogContact').unset('id');
                 this.getOrder().get('dialogContact').get('destinationContact').set('isBillingAddress', true);
@@ -714,9 +712,10 @@ define([
                     me.setPurchaseOrderInfo();
                     me.getPaymentTypeFromCurrentPayment();
 
-                    
+                    var savedCardId = me.get('card.paymentServiceCardId') ?
+                        me.get('card.paymentServiceCardId')
+                        : me.getPrimarySavedCard(me).id;
 
-                    var savedCardId = me.get('card.paymentServiceCardId');
                     me.set('savedPaymentMethodId', savedCardId, { silent: true });
                     me.setSavedPaymentMethod(savedCardId);
 
@@ -745,7 +744,7 @@ define([
                          if(destinations.length) {
                             this.set('billingContact', destinations[0].destinationContact, { silent: true });
                          }
-                         
+
                     } else if (billingContact) {
                         // if they initially checked the checkbox, then later they decided to uncheck it... remove the id so that updates don't update
                         // the original address, instead create a new contact address.
@@ -760,6 +759,13 @@ define([
 
 
                 _.bindAll(this, 'applyPayment', 'markComplete');
+            },
+            getPrimarySavedCard: function(me){
+                return _.find(
+                    me.savedPaymentMethods(), function(savedPayment) {
+                        return savedPayment.isDefaultPayMethod === true;
+                    }
+                );
             },
             selectPaymentType: function(me, newPaymentType) {
                 if ((!me.changed || !me.changed.paymentWorkflow) && !me.get('paymentWorkflow')) {
