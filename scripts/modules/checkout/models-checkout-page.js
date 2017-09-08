@@ -237,11 +237,17 @@ var CheckoutPage = Backbone.MozuModel.extend({
 
                 if(contacts.length){
                     contacts.each(function(contact, key){
-                        if(contact.contactTypeHelpers().isShipping()){
-                            if(!self.get('destinations').hasDestination(contact)){
-                                self.get('destinations').newDestination(contact, true);
+                        
+                        if(!self.get('destinations').hasDestination(contact)){
+                            if(contact.contactTypeHelpers().isShipping() && contact.contactTypeHelpers().isBilling()){
+                                self.get('destinations').newDestination(contact, true, "ShippingAndBilling");
+                            } else if (contact.contactTypeHelpers().isShipping()) {
+                                self.get('destinations').newDestination(contact, true, "Shipping");
+                            } else if (contact.contactTypeHelpers().isBilling()) {
+                                self.get('destinations').newDestination(contact, true, "Billing");
                             }
                         }
+
                     });
                     self.get('destinations').trigger('destinationsUpdate');
                 }
@@ -255,7 +261,7 @@ var CheckoutPage = Backbone.MozuModel.extend({
                 this.on('sync', function(rawJSON) {
                     self.addCustomerContacts();
                 });
-                
+
                 self.addCustomerContacts();
 
                 _.defer(function() {
@@ -338,11 +344,17 @@ var CheckoutPage = Backbone.MozuModel.extend({
             getCheckout : function(){
                 return this;
             },
-            selectableDestinations : function(){
-                var selectable = [];
+            selectableDestinations : function(customerContactType){
+               var selectable = [];
                this.getCheckout().get('destinations').each(function(destination){
                     if(!destination.get('isGiftCardDestination')){
-                        selectable.push(destination.toJSON());
+                       if(customerContactType && destination.get('customerContactType')) {
+                            if(destination.get('customerContactType') === customerContactType || destination.get('customerContactType') === "ShippingAndBilling"){
+                                selectable.push(destination.toJSON());
+                            }    
+                        } else {
+                            selectable.push(destination.toJSON()); 
+                        }
                     }
                 });
                 return selectable;

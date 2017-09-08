@@ -49,7 +49,7 @@ define(['modules/backbone-mozu','hyprlive', 'modules/jquery-mozu','underscore', 
                 if(self.model.get('id')) {
                     checkout.get('destinations').get(self.model.get('id')).set('destinationContact',self.model.get('destinationContact'));
                 } else {
-                    checkout.get('destinations').newDestination(self.model.get('destinationContact'), false, true);
+                    checkout.get('destinations').newDestination(self.model.get('destinationContact'), true, "Billing");
                 }
                 checkout.get('billingInfo').updateBillingContact(self.model.get('destinationContact'));
                 self.model.trigger('closeDialog');

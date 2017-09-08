@@ -160,7 +160,7 @@ define(["modules/jquery-mozu",
                 if(destination){
                     self.model.updateBillingContact(destination.get('destinationContact'));
                 }
-                //self.render();
+                self.render();
             },
             handleNewContact : function(){
                 var self = this;

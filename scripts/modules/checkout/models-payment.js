@@ -132,7 +132,7 @@ define([
                 return availableCredits && availableCredits.length > 0 && availableCredits;
             },
             selectableDestinations : function() {
-                return this.getOrder().selectableDestinations();
+                return this.getOrder().selectableDestinations("Billing");
             },
             applyingCredit: function () {
                 return this._applyingCredit;
