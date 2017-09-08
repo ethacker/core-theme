@@ -34,7 +34,7 @@
     {% include "modules/common/message-bar" with model=model.messages %}
 
     <div class="mz-l-column" id="checkout-rightcol">
-        
+
         <div class="mz-formstep mz-checkoutform-ordersummary" id="order-summary">
             {% include "modules/checkout/checkout-order-summary" %}
         </div>
@@ -71,10 +71,10 @@
         </div>
 
     </div><!-- left .column -->
-    
+
     {% block modal-dialog %}
         <div mz-modal-contact-dialog>
-          <div id="mzModalDialog" class="modal fade" tabindex="-1" role="dialog">
+          <div id="mzModalDialog" data-backdrop="static" class="modal fade" tabindex="-1" role="dialog">
             {% include "modules/multi-ship-checkout/modal-contact" %}
           </div>
         </div>
