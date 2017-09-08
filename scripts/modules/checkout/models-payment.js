@@ -904,6 +904,13 @@ define([
                     order.onCheckoutError(val['billingContact.email']);
                 }
 
+                var process = [function() {
+                    return order.apiUpdateCheckout({
+                        email: self.get('billingContact.email'),
+                        acceptsMarketing: order.get('acceptsMarketing')
+                    });
+                }];
+
                 //If Single Address Save to Destination
                 //Do I need this Line? Why Did I orginally Do this?
                 //
@@ -917,14 +924,15 @@ define([
                 }
 
                 if (!currentPayment) {
-                    return this.applyPayment();
+                    process.push(self.applyPayment());
                 } else if (this.hasPaymentChanged(currentPayment)) {
-                    return order.apiVoidPayment(currentPayment.id).then(this.applyPayment);
+                    process.push(order.apiVoidPayment(currentPayment.id).then(self.applyPayment));
                 } else if (card.get('cvv') && card.get('paymentServiceCardId')) {
-                    return card.apiSave().then(this.markComplete, order.onCheckoutError);
+                    process.push(card.apiSave().then(self.markComplete, order.onCheckoutError));
                 } else {
-                    this.markComplete();
+                   return this.markComplete();
                 }
+                return api.steps(process);
             },
             applyPayment: function () {
                 var self = this, order = this.getOrder();

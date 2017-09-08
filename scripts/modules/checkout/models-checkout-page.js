@@ -319,7 +319,7 @@ var CheckoutPage = Backbone.MozuModel.extend({
                     this.set('customer', { id: user.accountId });
                 }
                 // preloaded JSON has this as null if it's unset, which defeats the defaults collection in backbone
-                if (data.acceptsMarketing === null) {
+                if (!data.acceptsMarketing) {
                     self.set('acceptsMarketing', true);
                 }
 
