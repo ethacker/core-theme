@@ -714,7 +714,7 @@ define([
 
                     var savedCardId = me.get('card.paymentServiceCardId') ?
                         me.get('card.paymentServiceCardId')
-                        : me.getPrimarySavedCard(me).id;
+                        : me.getPrimarySavedCard(me) ? me.getPrimarySavedCard(me).id : undefined;
 
                     me.set('savedPaymentMethodId', savedCardId, { silent: true });
                     me.setSavedPaymentMethod(savedCardId);
@@ -807,9 +807,9 @@ define([
                 if (!shippingStepComplete || !shippingInfoComplete) return this.stepStatus('new');
 
                 if (this.isNonMozuCheckout()) return this.stepStatus("complete");
-                
+
                 if (paymentTypeIsCard && !Hypr.getThemeSetting('isCvvSuppressed')) return this.stepStatus('incomplete'); // initial state for CVV entry
-                
+
                 if(!billingContactEmail) return this.stepStatus("incomplete");
 
                 if (thereAreActivePayments && (balanceNotPositive || (this.get('paymentType') === 'PaypalExpress' && window.location.href.indexOf('PaypalExpress=complete') !== -1))) return this.stepStatus('complete');
@@ -867,7 +867,7 @@ define([
                 var order = this.getOrder();
                 var self = this;
                 // just can't sync these emails right
-                
+
 
                 //
 
