@@ -365,7 +365,7 @@ define(["modules/api", 'underscore', "modules/backbone-mozu", "hyprlive", "modul
                 return _.invoke(this._nonShippedItems, 'toJSON');
             },
             /**
-             * Creates a list package codes from all package types to be used to determine shipped and nonShipped items.
+             * Creates a list of package codes from all package types that will be used to determine shipped and nonShipped items.
              * 
              * [getCollectionOfPackageCodes]
              * @return {[Array]}
@@ -401,7 +401,7 @@ define(["modules/api", 'underscore', "modules/backbone-mozu", "hyprlive", "modul
                 return groupedCodes;
             },
             /**
-             * Creates a list of nonShipped items by comparing fulfilled packages items with Order Items
+             * Creates a list of nonShipped items by comparing fulfilled package items with Order Items
              * 
              * [setNonShippedItems]
              * @return {[Array]}
@@ -457,8 +457,8 @@ define(["modules/api", 'underscore', "modules/backbone-mozu", "hyprlive", "modul
             },
             /**
              * Used to create a list of returnable items from the return of apiGetReturnableItems and Order Items
-             * This is primary to get product detial information and ensure Product bundles are returned as a whole
-             * while product extras, within a bundle or not, are returned separately. 
+             * This is primarily used to get product detial information and ensure Product bundles are returned as a whole
+             * while product extras, bundle or otherwise, are returned separately. 
              * 
              * [returnableItems]
              * @return {[Array]}

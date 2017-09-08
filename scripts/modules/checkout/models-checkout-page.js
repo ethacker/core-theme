@@ -219,11 +219,17 @@ var CheckoutPage = Backbone.MozuModel.extend({
             },
             setMultiShipMode : function(){
             var directShipItems = this.get('items').where({fulfillmentMethod: "Ship"});
-            var destinationCount = _.countBy(directShipItems, function(item){
-                    return item.get('destinationId');
-                });
+            var destinationCount = [];
+             _.each(directShipItems, function(item){
+                var id = item.get('destinationId');
+                if(id){
+                    if(destinationCount.indexOf(id) === -1) {
+                        destinationCount.push(id);
+                    }
+                }
+             });
 
-            return (_.size(destinationCount) > 1) ? this.set('isMultiShipMode', true) : this.set('isMultiShipMode', false);
+            return (destinationCount.length > 1) ? this.set('isMultiShipMode', true) : this.set('isMultiShipMode', false);
             },
             addCustomerContacts : function(){
                 var self =this;
