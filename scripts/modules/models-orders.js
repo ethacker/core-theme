@@ -418,19 +418,19 @@ define(["modules/api", 'underscore', "modules/backbone-mozu", "hyprlive", "modul
                     //Update quanity of items by comparing with packaged items
                     _.each(packages, function(type, typeKey, typeList) {
                         _.each(type, function(myPackage, key, list) {
-                            _.each(groupedItems[typeKey], function(item, key) {
-                                if (item.uniqueProductCode() === myPackage.get('productCode')) {
-                                    if (item.get('optionAttributeFQN') && item.get('optionAttributeFQN') != myPackage.get('optionAttributeFQN')) {
+                            for (i = 0; i < groupedItems[typeKey].length; i++) {
+                                if (groupedItems[typeKey][i].uniqueProductCode() === myPackage.get('productCode')) {
+                                    if (groupedItems[typeKey][i].get('optionAttributeFQN') && groupedItems[typeKey][i].get('optionAttributeFQN') != myPackage.get('optionAttributeFQN')) {
                                         return false;
                                     }
-                                    if (item.get('quantity') === 1) {
+                                    if (groupedItems[typeKey][i].get('quantity') === 1) {
                                         groupedItems[typeKey].splice(key, 1);
                                         return false;
                                     }
-                                    item.set('quantity', item.get('quantity') - 1);
+                                    groupedItems[typeKey][i].set('quantity', groupedItems[typeKey][i].get('quantity') - 1);
                                     return false;
                                 }
-                            });
+                            };
                         });
                     });
 
