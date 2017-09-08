@@ -301,7 +301,7 @@ var CheckoutPage = Backbone.MozuModel.extend({
                         self.validation = _.pick(self.constructor.prototype.validation, _.filter(_.keys(self.constructor.prototype.validation), function(k) { return k.indexOf('fulfillment') === -1; }));
                     }
 
-                    
+
 
                     var billingEmail = billingInfo.get('billingContact.email');
                     if (!billingEmail && user.email) billingInfo.set('billingContact.email', user.email);
@@ -547,39 +547,96 @@ var CheckoutPage = Backbone.MozuModel.extend({
 
                 }
             },
+            compareAddressObjects: function(obj1, obj2) {
+                var areEqual = _.isMatch(obj1, {
+                    address1 : obj2.address1,
+                    addressType : obj2.addressType,
+                    cityOrTown : obj2.cityOrTown,
+                    countryCode : obj2.countryCode,
+                    postalOrZipCode : obj2.postalOrZipCode,
+                    stateOrProvince : obj2.stateOrProvince
+                });
+                return areEqual;
+            },
+            getContactIndex: function(contacts, contact) {
+                var self = this;
+                return _.findIndex(contacts, function(existingContact) {
+                        return self.compareAddressObjects(existingContact.address, contact.address);
+                    });
+            },
+            mergeContactTypes: function(originalContactTypes, newContactTypes) {
+                    var mergedTypes = originalContactTypes || [];
+                    var originalContactsTypesIndex = _.findIndex(originalContactTypes, function(type) {
+                        return type.name === "Billing";
+                    });
+
+                    var newContactTypesIndex = _.findIndex(newContactTypes, function(type) {
+                        return type.name === "Billing";
+                    });
+
+                    if (newContactTypes) {
+                        if (originalContactsTypesIndex > -1) {
+                            mergedTypes[originalContactsTypesIndex] = newContactTypes[newContactTypesIndex];
+                        }
+                        else {
+                            mergedTypes.push(newContactTypes[newContactTypesIndex]);
+                        }
+                    }
+
+                    return mergedTypes;
+            },
             saveCustomerContacts: function() {
                 var customer = this.get('customer');
                 var destinations = this.get('destinations');
-                var contacts = [];
+                var existingContacts = customer.get('contacts').toJSON() || [];
+                var updatedContacts = [];
                 var self = this;
 
-                destinations.each(function(destination){
-                    if(!destination.get("isGiftCardDestination")) {
-                        var contact = destination.get('destinationContact').toJSON();
-                        contact.types =  [{
-                            "name": "Shipping",
-                            "isPrimary": (destination.get('destinationContact').contactTypeHelpers().isPrimaryShipping()) ? true : false
-                        }];
-                        contacts.push(contact);
+                destinations.each(function(destination) {
+                    if (!destination.get("isGiftCardDestination")) {
+                        var destinationContact = destination.get('destinationContact').toJSON();
+                        var existingContactIndex = existingContacts.length > 0 ?
+                            self.getContactIndex(existingContacts, destinationContact)
+                            : -1;
+
+                        if (existingContactIndex && existingContactIndex === -1) {
+                            delete destinationContact.id;
+                            destinationContact.types =  [{
+                                "name": "Shipping",
+                                "isPrimary": (destination.get('destinationContact').contactTypeHelpers().isPrimaryShipping()) ? true : false
+                            }];
+                            updatedContacts.push(destinationContact);
+                        }
                     }
-
                 });
 
-                var billingContact = customer.get('contacts').filter(function(contact) {
-                    return contact.contactTypeHelpers().isPrimaryBilling();
-                });
+                var billingContact = this.get('billingInfo').get('billingContact').toJSON();
+                delete billingContact.email;
+                billingContact.types =  [{
+                        "name": "Billing",
+                        "isPrimary": true
+                    }];
 
+                var existingBillingContactIndex = existingContacts.length > 0 ?
+                    self.getContactIndex(existingContacts, billingContact)
+                    : -1;
+                var updatedContactIndex = updatedContacts.length > 0 ?
+                    self.getContactIndex(updatedContacts, billingContact)
+                    : -1;
 
-                var contact = this.get('billingInfo').get('billingContact').toJSON();
+                if (updatedContactIndex > -1) {
+                    updatedContacts[updatedContactIndex].types = self.mergeContactTypes(updatedContacts[updatedContactIndex].types, billingContact.types);
+                }
+                else if (existingBillingContactIndex > -1) {
+                    var newBillingContact = existingContacts[existingBillingContactIndex];
+                    newBillingContact.types = self.mergeContactTypes(existingContacts[existingBillingContactIndex].types, billingContact.types);
+                    updatedContacts.push(newBillingContact);
+                }
+                else {
+                    updatedContacts.push(billingContact);
+                }
 
-                contact.types =  [{
-                    "name": "Billing",
-                    "isPrimary": true
-                }];
-                contacts.push(contact);
-
-
-                return customer.apiModel.updateCustomerContacts({id: customer.id, postdata:contacts}).then(function(contactResult) {
+                return customer.apiModel.updateCustomerContacts({id: customer.id, postdata:updatedContacts}).then(function(contactResult) {
                     _.each(contactResult, function(contact) {
                         if (contact.data && contact.data.types && contact.data.types[0]) {
                             var contactType = contact.data.types[0];
@@ -723,7 +780,7 @@ var CheckoutPage = Backbone.MozuModel.extend({
 
                 if (customerEmail) {
                     this.set('email', customerEmail);
-                    
+
                 } else {
                     this.set('email', billingEmail);
                 }
@@ -822,8 +879,8 @@ var CheckoutPage = Backbone.MozuModel.extend({
                     this.isSubmitting = false;
                     return false;
                 }
-                
-                
+
+
 
                 this.isLoading(true);
 
