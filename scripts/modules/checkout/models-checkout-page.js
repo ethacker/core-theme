@@ -248,13 +248,15 @@ var CheckoutPage = Backbone.MozuModel.extend({
             },
             initialize: function (data) {
 
-                var self = this,
+                var self = this, 
                     user = require.mozuData('user');
                     //self.get('shippingStep').initSet();
 
                 this.on('sync', function(rawJSON) {
                     self.addCustomerContacts();
                 });
+                
+                self.addCustomerContacts();
 
                 _.defer(function() {
                     self.setMultiShipMode();
