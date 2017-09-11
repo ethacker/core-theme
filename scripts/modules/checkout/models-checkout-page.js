@@ -124,6 +124,7 @@ var CheckoutOrder = OrderModels.Order.extend({
     updateOrderItemDestination: function(destinationId, customerContactId){
         var self = this;
         self.isLoading(true);
+        
         if(!destinationId) {
             var destination = self.getCheckout().get('destinations').findWhere({customerContactId: customerContactId});
             if(destination){
