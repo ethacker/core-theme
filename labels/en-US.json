@@ -205,6 +205,7 @@
     "mfgPartNumber": "Mfg. Part Number",
     "milesAway": "{0} miles away",
     "missing": "missing",
+    "missingCheckoutPayments": "Somthing went very wrong and there seem to be no payments attached to the checkout",
     "missingParts": "Missing parts or accessories",
     "more": "more",
     "msrp": "MSRP",

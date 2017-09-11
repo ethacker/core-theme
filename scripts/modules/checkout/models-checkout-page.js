@@ -35,6 +35,11 @@ define([
                 fn: function (value) {
                     if (this.attributes.createAccount && value !== this.get('password')) return Hypr.getLabel('passwordsDoNotMatch');
                 }
+            },
+            'payments': {
+                fn: function(){
+                    if(!this.apiModel.getActivePayments().length) return Hypr.getLabel('missingCheckoutPayments');
+                }
             }
         };
 
@@ -61,6 +66,8 @@ define([
                 }
             }, this);
         }
+
+
 
 var CheckoutOrder = OrderModels.Order.extend({
     helpers : ['selectableDestinations', 'isOriginalCartItem'],
