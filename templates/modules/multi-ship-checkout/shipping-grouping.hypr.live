@@ -9,7 +9,7 @@
         </div>
         <div class="mz-l-formfieldgroup-cell">
             <div>{{model.groupingDestinationInfo.destinationContact.address.address1}}, {{model.groupingDestinationInfo.destinationContact.address.address2}}</div>
-            <div>{{model.groupingDestinationInfo.destinationContact.address.cityOrTown}} {{model.groupingDestinationInfo.destinationContact.address.stateOrProvince}} {{model.groupingDestinationInfo.destinationContact.address.postalOrZipCode}} {{model.contact.address.countryCode}}</div>
+            <div>{{model.groupingDestinationInfo.destinationContact.address.cityOrTown}} {{model.groupingDestinationInfo.destinationContact.address.stateOrProvince}} {{model.groupingDestinationInfo.destinationContact.address.postalOrZipCode}} {{model.groupingDestinationInfo.destinationContact.address.countryCode}}</div>
         </div>
     </div>
 
