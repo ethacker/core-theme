@@ -696,6 +696,7 @@ var CheckoutPage = Backbone.MozuModel.extend({
                     }, {});
                     var method = order.cardsSaved[card.get('id') || card.get('paymentServiceCardId')] ? 'updateCard' : 'addCard';
                     card.set('contactId', billingContact.id);
+                    card.set('isDefaultPayMethod', true);
                     return customer.apiModel[method](card.toJSON()).then(function(card) {
                         order.cardsSaved[card.data.id] = true;
                         return card;
