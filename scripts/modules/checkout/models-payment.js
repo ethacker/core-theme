@@ -431,7 +431,7 @@ define([
                     return deferred.promise;
                 }
                 me.isLoading(true);
-                return me.retrieveDigitalCredit(customer, creditCode, me).then(function() {
+                return me.retrieveDigitalCredit(customer, creditCode, me).ensure(function() {
                     me.isLoading(false);
                     return me;
                 });

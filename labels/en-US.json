@@ -147,6 +147,7 @@
     "errorDetail": "Our software encountered an error it couldn't resolve.",
     "exclusivePricelist": "The following items are not available for purchase and have been removed.",
     "expires": "Expires",
+    "expiredCredit" : "Credit Expired {0}",
     "findAtLocalStore": "Find it at a Local Store",
     "firstName": "First Name",
     "firstNameMissing": "First name required",
