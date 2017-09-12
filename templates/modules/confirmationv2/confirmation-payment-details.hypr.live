@@ -35,6 +35,12 @@
             <div class="mz-addresssummary">{% include "modules/common/address-summary" with model=model.billingInfo.billingContact %}</div>
         </div>
         {% endif %}
+        {% if model.billingInfo.paymentType == "PurchaseOrder" %}
+        <div class="mz-l-stack-item">
+          <small>{{ labels.purchaseOrderPaymentTerm }}</small>
+          <div> {{model.billingInfo.purchaseOrder.paymentTerm.code }} </div>
+        </div>
+        {% endif %}
         {% if model.billingInfo.paymentType == "CreditCard" %}
         <div class="mz-l-stack-item">
             <small>{{ labels.cardtype }}</small>
