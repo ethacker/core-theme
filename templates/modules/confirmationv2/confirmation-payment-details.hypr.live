@@ -59,9 +59,9 @@
         <div class="mz-l-stack-item">
             <small><strong>{{ labels.mailCheckTo }}</strong></small>
             <div class="mz-addresssummary">
-                <span>{{ ViewData.mailCheckTo.shippingOriginContact.firstName}} {{ ViewData.mailCheckTo.shippingOriginContact.lastNameOrSurname }}</span>
-                <span>{{ ViewData.mailCheckTo.shippingOriginContact.companyOrOrganization }}</span>
-                {% include "modules/common/address-summary" with model=ViewData.mailCheckTo %}
+                <span>{{ model.mailCheckTo.shippingOriginContact.firstName}} {{ model.mailCheckTo.shippingOriginContact.lastNameOrSurname }}</span>
+                <span>{{ model.mailCheckTo.shippingOriginContact.companyOrOrganization }}</span>
+                {% include "modules/common/address-summary" with model=model.mailCheckTo %}
             </div>
         </div>
     {% endif %}
