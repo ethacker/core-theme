@@ -720,10 +720,17 @@ var CheckoutPage = Backbone.MozuModel.extend({
 
                 if (customerEmail) {
                     this.set('email', customerEmail);
-
                 } else {
                     this.set('email', billingEmail);
                 }
+            },
+            setNewCustomerEmailAddress : function(){
+                var self = this;
+
+                if(!self.get('emailAddress')){
+                    self.set('emailAddress', this.get('billingInfo.billingContact.email'));
+                }
+
             },
             addDigitalCreditToCustomerAccount: function () {
                 var billingInfo = this.get('billingInfo'),
@@ -812,7 +819,7 @@ var CheckoutPage = Backbone.MozuModel.extend({
                 }
 
                 this.syncBillingAndCustomerEmail();
-                //this.setFulfillmentContactEmail();
+                this.setNewCustomerEmailAddress();
 
                 // skip payment validation, if there are no payments, but run the attributes and accept terms validation.
                 if (!this.validateReviewCheckoutFields()) {

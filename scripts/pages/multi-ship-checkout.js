@@ -18,7 +18,6 @@ require(["modules/jquery-mozu",
 
     var OrderSummaryView = Backbone.MozuView.extend({
         templateName: 'modules/multi-ship-checkout/checkout-order-summary',
-
         initialize: function () {
             this.listenTo(this.model.get('billingInfo'), 'orderPayment', this.onOrderCreditChanged, this);
         },
