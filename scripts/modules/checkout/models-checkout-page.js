@@ -36,6 +36,8 @@ define([
                     if (this.attributes.createAccount && value !== this.get('password')) return Hypr.getLabel('passwordsDoNotMatch');
                 }
             },
+            //More of a fail safe. This really should not be checked here at all. If a checkout has no payments at the time of checkout other things
+            //have gone wrong and there is no real way for a user to correct.  
             'payments': {
                 fn: function(){
                     if(!this.apiModel.getActivePayments().length) return Hypr.getLabel('missingCheckoutPayments');
@@ -711,100 +713,6 @@ var CheckoutPage = Backbone.MozuModel.extend({
             getBillingContact: function () {
                 return;
             },
-            // addShippingContact: function () {
-            //     return this.addCustomerContact('fulfillmentInfo', 'fulfillmentContact', [{ name: 'Shipping' }]);
-            // },
-            // addShippingAndBillingContact: function () {
-            //     return this.addCustomerContact('fulfillmentInfo', 'fulfillmentContact', [{ name: 'Shipping' }, { name: 'Billing' }]);
-            // },
-            // addCustomerContact: function (infoName, contactName, contactTypes) {
-            //     var customer = this.get('customer'),
-            //         contactInfo = this.get(infoName),
-            //         process = [function () {
-
-            //             // Update contact if a valid contact ID exists
-            //             if (orderContact.id && orderContact.id > 0) {
-            //                 return customer.apiModel.updateContact(orderContact);
-            //             }
-
-            //             if (orderContact.id === -1 || orderContact.id === 1 || orderContact.id === 'new') {
-            //                 delete orderContact.id;
-            //             }
-            //             return customer.apiModel.addContact(orderContact).then(function(contactResult) {
-            //                     orderContact.id = contactResult.data.id;
-            //                     return contactResult;
-            //                 });
-            //         }];
-            //     var contactInfoContactName = contactInfo.get(contactName);
-            //     var customerContacts = customer.get('contacts');
-
-            //     if (!contactInfoContactName.get('accountId')) {
-            //         contactInfoContactName.set('accountId', customer.id);
-            //     }
-            //     var orderContact = contactInfoContactName.toJSON();
-            //     // if customer doesn't have a primary of any of the contact types we're setting, then set primary for those types
-            //     if (!this.isSavingNewCustomer()) {
-            //         process.unshift(function() {
-            //             return customer.apiModel.getContacts().then(function(contacts) {
-            //                 _.each(contactTypes, function(newType) {
-            //                     var primaryExistsAlready = _.find(contacts.data.items, function(existingContact) {
-            //                         return _.find(existingContact.types || [], function(existingContactType) {
-            //                             return existingContactType.name === newType.name && existingContactType.isPrimary;
-            //                         });
-            //                     });
-            //                     newType.isPrimary = !primaryExistsAlready;
-            //                 });
-            //             });
-            //         });
-            //     } else {
-            //         _.each(contactTypes, function(type) {
-            //             type.isPrimary = true;
-            //         });
-            //     }
-
-            //     // handle email
-            //     if (!orderContact.email) orderContact.email = this.get('emailAddress') || customer.get('emailAddress') || require.mozuData('user').email;
-
-            //     var contactId = orderContact.contactId;
-            //     if (contactId) orderContact.id = contactId;
-            //     if (!orderContact.id || orderContact.id === -1 || orderContact.id === 1 || orderContact.id === 'new') {
-            //         orderContact.types = contactTypes;
-            //         return api.steps(process);
-            //     } else {
-            //         var customerContact = customerContacts.get(orderContact.id).toJSON();
-            //         if (this.isContactModified(orderContact, customerContact)) {
-            //             //keep the current types on edit
-            //             orderContact.types = orderContact.types ? orderContact.types : customerContact.types;
-            //             return api.steps(process);
-            //         } else {
-            //             var deferred = api.defer();
-            //             deferred.resolve();
-            //             return deferred.promise;
-            //         }
-            //     }
-            // },
-            // isContactModified: function(orderContact, customerContact) {
-            //     var validContact = orderContact && customerContact && orderContact.id === customerContact.id;
-            //     var addressChanged = validContact && !_.isEqual(orderContact.address, customerContact.address);
-            //     //Note: Only home phone is used on the checkout page
-            //     var phoneChanged = validContact && orderContact.phoneNumbers.home &&
-            //                         (!customerContact.phoneNumbers.home || orderContact.phoneNumbers.home !== customerContact.phoneNumbers.home);
-
-            //     //Check whether any of the fields available in the contact UI on checkout page is modified
-            //     return validContact &&
-            //         (addressChanged || phoneChanged ||
-            //         orderContact.email !== customerContact.email || orderContact.firstName !== customerContact.firstName ||
-            //         orderContact.lastNameOrSurname !== customerContact.lastNameOrSurname);
-            // },
-
-            // setFulfillmentContactEmail: function () {
-            //     var fulfillmentEmail = this.get('fulfillmentInfo.fulfillmentContact.email'),
-            //         orderEmail = this.get('email');
-
-            //     if (!fulfillmentEmail) {
-            //         this.set('fulfillmentInfo.fulfillmentContact.email', orderEmail);
-            //     }
-            // },
             syncBillingAndCustomerEmail: function () {
                 var self = this;
                 var billingEmail = this.get('billingInfo.billingContact.email'),
