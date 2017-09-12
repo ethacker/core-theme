@@ -670,16 +670,15 @@ var CheckoutPage = Backbone.MozuModel.extend({
                 }
 
                 return customer.apiModel.updateCustomerContacts({id: customer.id, postdata:updatedContacts}).then(function(contactResult) {
-                    _.each(contactResult, function(contact) {
-                        if (contact.data && contact.data.types && contact.data.types[0]) {
-                            var contactType = contact.data.types[0];
-
-                            if (contactType.name === 'Billing' && contactType.isPrimary === true) {
-                                self.get('billingInfo').set('billingContact', contact.data);
+                    _.each(contactResult.data.items, function(contact) {
+                        if(contact.types){ 
+                            var found = _.findWhere(contact.types, {name: "Billing", isPrimary: true});
+                            if(found) {
+                                self.get('billingInfo').set('billingContact', contact);
+                            return false;
                             }
                         }
                     });
-
                     return contactResult;
                 });
             },
