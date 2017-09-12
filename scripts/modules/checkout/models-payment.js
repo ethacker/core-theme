@@ -524,7 +524,7 @@ define([
                     billingInfoPaymentWorkflow = this.get('paymentWorkflow'),
                     currentPayment = this.getOrder().apiModel.getCurrentPayment(),
                     currentPaymentType = currentPayment && currentPayment.billingInfo.paymentType,
-                    currentPaymentWorkflow = currentPayment && currentPayment.billingInfo.paymentWorkflow,
+                    currentPaymentWorkflow = currentPayment && currentPayment.paymentWorkflow,
                     currentBillingContact = currentPayment && currentPayment.billingInfo.billingContact,
                     currentCard = currentPayment && currentPayment.billingInfo.card,
                     currentPurchaseOrder = currentPayment && currentPayment.billingInfo.purchaseorder,
