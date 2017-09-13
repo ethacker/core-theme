@@ -113,7 +113,8 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
             return selectable;
         },
         selectedDestinationsCount : function(){
-            var destinationCount = this.parent.get("items").countBy(function(item){
+            var shippingItems = this.parent.get("items").filter({fulfillmentMethod: "Ship"});
+            var destinationCount = _.countBy(shippingItems, function(item){
                 return item.get('destinationId');
             });
             return _.size(destinationCount);
