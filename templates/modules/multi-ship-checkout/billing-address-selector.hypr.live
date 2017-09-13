@@ -1,3 +1,6 @@
+{% if model.requiresFulfillmentInfo and not model.usingSavedCard %}
+	<div class="mz-l-formfieldgroup mz-l-formfieldgroup-norows"><label><input type="checkbox" data-mz-value="isSameBillingShippingAddress" value="true" {% if model.isSameBillingShippingAddress %}checked="checked"{% endif %}> {{ labels.useShippingAddress }}</label></div>
+{% endif %}
 
 {% if model.isSameBillingShippingAddress %}
     <div class="mz-addresssummary mz-same-as-shipping-summary" id="mz-same-as-shipping-summary">
@@ -16,6 +19,3 @@
 	{% endif %}
 {% endif %}
 
-{% if model.requiresFulfillmentInfo and not model.usingSavedCard %}
-	<div class="mz-l-formfieldgroup mz-l-formfieldgroup-norows"><label><input type="checkbox" data-mz-value="isSameBillingShippingAddress" valuE="true" {% if model.isSameBillingShippingAddress %}checked="checked"{% endif %}> {{ labels.useShippingAddress }}</label></div>
-{% endif %}
