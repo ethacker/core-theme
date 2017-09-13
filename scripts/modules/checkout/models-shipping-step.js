@@ -294,8 +294,20 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
             var shippingDestination = self.getDestinations().singleShippingDestination();
             var addr = shippingDestination.get('destinationContact').get('address');
 
+            var scrubBillingContactId = function(){
+                if(shippingDestination.get('id')) {
+                    var isBilling = shippingDestination.get('id').toString().startsWith("billing_");
+                    if(isBilling) {
+                        shippingDestination.set('id', "");    
+                    }
+                }
+                return shippingDestination;
+            };
+
             var saveAddress = function(){
                 self.isLoading('true');
+                scrubBillingContactId();
+                
                 if(!shippingDestination.get('id')) {
                     self.getDestinations().apiSaveDestinationAsync(shippingDestination).then(function(data){
                         self.getCheckout().apiSetAllShippingDestinations({destinationId: data.data.id}).then(function(){

@@ -43,9 +43,20 @@ define(['modules/backbone-mozu','hyprlive', 'modules/jquery-mozu','underscore', 
             var self = this;
             var checkout = this.model.parent;
 
+             var scrubBillingContactId = function(){
+                if(self.model.get('id')) {
+                    var isBilling = self.model.get('id').toString().startsWith("billing_");
+                    if(isBilling) {
+                        self.model.set('id', "");    
+                    }
+                }
+                return self.model;
+            };
+             
 
             var saveBillingDestination = function(){
                 self.model.messages.reset();
+                scrubBillingContactId();
                 if(self.model.get('id')) {
                     checkout.get('destinations').get(self.model.get('id')).set('destinationContact',self.model.get('destinationContact'));
                 } else {
@@ -70,11 +81,9 @@ define(['modules/backbone-mozu','hyprlive', 'modules/jquery-mozu','underscore', 
 
             var addr = this.model.get('destinationContact').get('address');
 
-
-             
-
             var saveShippingDestination = function(){
               self.model.messages.reset();
+              scrubBillingContactId();
                 if(self.model.get('id')) {
                         self.model.parent.get('destinations').updateShippingDestinationAsync(self.model).ensure(function () {
                              self.model.trigger('closeDialog');
