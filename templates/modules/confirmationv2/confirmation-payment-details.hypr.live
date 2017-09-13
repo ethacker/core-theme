@@ -57,11 +57,11 @@
         <div>{{ model.billingInfo.check.checkNumber }}</div>
         -->
         <div class="mz-l-stack-item">
-            <small><strong>{{ labels.mailCheckTo }}</strong></small>
+            <small>{{ labels.mailCheckTo }}:</small>
             <div class="mz-addresssummary">
-                <span>{{ model.mailCheckTo.shippingOriginContact.firstName}} {{ model.mailCheckTo.shippingOriginContact.lastNameOrSurname }}</span>
-                <span>{{ model.mailCheckTo.shippingOriginContact.companyOrOrganization }}</span>
-                {% include "modules/common/address-summary" with model=model.mailCheckTo %}
+                <span>{{ mailCheckTo.shippingOriginContact.firstName}} {{ mailCheckTo.shippingOriginContact.lastNameOrSurname }}</span>
+                <span>{{ mailCheckTo.shippingOriginContact.companyOrOrganization }}</span>
+                {% include "modules/common/address-summary" with model=mailCheckTo %}
             </div>
         </div>
     {% endif %}
