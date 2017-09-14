@@ -8,8 +8,11 @@ function($, Api, CartModels, hyprlivecontext, _) {
     window.paypalCheckoutReady = function() {
 
       var siteContext = hyprlivecontext.locals.siteContext,
-          externalPayment = _.findWhere(siteContext.checkoutSettings.externalPaymentWorkflowSettings, {"name" : "PayPalExpress2"}),
-          merchantAccountId = _.findWhere(externalPayment.credentials, {"apiName" : "merchantAccountId"}),
+          externalPayment = _.findWhere(siteContext.checkoutSettings.externalPaymentWorkflowSettings, {"name" : "PayPalExpress2"});
+    
+       if (!externalPayment) return;
+
+       var merchantAccountId = _.findWhere(externalPayment.credentials, {"apiName" : "merchantAccountId"}),
           environment = _.findWhere(externalPayment.credentials, {"apiName" : "environment"}),
           id = CartModels.Cart.fromCurrent().id || window.order.id,
           isCart = window.location.href.indexOf("cart") > 0;
