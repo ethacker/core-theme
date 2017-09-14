@@ -113,7 +113,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
             return selectable;
         },
         selectedDestinationsCount : function(){
-            var shippingItems = this.parent.get("items").filter({fulfillmentMethod: "Ship"});
+            var shippingItems = this.parent.get("items").filter(function(item){ return item.get('fulfillmentMethod') == "Ship"; });
             var destinationCount = _.countBy(shippingItems, function(item){
                 return item.get('destinationId');
             });
@@ -307,7 +307,7 @@ function ($, _, Hypr, Backbone, api, HyprLiveContext, CheckoutStep, ShippingDest
             var saveAddress = function(){
                 self.isLoading('true');
                 scrubBillingContactId();
-                
+
                 if(!shippingDestination.get('id')) {
                     self.getDestinations().apiSaveDestinationAsync(shippingDestination).then(function(data){
                         self.getCheckout().apiSetAllShippingDestinations({destinationId: data.data.id}).then(function(){
