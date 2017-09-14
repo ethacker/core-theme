@@ -8,11 +8,13 @@ function($, Api, CartModels, hyprlivecontext, _) {
         externalPayment = _.findWhere(siteContext.checkoutSettings.externalPaymentWorkflowSettings, {"name" : "PayPalExpress2"});
 
     window.paypalCheckoutReady = function() {
-          var merchantAccountId = _.findWhere(externalPayment.credentials, {"apiName" : "merchantAccountId"}),
+       if (!externalPayment || !externalPayment.isEnabled) return;
+
+       var merchantAccountId = _.findWhere(externalPayment.credentials, {"apiName" : "merchantAccountId"}),
           environment = _.findWhere(externalPayment.credentials, {"apiName" : "environment"}),
           id = CartModels.Cart.fromCurrent().id || window.order.id,
           isCart = window.location.href.indexOf("cart") > 0;
-      if(externalPayment.isEnabled) {
+
         window.paypal.checkout.setup(merchantAccountId.value, {
             environment: environment.value,
             click: function(event) {
@@ -41,7 +43,6 @@ function($, Api, CartModels, hyprlivecontext, _) {
             },
             button: ['btn_xpressPaypal']
         });
-      }
     };
     var paypal = {
       scriptLoaded: false,
