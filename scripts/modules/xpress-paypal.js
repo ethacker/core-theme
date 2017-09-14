@@ -10,7 +10,7 @@ function($, Api, CartModels, hyprlivecontext, _) {
       var siteContext = hyprlivecontext.locals.siteContext,
           externalPayment = _.findWhere(siteContext.checkoutSettings.externalPaymentWorkflowSettings, {"name" : "PayPalExpress2"});
     
-       if (!externalPayment) return;
+       if (!externalPayment || !externalPayment.isEnabled) return;
 
        var merchantAccountId = _.findWhere(externalPayment.credentials, {"apiName" : "merchantAccountId"}),
           environment = _.findWhere(externalPayment.credentials, {"apiName" : "environment"}),
