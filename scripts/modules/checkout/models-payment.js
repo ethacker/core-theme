@@ -238,8 +238,7 @@ define([
                     this.loadCustomerDigitalCredits();
                 }
                 return this._cachedDigitalCredits && this._cachedDigitalCredits.length > 0 && this._cachedDigitalCredits;
-            },
-
+            }, 
             refreshBillingInfoAfterAddingStoreCredit: function (order, updatedOrder) {
                 var self = this;
                 //clearing existing order billing info because information may have been removed (payment info) #68583
@@ -906,12 +905,7 @@ define([
                     order.onCheckoutError(val['billingContact.email']);
                 }
 
-                var process = [function() {
-                    return order.apiUpdateCheckout({
-                        email: self.get('billingContact.email'),
-                        acceptsMarketing: order.get('acceptsMarketing')
-                    });
-                }];
+
 
                 //If Single Address Save to Destination
                 //Do I need this Line? Why Did I orginally Do this?
@@ -926,15 +920,14 @@ define([
                 }
 
                 if (!currentPayment) {
-                    process.push(self.applyPayment());
+                    return self.applyPayment();
                 } else if (this.hasPaymentChanged(currentPayment)) {
-                    process.push(order.apiVoidPayment(currentPayment.id).then(self.applyPayment));
+                    return order.apiVoidPayment(currentPayment.id).then(self.applyPayment);
                 } else if (card.get('cvv') && card.get('paymentServiceCardId')) {
-                    process.push(card.apiSave().then(self.markComplete, order.onCheckoutError));
+                    return card.apiSave().then(self.markComplete, order.onCheckoutError);
                 } else {
                    return this.markComplete();
                 }
-                return api.steps(process);
             },
             applyPayment: function () {
                 var self = this, order = this.getOrder();
@@ -974,9 +967,14 @@ define([
             },
 
             markComplete: function () {
+                var order = this.getOrder();
+                var self = this;
+                order.apiModel.updateCheckout({
+                    email: self.get('billingContact.email'),
+                    acceptsMarketing: order.get('acceptsMarketing')
+                });
                 this.stepStatus('complete');
                 this.isLoading(false);
-                var order = this.getOrder();
                 _.defer(function() {
                     order.isReady(true);
                 });

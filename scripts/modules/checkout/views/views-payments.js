@@ -56,7 +56,6 @@ define(["modules/jquery-mozu",
                 "change [data-mz-purchase-order-payment-term]": "updatePurchaseOrderPaymentTerm",
                 "change [data-mz-single-fulfillment-contact]": "handleBillingAddressSelectorChange"
             },
-
             initialize: function () {
                 // this.addPOCustomFieldAutoUpdate();
                 this.listenTo(this.model, 'change:digitalCreditCode', this.onEnterDigitalCreditCode, this);
@@ -76,8 +75,10 @@ define(["modules/jquery-mozu",
                 if (e.target !== $('[data-mz-saved-credit-card]')[0]) {
                     $("[name='savedPaymentMethods']").val('0');
                 }
+                var billingContactEmail = this.model.get('billingContact').get('email');
                 this.model.clear();
                 this.model.resetAddressDefaults();
+                this.model.get('billingContact').set('email', billingContactEmail);
                 if(HyprLiveContext.locals.siteContext.checkoutSettings.purchaseOrder.isEnabled) {
                     this.model.resetPOInfo();
                 }
