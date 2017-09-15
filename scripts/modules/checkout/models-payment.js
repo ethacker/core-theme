@@ -249,7 +249,9 @@ define([
                 if ((order.get('amountRemainingForPayment') >= 0 && !hasNonStoreCreditPayment) ||
                     (order.get('amountRemainingForPayment') < 0 && hasNonStoreCreditPayment)
                     ) {
+                    var billingContactEmail = this.model.get('billingContact').get('email');
                     order.get('billingInfo').clear();
+                    order.get('billingInfo').set('email', billingContactEmail);
                     order.set(updatedOrder, { silent: true });
                 }
                 self.getPaymentTypeFromCurrentPayment();
