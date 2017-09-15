@@ -424,7 +424,7 @@ define(["modules/api", 'underscore', "modules/backbone-mozu", "hyprlive", "modul
                                         return false;
                                     }
                                     if (groupedItems[typeKey][i].get('quantity') === 1) {
-                                        groupedItems[typeKey].splice(key, 1);
+                                        groupedItems[typeKey].splice(i, 1);
                                         return false;
                                     }
                                     groupedItems[typeKey][i].set('quantity', groupedItems[typeKey][i].get('quantity') - 1);
