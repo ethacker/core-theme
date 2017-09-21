@@ -37,7 +37,7 @@ define([
                 }
             },
             //More of a fail safe. This really should not be checked here at all. If a checkout has no payments at the time of checkout other things
-            //have gone wrong and there is no real way for a user to correct.  
+            //have gone wrong and there is no real way for a user to correct.
             'payments': {
                 fn: function(){
                     if(!this.apiModel.getActivePayments().length) return Hypr.getLabel('missingCheckoutPayments');
@@ -90,9 +90,10 @@ var CheckoutOrder = OrderModels.Order.extend({
     },
     selectableDestinations : function(){
         var selectable = [];
-       this.getCheckout().get('destinations').each(function(destination){
-            if(!destination.get('isGiftCardDestination') && !destination.get('isSingleShipDestination')){
-                selectable.push(destination.toJSON());
+         var shippingDestinations = this.getCheckout().selectableDestinations("Shipping");
+         shippingDestinations.forEach(function(destination){
+            if(destination.isSingleShipDestination){
+                selectable.push(destination);
             }
         });
         return selectable;
@@ -126,7 +127,7 @@ var CheckoutOrder = OrderModels.Order.extend({
     updateOrderItemDestination: function(destinationId, customerContactId){
         var self = this;
         self.isLoading(true);
-        
+
         if(!destinationId) {
             var destination = self.getCheckout().get('destinations').findWhere({customerContactId: customerContactId});
             if(destination){
@@ -247,7 +248,7 @@ var CheckoutPage = Backbone.MozuModel.extend({
 
                 if(contacts.length){
                     contacts.each(function(contact, key){
-                        
+
                         if(!self.get('destinations').hasDestination(contact)){
                             if(contact.contactTypeHelpers().isShipping() && contact.contactTypeHelpers().isBilling()){
                                 self.get('destinations').newDestination(contact, true, "ShippingAndBilling");
@@ -264,7 +265,7 @@ var CheckoutPage = Backbone.MozuModel.extend({
             },
             initialize: function (data) {
 
-                var self = this, 
+                var self = this,
                     user = require.mozuData('user');
                     //self.get('shippingStep').initSet();
 
@@ -361,9 +362,9 @@ var CheckoutPage = Backbone.MozuModel.extend({
                        if(customerContactType && destination.get('customerContactType')) {
                             if(destination.get('customerContactType') === customerContactType || destination.get('customerContactType') === "ShippingAndBilling"){
                                 selectable.push(destination.toJSON());
-                            }    
+                            }
                         } else {
-                            selectable.push(destination.toJSON()); 
+                            selectable.push(destination.toJSON());
                         }
                     }
                 });
@@ -644,14 +645,14 @@ var CheckoutPage = Backbone.MozuModel.extend({
                 });
 
                 // TO-DO :REMOVE
-                // This no good and down right bad... 
+                // This no good and down right bad...
                 // var isSavingNewCustomer = this.isSavingNewCustomer();
                 // if(isSavingNewCustomer){
                 //     if(updatedContacts.length) {
                 //         updatedContacts.push(updatedContacts[0].types[{
                 //         "name": "Shipping",
                 //         "isPrimary": false
-                //     }]) 
+                //     }])
                 //     }
                 // }
 
@@ -684,7 +685,7 @@ var CheckoutPage = Backbone.MozuModel.extend({
 
                 return customer.apiModel.updateCustomerContacts({id: customer.id, postdata:updatedContacts}).then(function(contactResult) {
                     _.each(contactResult.data.items, function(contact) {
-                        if(contact.types){ 
+                        if(contact.types){
                             var found = _.findWhere(contact.types, {name: "Billing", isPrimary: true});
                             if(found) {
                                 self.get('billingInfo').set('billingContact', contact);
