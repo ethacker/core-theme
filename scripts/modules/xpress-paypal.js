@@ -47,7 +47,7 @@ function($, Api, CartModels, hyprlivecontext, _) {
     var paypal = {
       scriptLoaded: false,
      loadScript: function() {
-      if(externalPayment.isEnabled){
+      if(externalPayment && externalPayment.isEnabled){
         var self = this;
          if (this.scriptLoaded) return;
           this.scriptLoaded = true;
