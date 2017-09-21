@@ -643,6 +643,18 @@ var CheckoutPage = Backbone.MozuModel.extend({
                     }
                 });
 
+                // TO-DO :REMOVE
+                // This no good and down right bad... 
+                // var isSavingNewCustomer = this.isSavingNewCustomer();
+                // if(isSavingNewCustomer){
+                //     if(updatedContacts.length) {
+                //         updatedContacts.push(updatedContacts[0].types[{
+                //         "name": "Shipping",
+                //         "isPrimary": false
+                //     }]) 
+                //     }
+                // }
+
                 var billingContact = this.get('billingInfo').get('billingContact').toJSON();
                 delete billingContact.email;
                 billingContact.types =  [{
@@ -668,6 +680,7 @@ var CheckoutPage = Backbone.MozuModel.extend({
                 else {
                     updatedContacts.push(billingContact);
                 }
+
 
                 return customer.apiModel.updateCustomerContacts({id: customer.id, postdata:updatedContacts}).then(function(contactResult) {
                     _.each(contactResult.data.items, function(contact) {

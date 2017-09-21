@@ -247,9 +247,9 @@ define([
                 var activePayments = this.activePayments();
                 var hasNonStoreCreditPayment = (_.filter(activePayments, function (item) { return item.paymentType !== 'StoreCredit'; })).length > 0;
                 if ((order.get('amountRemainingForPayment') >= 0 && !hasNonStoreCreditPayment) ||
-                    (order.get('amountRemainingForPayment') < 0 && hasNonStoreCreditPayment)
-                    ) {
-                    var billingContactEmail = this.model.get('billingContact').get('email');
+                    (order.get('amountRemainingForPayment') < 0 && hasNonStoreCreditPayment)) 
+                {
+                    var billingContactEmail = this.get('billingContact').get('email');
                     order.get('billingInfo').clear();
                     order.get('billingInfo').set('email', billingContactEmail);
                     order.set(updatedOrder, { silent: true });
@@ -819,6 +819,14 @@ define([
             },
             hasPaymentChanged: function(payment) {
 
+                function getPurchaseOrder(obj) {
+                    if(obj.purchaseOrder){
+                        if(obj.purchaseOrder.code){
+                            return obj.purchaseOrder;
+                        }
+                    }
+                    return {};
+                }
                 // fix this for purchase orders, currently it constantly voids, then re-applys the payment even if nothing changes.
                 function normalizeBillingInfos(obj) {
                     return {
@@ -849,7 +857,7 @@ define([
                             id: obj.card.paymentServiceCardId || obj.card.id,
                             isCardInfoSaved: obj.card.isCardInfoSaved || false
                         }) : {},
-                        purchaseOrder: obj.purchaseOrder || {},
+                        purchaseOrder: getPurchaseOrder(obj),
                         check: obj.check || {}
                     };
                 }

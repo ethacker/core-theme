@@ -223,8 +223,9 @@ define(["modules/jquery-mozu",
                 } else {
                     targetCreditAmtEl.prop('disabled', true);
                     me.model.applyDigitalCredit(creditCode, 0, false);
-                    me.render();
+                    
                 }
+                
             },
             addRemainderToCustomer: function (e) {
                 var creditCode = $(e.currentTarget).attr('data-mz-credit-code-to-tie-to-customer'),
